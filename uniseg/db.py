@@ -28,7 +28,7 @@ def find_dbpath():
     3. and the current directory.
     """
     dbname = 'ucd.sqlite3'
-    
+
     dbpath = os.path.join(os.path.dirname(__file__), dbname)
     if (os.path.exists(dbpath)):
         return dbpath
@@ -46,13 +46,13 @@ def find_dbpath():
 
 _dbpath = find_dbpath()
 if _dbpath:
-    _conn = sqlite3.connect(_dbpath)
+    _conn = sqlite3.connect(_dbpath, check_same_thread=False)
 else:
     _conn = None
 
 
 def grapheme_cluster_break(u):
-    
+
     cur = _conn.cursor()
     cur.execute('select value from GraphemeClusterBreak where cp = ?',
                 (ord(u),))
@@ -62,14 +62,14 @@ def grapheme_cluster_break(u):
 
 
 def iter_grapheme_cluster_break_tests():
-    
+
     cur = _conn.cursor()
     cur.execute('select name, pattern, comment from GraphemeClusterBreakTest')
     return iter(cur)
 
 
 def word_break(u):
-    
+
     cur = _conn.cursor()
     cur.execute('select value from WordBreak where cp = ?',
                 (ord(u),))
@@ -79,14 +79,14 @@ def word_break(u):
 
 
 def iter_word_break_tests():
-    
+
     cur = _conn.cursor()
     cur.execute('select name, pattern, comment from WordBreakTest')
     return iter(cur)
 
 
 def sentence_break(u):
-    
+
     cur = _conn.cursor()
     cur.execute('select value from SentenceBreak where cp = ?',
                 (ord(u),))
@@ -96,14 +96,14 @@ def sentence_break(u):
 
 
 def iter_sentence_break_tests():
-    
+
     cur = _conn.cursor()
     cur.execute('select name, pattern, comment from SentenceBreakTest')
     return iter(cur)
 
 
 def line_break(u):
-    
+
     cur = _conn.cursor()
     cur.execute('select value from LineBreak where cp = ?',
                 (ord(u),))
@@ -113,7 +113,7 @@ def line_break(u):
 
 
 def iter_line_break_tests():
-    
+
     cur = _conn.cursor()
     cur.execute('select name, pattern, comment from LineBreakTest')
     return iter(cur)
