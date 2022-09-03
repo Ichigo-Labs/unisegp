@@ -19,9 +19,6 @@ setup(
     package_data = {
         'uniseg': ['ucd.sqlite3', 'docs/*.html', 'samples/*.py']
     },
-    entry_points = {
-        'console_scripts': ['uniseg-dbpath = uniseg.db:print_dbpath'],
-    },
     classifiers = [
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
@@ -32,6 +29,11 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Topic :: Text Processing',
     ],
     zip_safe = False,

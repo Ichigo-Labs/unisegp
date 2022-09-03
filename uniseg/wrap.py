@@ -7,7 +7,7 @@ from __future__ import (absolute_import,
 import re
 from unicodedata import east_asian_width
 
-from .codepoint         import ord, code_point, code_points
+from .codepoint         import code_point
 from .graphemecluster   import grapheme_clusters, grapheme_cluster_boundaries
 from .linebreak         import line_break_boundaries
 

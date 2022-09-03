@@ -7,7 +7,6 @@ MV = mv
 RM = rm -v
 CURL = curl --compressed
 PYTHON = python
-SQLITE3 = sqlite3
 PIP = pip
 SPHINX_BUILD = sphinx-build
 
@@ -16,7 +15,8 @@ URL_DOWNLOAD = http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 DIR_DOWNLOAD = data/$(UNICODE_VERSION)
 DIR_SRC = uniseg
 DIR_DIST = dist
-UCD_DB = $(DIR_SRC)/ucd.sqlite3
+DB_LOOKUPS = $(DIR_SRC)/db_lookups.py
+DB_LOOKUPS_TEST = $(DIR_SRC)/db_lookups_test.py
 DIR_DOCS = docs
 DIR_DOCS_BUILD = docs/_build
 
@@ -30,27 +30,20 @@ CSV_FILES =\
     csv/LineBreak.csv\
     csv/LineBreakTest.csv
 
-test: $(UCD_DB)
+test: db_lookups
 	$(PYTHON) -m $(DIR_SRC).test
 
-$(UCD_DB): schema.sql $(CSV_FILES)
-	-$(SQLITE3) $@ < schema.sql
-	$(SQLITE3) -csv $@ ".import csv/GraphemeClusterBreak.csv GraphemeClusterBreak"
-	$(SQLITE3) -csv $@ ".import csv/GraphemeClusterBreakTest.csv GraphemeClusterBreakTest"
-	$(SQLITE3) -csv $@ ".import csv/WordBreak.csv WordBreak"
-	$(SQLITE3) -csv $@ ".import csv/WordBreakTest.csv WordBreakTest"
-	$(SQLITE3) -csv $@ ".import csv/SentenceBreak.csv SentenceBreak"
-	$(SQLITE3) -csv $@ ".import csv/SentenceBreakTest.csv SentenceBreakTest"
-	$(SQLITE3) -csv $@ ".import csv/LineBreak.csv LineBreak"
-	$(SQLITE3) -csv $@ ".import csv/LineBreakTest.csv LineBreakTest"
-	$(SQLITE3) $@ "vacuum"
+db_lookups: $(CSV_FILES)
+	$(PYTHON) tools/build_db_lookups.py
+	$(PYTHON) tools/build_db_lookups_test.py
 
 clean:
 	-$(RM) $(DIR_SRC)/*.pyc
 	-$(RM) -r csv
 
 cleanall: clean cleandocs
-	-$(RM) $(UCD_DB)
+	-$(RM) $(DB_LOOKUPS)
+	-$(RM) $(DB_LOOKUPS_TEST)
 	-$(RM) -r $(DIR_DOWNLOAD)
 	-$(RM) MANIFEST
 	-$(RM) -r dist

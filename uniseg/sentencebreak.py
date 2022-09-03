@@ -11,7 +11,7 @@ from __future__ import (absolute_import,
                         unicode_literals)
 
 from .breaking import boundaries, break_units
-from .codepoint import ord, code_point, code_points
+from .codepoint import code_point, code_points
 from .db import sentence_break as _sentence_break
 
 
