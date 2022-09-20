@@ -78,6 +78,9 @@ or download the archive and::
 Changes
 =======
 
+0.7.2 (2022-09-20)
+  - Improve performance of Unicode lookups. PR by Max Bachmann.
+    https://bitbucket.org/emptypage/uniseg-py/pull-requests/1
 0.7.1 (2015-05-02)
   - CHANGE: wrap.Wrapper.wrap(): returns the count of lines now.
   - Separate LICENSE from README.txt for the packaging-related reason in some
