@@ -1,4 +1,4 @@
-.PHONY: clean test upload docs testpypi pypi
+.PHONY: clean test upload docs db_lookups testpypi pypi
 
 PROJ_NAME = uniseg
 
@@ -50,16 +50,16 @@ cleanall: clean cleandocs
 	-$(RM) -r data
 	-$(RM) -r build
 
-sdist:
+sdist: db_lookups
 	$(PYTHON) setup.py sdist -d $(DIR_DIST) --formats=zip
 
-wheel:
+wheel: db_lookups
 	$(PYTHON) setup.py bdist_wheel -d $(DIR_DIST) --universal
 
-testpypi:
+testpypi: sdist wheel
 	twine upload -r testpypi --skip-existing dist/*
 
-pypi:
+pypi: sdist wheel
 	twine upload dist/*
 
 install:
