@@ -6,6 +6,12 @@ Introduction
 You can see the full documentation including the package reference on
 http://uniseg-py.readthedocs.io.
 
+**Note (2022-09-26):**  This version (0.7.2) will be the last version which says
+that supports old Python interpreters. Actually, 2.x interpreters are no longer
+tested and versions less than 3.8 are not considered as taget platform
+versions now. Compatible codes for 2.x will be removed in further releases.
+They remain just because of historical reasons and my laziness.
+
 
 Features
 ========
