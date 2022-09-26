@@ -17,7 +17,7 @@ setup(
     license = 'MIT',
     packages = ['uniseg'],
     package_data = {
-        'uniseg': ['ucd.sqlite3', 'docs/*.html', 'samples/*.py']
+        'uniseg': ['docs/*.html', 'samples/*.py']
     },
     classifiers = [
         'Development Status :: 4 - Beta',
