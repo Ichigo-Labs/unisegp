@@ -13,7 +13,7 @@ setup(
     author_email = 'mshibata@emptypage.jp',
     url = 'https://bitbucket.org/emptypage/uniseg-python',
     description = 'Determine Unicode text segmentations',
-    long_description = open('README').read(),
+    long_description = open('README.rst').read(),
     license = 'MIT',
     packages = ['uniseg'],
     package_data = {
