@@ -4,7 +4,7 @@ Introduction
  A Python package to determine Unicode text segmentations.
 
 You can see the full documentation including the package reference on
-http://uniseg-python.readthedocs.io.
+http://uniseg-py.readthedocs.io.
 
 
 Features
