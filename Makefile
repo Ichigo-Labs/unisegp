@@ -1,4 +1,4 @@
-.PHONY: clean test upload docs
+.PHONY: clean test upload docs testpypi pypi
 
 PROJ_NAME = uniseg
 
@@ -56,12 +56,11 @@ sdist:
 wheel:
 	$(PYTHON) setup.py bdist_wheel -d $(DIR_DIST) --universal
 
-release:
-	$(PYTHON) setup.py \
-	register \
-	sdist -d $(DIR_DIST) --formats=zip \
-	bdist_wheel -d $(DIR_DIST) --universal \
-	upload
+testpypi:
+	twine upload -r testpypi --skip-existing dist/*
+
+pypi:
+	twine upload dist/*
 
 install:
 	$(PIP) install -e .
@@ -104,7 +103,7 @@ csv/LineBreakTest.csv: $(DIR_DOWNLOAD)/auxiliary/LineBreakTest.txt
 	-$(MKDIR) -p $(dir $@)
 	$(PYTHON) tools/test2csv.py -p LB -o $@ $<
 
-# Use 'mkdir -p' instead of --create-dirs option of curl because it 
+# Use 'mkdir -p' instead of --create-dirs option of curl because it
 # doesn't work well with path names with '/' on Windows.
 $(DIR_DOWNLOAD)/%:
 	-$(MKDIR) -p $(dir $@)
