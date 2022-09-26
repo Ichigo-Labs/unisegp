@@ -4,7 +4,7 @@ Introduction
  A Python package to determine Unicode text segmentations.
 
 You can see the full documentation including the package reference on
-http://uniseg-py.readthedocs.io.
+https://uniseg-py.readthedocs.io.
 
 **Note (2022-09-26):**  This version (0.7.2) will be the last version which says
 that supports old Python interpreters. Actually, 2.x interpreters are no longer
@@ -27,11 +27,11 @@ This package provides:
 Supporting segmentations are:
 
 *code point*
-    `Code point <http://www.unicode.org/glossary/#code_point>`_ is *"any value
+    `Code point <https://www.unicode.org/glossary/#code_point>`_ is *"any value
     in the Unicode codespace."* It is the basic unit for processing Unicode
     strings.
 *grapheme cluster*
-    `Grapheme cluster <http://www.unicode.org/glossary/#grapheme_cluster>`_
+    `Grapheme cluster <https://www.unicode.org/glossary/#grapheme_cluster>`_
     approximately represents *"user-perceived character."* They may be made
     up of single or multiple Unicode code points. e.g. "G" + *acute-accent* is
     a *user-perceived character*.
@@ -113,9 +113,9 @@ References
 ==========
 
 *UAX #14: Unicode Line Breaking Algorithm* (6.2.0)
-    http://www.unicode.org/reports/tr14/tr14-30.html
+    https://www.unicode.org/reports/tr14/tr14-30.html
 *UAX #29 Unicode Text Segmentation* (6.2.0)
-    http://www.unicode.org/reports/tr29/tr29-21.html
+    https://www.unicode.org/reports/tr29/tr29-21.html
 
 
 Related / Similar Projects
