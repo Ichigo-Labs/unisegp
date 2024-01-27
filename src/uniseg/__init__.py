@@ -1,8 +1,12 @@
-from . import version
+"""Determine Unicode text segmentations. """
 
+from importlib.metadata import version, PackageNotFoundError
 
-# The version of the package
-__version__ = version.__doc__
+try:
+    __version__ = version(__name__)
+except PackageNotFoundError:
+    # package is not installed
+    pass
 
 # The version of the Unicode database used in the package
 unidata_version = '6.2.0'
