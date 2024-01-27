@@ -1,4 +1,4 @@
-.PHONY: clean build test upload docs db_lookups testpypi pypi
+.PHONY: db_lookups download csv clean build test upload docs testpypi pypi
 
 PROJ_NAME = uniseg
 
@@ -10,7 +10,7 @@ PYTHON = python
 PIP = pip
 SPHINX_BUILD = sphinx-build
 
-UNICODE_VERSION = 6.2.0
+UNICODE_VERSION = 15.1.0
 URL_DOWNLOAD = http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 DIR_DOWNLOAD = data/$(UNICODE_VERSION)
 DIR_DIST = dist
@@ -30,6 +30,25 @@ CSV_FILES =\
     csv/SentenceBreakTest.csv\
     csv/LineBreak.csv\
     csv/LineBreakTest.csv
+DATA_FILES = \
+    $(DIR_DOWNLOAD)/auxiliary/GraphemeBreakProperty.txt \
+	$(DIR_DOWNLOAD)/auxiliary/GraphemeBreakTest.txt \
+	$(DIR_DOWNLOAD)/auxiliary/WordBreakProperty.txt \
+	$(DIR_DOWNLOAD)/auxiliary/WordBreakTest.txt \
+	$(DIR_DOWNLOAD)/auxiliary/SentenceBreakProperty.txt \
+	$(DIR_DOWNLOAD)/auxiliary/SentenceBreakTest.txt \
+	$(DIR_DOWNLOAD)/LineBreak.txt \
+	$(DIR_DOWNLOAD)/auxiliary/LineBreakTest.txt
+
+
+
+db_lookups: $(CSV_FILES)
+	$(PYTHON) tools/build_db_lookups.py $(DB_LOOKUPS)
+	$(PYTHON) tools/build_db_lookups_test.py $(DB_LOOKUPS_TEST)
+
+csv: $(CSV_FILES)
+
+download: $(DATA_FILES)
 
 build: db_lookups
 	$(PYTHON) -m build .
@@ -37,9 +56,6 @@ build: db_lookups
 test: db_lookups
 	$(PYTHON) -m $(DIR_SRC).test
 
-db_lookups: $(CSV_FILES)
-	$(PYTHON) tools/build_db_lookups.py $(DB_LOOKUPS)
-	$(PYTHON) tools/build_db_lookups_test.py $(DB_LOOKUPS_TEST)
 
 clean:
 	-$(RM) $(DIR_SRC)/*.pyc
