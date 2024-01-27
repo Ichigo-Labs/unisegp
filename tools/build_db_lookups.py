@@ -100,5 +100,15 @@ index1={repr(index1_bytes)}
 index2={repr(index2_bytes)}
 """
 
-with open(path + '/../uniseg/db_lookups.py', 'w') as f:
-    f.write(form)
+def main() -> None:
+    from argparse import ArgumentParser, FileType
+
+    parser = ArgumentParser()
+    parser.add_argument('infile', type=FileType('w', encoding='utf-8'))
+
+    args = parser.parse_args()
+    args.infile.write(form)
+
+
+if __name__ == '__main__':
+    main()

@@ -5,7 +5,12 @@ import unittest
 
 from uniseg import wordbreak
 
-from .test import iter_word_break_tests, implement_break_tests
+from db_lookups_test import word_break_test
+from uniseg_test import implement_break_tests
+
+
+def iter_word_break_tests():
+    return word_break_test
 
 
 @implement_break_tests(wordbreak.word_boundaries,

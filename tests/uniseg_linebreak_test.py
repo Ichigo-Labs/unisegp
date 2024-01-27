@@ -3,7 +3,8 @@ import unittest
 
 from uniseg import linebreak
 
-from .test import iter_line_break_tests, implement_break_tests
+from db_lookups_test import line_break_test
+from uniseg_test import implement_break_tests
 
 
 skips = [
@@ -45,6 +46,10 @@ skips = [
     (u'}\u0308$', [2, 3]),
     (u'}\u0308%', [2, 3]),
 ]
+
+
+def iter_line_break_tests():
+    return line_break_test
 
 
 @implement_break_tests(linebreak.line_break_boundaries,

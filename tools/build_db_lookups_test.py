@@ -18,5 +18,15 @@ sentence_break_test={get_break_tests(path + '/../csv/SentenceBreakTest.csv')}
 grapheme_cluster_break_test={get_break_tests(path + '/../csv/GraphemeClusterBreakTest.csv')}
 """
 
-with open(path + '/../uniseg/db_lookups_test.py', 'w') as f:
-    f.write(form)
+def main() -> None:
+    from argparse import ArgumentParser, FileType
+
+    parser = ArgumentParser()
+    parser.add_argument('infile', type=FileType('w', encoding='utf-8'))
+
+    args = parser.parse_args()
+    args.infile.write(form)
+
+
+if __name__ == '__main__':
+    main()

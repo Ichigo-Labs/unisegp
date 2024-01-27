@@ -13,10 +13,11 @@ SPHINX_BUILD = sphinx-build
 UNICODE_VERSION = 6.2.0
 URL_DOWNLOAD = http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 DIR_DOWNLOAD = data/$(UNICODE_VERSION)
-DIR_SRC = uniseg
 DIR_DIST = dist
+DIR_SRC = src/uniseg
+DIR_TESTS = tests
 DB_LOOKUPS = $(DIR_SRC)/db_lookups.py
-DB_LOOKUPS_TEST = $(DIR_SRC)/db_lookups_test.py
+DB_LOOKUPS_TEST = $(DIR_TESTS)/db_lookups_test.py
 DIR_DOCS = docs
 DIR_DOCS_BUILD = docs/_build
 
@@ -37,8 +38,8 @@ test: db_lookups
 	$(PYTHON) -m $(DIR_SRC).test
 
 db_lookups: $(CSV_FILES)
-	$(PYTHON) tools/build_db_lookups.py
-	$(PYTHON) tools/build_db_lookups_test.py
+	$(PYTHON) tools/build_db_lookups.py $(DB_LOOKUPS)
+	$(PYTHON) tools/build_db_lookups_test.py $(DB_LOOKUPS_TEST)
 
 clean:
 	-$(RM) $(DIR_SRC)/*.pyc

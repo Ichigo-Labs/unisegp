@@ -5,7 +5,12 @@ import unittest
 
 from uniseg import graphemecluster
 
-from .test import iter_grapheme_cluster_break_tests, implement_break_tests
+from db_lookups_test import grapheme_cluster_break_test
+from uniseg_test import implement_break_tests
+
+
+def iter_grapheme_cluster_break_tests():
+    return grapheme_cluster_break_test
 
 
 @implement_break_tests(graphemecluster.grapheme_cluster_boundaries,

@@ -12,18 +12,6 @@ from uniseg.codepoint import unichr
 preferred_encoding = locale.getpreferredencoding()
 
 
-
-def iter_sentence_break_tests():
-    import db_lookups_test
-    return db_lookups_test.sentence_break_test
-
-
-def iter_line_break_tests():
-    import db_lookups_test
-    return db_lookups_test.line_break_test
-
-
-
 def parse_breaking_test_pattern(pattern):
 
     BREAK = '\u00f7'

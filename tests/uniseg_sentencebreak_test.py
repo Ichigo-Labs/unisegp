@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
-
 import doctest
 import unittest
 
 from uniseg import sentencebreak
 
-from .test import iter_sentence_break_tests, implement_break_tests
+from db_lookups_test import sentence_break_test
+from uniseg_test import implement_break_tests
+
+
+def iter_sentence_break_tests():
+    return sentence_break_test
 
 
 @implement_break_tests(sentencebreak.sentence_boundaries,
