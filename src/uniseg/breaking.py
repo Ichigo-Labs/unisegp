@@ -1,15 +1,17 @@
 """Breakable table and string tokenization. """
 
-from typing import Iterator, Literal, Sequence
+from typing import Callable, Iterator, Literal
 
 
 __all__ = [
-    'boundaries',
-    'break_units',
+    'Breakables', 'TailorFunc',
+    'boundaries', 'break_units',
 ]
 
 
+# type aliases for annotation
 Breakables = Iterator[Literal[0, 1]]
+TailorFunc = Callable[[str, Breakables], Breakables]
 
 
 def boundaries(breakables: Breakables, /) -> Iterator[int]:

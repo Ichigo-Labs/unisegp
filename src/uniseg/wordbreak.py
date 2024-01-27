@@ -1,12 +1,12 @@
-# encoding: utf-8
-"""Unicode word breaking
+"""Unicode word breaking.
 
-UAX #29: Unicode Text Segmentation (Unicode 6.2.0)
-http://www.unicode.org/reports/tr29/tr29-21.html
+UAX #29: Unicode Text Segmentation (Unicode 15.1.0)
+https://www.unicode.org/reports/tr29/tr29-43.html
 """
 
+from typing import Iterator, Optional, Tuple
 
-from uniseg.breaking import boundaries, break_units
+from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
 from uniseg.codepoint import code_point, code_points
 from uniseg.db import word_break as _word_break
 
@@ -100,7 +100,7 @@ break_table = [
 ]
 
 
-def word_break(c, index=0):
+def word_break(c: str, index: int = 0) -> str:
 
     r"""Return the Word_Break property of `c`
 
@@ -124,7 +124,7 @@ def word_break(c, index=0):
     return _word_break(code_point(c, index))
 
 
-def _preprocess_boundaries(s):
+def _preprocess_boundaries(s: str) -> Iterator[Tuple[int, str]]:
 
     r"""(internal) Preprocess WB4; X [Extend Format]* -> X
 
@@ -159,18 +159,18 @@ def _preprocess_boundaries(s):
         i += len(c)
 
 
-def word_breakables(s):
+def word_breakables(s: str) -> Breakables:
 
     r"""Iterate word breaking opportunities for every position of `s`
 
     1 for "break" and 0 for "do not break".  The length of iteration
     will be the same as ``len(s)``.
 
-    >>> list(word_breakables(u'ABC'))
+    >>> list(word_breakables('ABC'))
     [1, 0, 0]
-    >>> list(word_breakables(u'Hello, world.'))
+    >>> list(word_breakables('Hello, world.'))
     [1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1]
-    >>> list(word_breakables(u'\x01\u0308\x01'))
+    >>> list(word_breakables('\x01\u0308\x01'))
     [1, 0, 1]
     """
 
@@ -230,13 +230,13 @@ def word_breakables(s):
         else:
             do_break = True
         for j in range(next_pos-pos):
-            yield int(j==0 and do_break)
+            yield 1 if (j==0 and do_break) else 0
         prev_pos = pos
         prev_prev_wb = prev_wb
         prev_wb = wb
 
 
-def word_boundaries(s, tailor=None):
+def word_boundaries(s: str, tailor: Optional[TailorFunc] = None) -> Iterator[int]:
 
     """Iterate indices of the word boundaries of `s`
 
@@ -250,7 +250,7 @@ def word_boundaries(s, tailor=None):
     return boundaries(breakables)
 
 
-def words(s, tailor=None):
+def words(s: str, tailor: Optional[TailorFunc] = None) -> Iterator[str]:
 
     """Iterate *user-perceived* words of `s`
 
@@ -260,7 +260,7 @@ def words(s, tailor=None):
     >>> s = 'The quick (“brown”) fox can’t jump 32.3 feet, right?'
     >>> print('|'.join(words(s)))
     The| |quick| |(|“|brown|”|)| |fox| |can’t| |jump| |32.3| |feet|,| |right|?
-    >>> list(words(u''))
+    >>> list(words(''))
     []
     """
 

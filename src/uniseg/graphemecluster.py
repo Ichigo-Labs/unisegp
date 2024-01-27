@@ -6,7 +6,7 @@ https://www.unicode.org/reports/tr29/tr29-43.html
 
 from typing import Callable, Iterator, Optional
 
-from uniseg.breaking import boundaries, break_units, Breakables
+from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
 from uniseg.codepoint import code_point, code_points
 from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
 
@@ -16,9 +16,6 @@ __all__ = [
     'grapheme_cluster_boundaries',
     'grapheme_clusters',
 ]
-
-# type alias for annotation
-TailorFunc = Callable[[str, Breakables], Breakables]
 
 
 Other = 0
@@ -84,7 +81,7 @@ def grapheme_cluster_break(c: str, index: int = 0, /) -> str:
     string and return Grapheme_Cluster_Break property of the code
     point at c[index].
 
-    >>> print(grapheme_cluster_break(u'a\x0d', 1))
+    >>> print(grapheme_cluster_break('a\x0d', 1))
     CR
     """
 
@@ -99,11 +96,11 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     1 for "break" and 0 for "do not break".  The length of iteration
     will be the same as ``len(s)``.
 
-    >>> list(grapheme_cluster_breakables(u'ABC'))
+    >>> list(grapheme_cluster_breakables('ABC'))
     [1, 1, 1]
-    >>> list(grapheme_cluster_breakables(u'\x67\u0308'))
+    >>> list(grapheme_cluster_breakables('\x67\u0308'))
     [1, 0]
-    >>> list(grapheme_cluster_breakables(u''))
+    >>> list(grapheme_cluster_breakables(''))
     []
     """
 

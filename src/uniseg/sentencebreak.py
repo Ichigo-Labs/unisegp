@@ -1,10 +1,12 @@
-"""sentence boundaries
+"""sentence boundaries.
 
-UAX #29: Unicode Text Segmentation
-http://www.unicode.org/reports/tr29/tr29-15.html
+UAX #29: Unicode Text Segmentation (Unicode 15.1.0)
+https://www.unicode.org/reports/tr29/tr29-43.html
 """
 
-from uniseg.breaking import boundaries, break_units
+from typing import Iterator, Optional, Tuple, Sequence, List
+
+from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
 from uniseg.codepoint import code_point, code_points
 from uniseg.db import sentence_break as _sentence_break
 
@@ -33,31 +35,31 @@ STerm = 'STerm'
 Close = 'Close'
 
 
-def sentence_break(c, index=0):
+def sentence_break(c: str, index: int = 0) -> str:
 
     r"""Return Sentence_Break property value of `c`
 
     `c` must be a single Unicode code point string.
 
-    >>> print(sentence_break(u'\x0d'))
+    >>> print(sentence_break('\x0d'))
     CR
-    >>> print(sentence_break(u' '))
+    >>> print(sentence_break(' '))
     Sp
-    >>> print(sentence_break(u'a'))
+    >>> print(sentence_break('a'))
     Lower
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Sentence_Break property of the code point at
     c[index].
 
-    >>> print(sentence_break(u'a\x0d', 1))
+    >>> print(sentence_break('a\x0d', 1))
     CR
     """
 
     return _sentence_break(code_point(c, index))
 
 
-def _preprocess_boundaries(s):
+def _preprocess_boundaries(s: str) -> Iterator[Tuple[int, str]]:
 
     r"""(internal)
 
@@ -90,7 +92,9 @@ def _preprocess_boundaries(s):
         i += len(c)
 
 
-def _next_break(primitive_boundaries, pos, expects):
+def _next_break(primitive_boundaries: Sequence[Tuple[int, str]],
+                pos: int,
+                expects: Sequence[str]) -> Optional[str]:
 
     """(internal)
     """
@@ -102,7 +106,7 @@ def _next_break(primitive_boundaries, pos, expects):
     return None
 
 
-def sentence_breakables(s):
+def sentence_breakables(s: str) -> Breakables:
 
     r"""Iterate sentence breaking opportunities for every position of
     `s`
@@ -204,7 +208,7 @@ def sentence_breakables(s):
         else:
             do_break = False
         for j in range(next_pos-pos):
-            yield int(j==0 and do_break)
+            yield 1 if j==0 and do_break else 0
         prev_prev_prev_prev_sb = prev_prev_prev_sb
         prev_prev_prev_sb = prev_prev_sb
         prev_prev_sb = prev_sb
@@ -212,18 +216,18 @@ def sentence_breakables(s):
         pos = next_pos
 
 
-def sentence_boundaries(s, tailor=None):
+def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None) -> Iterator[int]:
 
     """Iterate indices of the sentence boundaries of `s`
 
     This function yields from 0 to the end of the string (== len(s)).
 
-    >>> list(sentence_boundaries(u'ABC'))
+    >>> list(sentence_boundaries('ABC'))
     [0, 3]
     >>> s = 'He said, \u201cAre you going?\u201d John shook his head.'
     >>> list(sentence_boundaries(s))
     [0, 26, 46]
-    >>> list(sentence_boundaries(u''))
+    >>> list(sentence_boundaries(''))
     []
     """
 
@@ -233,7 +237,7 @@ def sentence_boundaries(s, tailor=None):
     return boundaries(breakables)
 
 
-def sentences(s, tailor=None):
+def sentences(s: str, tailor: Optional[TailorFunc] = None) -> List[str]:
 
     """Iterate every sentence of `s`
 
