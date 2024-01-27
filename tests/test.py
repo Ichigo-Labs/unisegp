@@ -1,12 +1,6 @@
 """Test submodules and provide utility functions for testing
 """
 
-
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
-
 import locale
 import sys
 import unittest

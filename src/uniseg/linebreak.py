@@ -5,10 +5,6 @@ UAX #14: Unicode Line Breaking Algorithm
 """
 
 
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
 from unicodedata import east_asian_width
 
 from .breaking import boundaries, break_units
@@ -212,35 +208,35 @@ CB: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '_',
 
 
 def line_break(c, index=0):
-    
+
     r"""Return the Line_Break property of `c`
-    
+
     `c` must be a single Unicode code point string.
-    
+
     >>> print(line_break('\x0d'))
     CR
     >>> print(line_break(' '))
     SP
     >>> print(line_break('1'))
     NU
-    
-    If `index` is specified, this function consider `c` as a unicode 
-    string and return Line_Break property of the code point at 
+
+    If `index` is specified, this function consider `c` as a unicode
+    string and return Line_Break property of the code point at
     c[index].
-    
+
     >>> print(line_break(u'a\x0d', 1))
     CR
     """
-    
+
     return _line_break(code_point(c, index))
 
 
 def _preprocess_boundaries(s):
-    
+
     r"""(internal) Preprocess LB9: X CM* -> X
-    
+
     Where X is not in (BK, CR, LF, NL, SP, ZW)
-    
+
     >>> list(_preprocess_boundaries(u'\r\n')) == [(0, 'CR'), (1, 'LF')]
     True
     >>> list(_preprocess_boundaries(u'A\x01A')) == [(0, 'AL'), (2, 'AL')]
@@ -250,7 +246,7 @@ def _preprocess_boundaries(s):
     >>> list(_preprocess_boundaries(u'\n  A')) == [(0, 'LF'), (1, 'SP'), (2, 'SP'), (3, 'AL')]
     True
     """
-    
+
     prev_prop = None
     i = 0
     for c in code_points(s):
@@ -269,12 +265,12 @@ def _preprocess_boundaries(s):
 
 
 def line_break_breakables(s, legacy=False):
-    
+
     """Iterate line breaking opportunities for every position of `s`
-    
-    1 means "break" and 0 means "do not break" BEFORE the postion.  
+
+    1 means "break" and 0 means "do not break" BEFORE the postion.
     The length of iteration will be the same as ``len(s)``.
-    
+
     >>> list(line_break_breakables('ABC'))
     [0, 0, 0]
     >>> list(line_break_breakables('Hello, world.'))
@@ -282,17 +278,17 @@ def line_break_breakables(s, legacy=False):
     >>> list(line_break_breakables(u''))
     []
     """
-    
+
     if not s:
         return
-    
+
     primitive_boundaries = list(_preprocess_boundaries(s))
     prev_prev_lb = None
     prev_lb = None
     for i, (pos, lb) in enumerate(primitive_boundaries):
         next_pos, __ = (primitive_boundaries[i+1]
                         if i<len(primitive_boundaries)-1 else (len(s), None))
-        
+
         if legacy:
             if lb == AL:
                 cp = unichr(ord(s, pos))
@@ -302,7 +298,7 @@ def line_break_breakables(s, legacy=False):
         else:
             if lb == AI:
                 lb = AL
-        
+
         if lb == CJ:
             lb = NS
 
@@ -424,12 +420,12 @@ def line_break_breakables(s, legacy=False):
 
 
 def line_break_boundaries(s, legacy=False, tailor=None):
-    
+
     """Iterate indices of the line breaking boundaries of `s`
-    
+
     This function yields from 0 to the end of the string (== len(s)).
     """
-    
+
     breakables = line_break_breakables(s, legacy)
     if tailor is not None:
         breakables = tailor(s, breakables)
@@ -437,21 +433,21 @@ def line_break_boundaries(s, legacy=False, tailor=None):
 
 
 def line_break_units(s, legacy=False, tailor=None):
-    
+
     r"""Iterate every line breaking token of `s`
-    
+
     >>> s = 'The quick (\u201cbrown\u201d) fox can\u2019t jump 32.3 feet, right?'
     >>> '|'.join(line_break_units(s)) == 'The |quick |(\u201cbrown\u201d) |fox |can\u2019t |jump |32.3 |feet, |right?'
     True
     >>> list(line_break_units(u''))
     []
-    
+
     >>> list(line_break_units('\u03b1\u03b1')) == [u'\u03b1\u03b1']
     True
     >>> list(line_break_units(u'\u03b1\u03b1', True)) == [u'\u03b1', u'\u03b1']
     True
     """
-    
+
     breakables = line_break_breakables(s, legacy)
     if tailor is not None:
         breakables = tailor(s, breakables)

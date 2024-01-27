@@ -1,8 +1,3 @@
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
-
 import doctest
 import unittest
 
@@ -12,10 +7,10 @@ from .test import implement_break_tests
 
 
 skips = [
-    # Tests to skip are specified in the form of (string, expect) so 
+    # Tests to skip are specified in the form of (string, expect) so
     # as not to skip them when they are modified.
 
-    # All these tests below will fail because they expect results based 
+    # All these tests below will fail because they expect results based
     # on the regex-based algorithm on LB25 while we don't implement it yet.
     ('}$', [1, 2]),
     (u'$(', [1, 2]),
@@ -60,7 +55,7 @@ class LineBreakTest(unittest.TestCase):
 
 
 def load_tests(loader, tests, ignore):
-    
+
     tests.addTests(doctest.DocTestSuite(linebreak))
     return tests
 

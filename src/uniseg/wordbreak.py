@@ -6,11 +6,6 @@ http://www.unicode.org/reports/tr29/tr29-21.html
 """
 
 
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
-
 from .breaking import boundaries, break_units
 from .codepoint import code_point, code_points
 from .db import word_break as _word_break

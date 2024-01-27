@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
-
 import doctest
 import unittest
 
@@ -20,7 +15,7 @@ class GraphemeClusterTest(unittest.TestCase):
 
 
 def load_tests(loader, tests, ignore):
-    
+
     tests.addTests(doctest.DocTestSuite(graphemecluster))
     return tests
 
