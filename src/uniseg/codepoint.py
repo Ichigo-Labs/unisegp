@@ -3,10 +3,7 @@
 
 import re
 import sys
-if sys.version_info >= (3, 0):
-    from builtins import ord as _ord, chr as _chr
-else:
-    from __builtin__ import ord as _ord, unichr as _chr
+from builtins import ord as _ord, chr as _chr
 
 
 __all__ = [

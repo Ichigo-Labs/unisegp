@@ -7,9 +7,9 @@ UAX #14: Unicode Line Breaking Algorithm
 
 from unicodedata import east_asian_width
 
-from .breaking import boundaries, break_units
-from .codepoint import ord, unichr, code_point, code_points
-from .db import line_break as _line_break
+from uniseg.breaking import boundaries, break_units
+from uniseg.codepoint import ord, unichr, code_point, code_points
+from uniseg.db import line_break as _line_break
 
 
 __all__ = [

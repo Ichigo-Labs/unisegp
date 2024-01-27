@@ -4,9 +4,9 @@ UAX #29: Unicode Text Segmentation
 http://www.unicode.org/reports/tr29/tr29-15.html
 """
 
-from .breaking import boundaries, break_units
-from .codepoint import code_point, code_points
-from .db import sentence_break as _sentence_break
+from uniseg.breaking import boundaries, break_units
+from uniseg.codepoint import code_point, code_points
+from uniseg.db import sentence_break as _sentence_break
 
 
 __all__ = [

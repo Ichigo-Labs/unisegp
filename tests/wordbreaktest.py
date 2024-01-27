@@ -3,8 +3,9 @@
 import doctest
 import unittest
 
-from . import wordbreak
-from .db import iter_word_break_tests
+from uniseg import wordbreak
+from uniseg.db import iter_word_break_tests
+
 from .test import implement_break_tests
 
 

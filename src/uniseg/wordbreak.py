@@ -6,9 +6,9 @@ http://www.unicode.org/reports/tr29/tr29-21.html
 """
 
 
-from .breaking import boundaries, break_units
-from .codepoint import code_point, code_points
-from .db import word_break as _word_break
+from uniseg.breaking import boundaries, break_units
+from uniseg.codepoint import code_point, code_points
+from uniseg.db import word_break as _word_break
 
 
 __all__ = [

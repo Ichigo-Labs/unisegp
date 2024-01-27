@@ -6,7 +6,7 @@ import sys
 import unittest
 from functools import wraps
 
-from .codepoint import unichr
+from uniseg.codepoint import unichr
 
 
 preferred_encoding = locale.getpreferredencoding()

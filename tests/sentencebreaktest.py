@@ -4,8 +4,9 @@
 import doctest
 import unittest
 
-from . import sentencebreak
-from .db import iter_sentence_break_tests
+from uniseg import sentencebreak
+from uniseg.db import iter_sentence_break_tests
+
 from .test import implement_break_tests
 
 

@@ -4,9 +4,9 @@ UAX #29: Unicode Text Segmentation (Unicode 6.2.0)
 http://www.unicode.org/reports/tr29/tr29-21.html
 """
 
-from .breaking import boundaries, break_units
-from .codepoint import code_point, code_points
-from .db import grapheme_cluster_break as _grapheme_cluster_break
+from uniseg.breaking import boundaries, break_units
+from uniseg.codepoint import code_point, code_points
+from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
 
 
 __all__ = [

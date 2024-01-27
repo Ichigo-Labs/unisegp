@@ -1,6 +1,7 @@
 
-from .codepoint import ord
-from . import db_lookups
+from uniseg import db_lookups
+from uniseg.codepoint import ord
+
 
 def _find_break(u):
     """

@@ -3,9 +3,9 @@
 import re
 from unicodedata import east_asian_width
 
-from .codepoint         import code_point
-from .graphemecluster   import grapheme_clusters, grapheme_cluster_boundaries
-from .linebreak         import line_break_boundaries
+from uniseg.codepoint import code_point
+from uniseg.graphemecluster import grapheme_clusters, grapheme_cluster_boundaries
+from uniseg.linebreak import line_break_boundaries
 
 
 __all__ = [

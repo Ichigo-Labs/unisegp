@@ -3,8 +3,9 @@
 import doctest
 import unittest
 
-from . import graphemecluster
-from .db import iter_grapheme_cluster_break_tests
+from uniseg import graphemecluster
+from uniseg.db import iter_grapheme_cluster_break_tests
+
 from .test import implement_break_tests
 
 

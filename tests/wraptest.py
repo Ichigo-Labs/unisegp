@@ -3,7 +3,7 @@
 import doctest
 import unittest
 
-from . import wrap
+from uniseg import wrap
 
 
 def load_tests(loader, tests, ignore):
