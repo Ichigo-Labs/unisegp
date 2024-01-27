@@ -95,7 +95,7 @@ def _next_break(primitive_boundaries, pos, expects):
     """(internal)
     """
 
-    for i in xrange(pos, len(primitive_boundaries)):
+    for i in range(pos, len(primitive_boundaries)):
         sb = primitive_boundaries[i][1]
         if sb in expects:
             return sb
