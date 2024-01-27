@@ -1,4 +1,4 @@
-.PHONY: clean test upload docs db_lookups testpypi pypi
+.PHONY: clean build test upload docs db_lookups testpypi pypi
 
 PROJ_NAME = uniseg
 
@@ -30,6 +30,9 @@ CSV_FILES =\
     csv/LineBreak.csv\
     csv/LineBreakTest.csv
 
+build:
+	$(PYTHON) -m build .
+
 test: db_lookups
 	$(PYTHON) -m $(DIR_SRC).test
 
@@ -49,12 +52,6 @@ cleanall: clean cleandocs
 	-$(RM) -r dist
 	-$(RM) -r data
 	-$(RM) -r build
-
-sdist: db_lookups
-	$(PYTHON) setup.py sdist -d $(DIR_DIST) --formats=zip
-
-wheel: db_lookups
-	$(PYTHON) setup.py bdist_wheel -d $(DIR_DIST) --universal
 
 testpypi: sdist wheel
 	twine upload -r testpypi --skip-existing dist/*
