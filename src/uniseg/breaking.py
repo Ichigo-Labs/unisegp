@@ -1,4 +1,7 @@
-"""Breakable table and string tokenization """
+"""Breakable table and string tokenization. """
+
+from typing import Iterator, Literal, Sequence
+
 
 __all__ = [
     'boundaries',
@@ -6,7 +9,10 @@ __all__ = [
 ]
 
 
-def boundaries(breakables):
+Breakables = Sequence[Literal[0, 1]]
+
+
+def boundaries(breakables: Breakables) -> Iterator[int]:
 
     """Iterate boundary indices of the breakabe table, `breakables`
 
@@ -34,7 +40,7 @@ def boundaries(breakables):
         yield i+1
 
 
-def break_units(s, breakables):
+def break_units(s: str, breakables: Breakables) -> Iterator[str]:
 
     """Iterate every tokens of `s` basing on breakable table, `breakables`
 
