@@ -1,0 +1,5 @@
+prune *
+exclude *
+graft src
+global-exclude .* *.py[cdo]
+include pyproject.toml
