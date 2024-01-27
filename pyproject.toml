@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61", "wheel", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+dynamic = ["version"]
+name = "uniseg"
+dependencies = [
+]
+requires-python = ">=3.8"
+authors = [
+    {name = "Masaaki Shibata", email = "mshibata@emptypage.jp"},
+]
+description = "Determine Unicode text segmentations."
+readme = "README.rst"
+keywords = ["text", "unicode"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing",
+]
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "setuptools>=61",
+    "setuptools-scm",
+    "twine",
+]
+
+[project.urls]
+Documentation = "https://uniseg-py.readthedocs.io/"
+Repository = "https://bitbucket.org/emptypage/uniseg-py/"
+
+[tool.setuptools_scm]
