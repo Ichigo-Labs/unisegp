@@ -31,7 +31,7 @@ CSV_FILES =\
     csv/LineBreak.csv\
     csv/LineBreakTest.csv
 
-build:
+build: db_lookups
 	$(PYTHON) -m build .
 
 test: db_lookups
