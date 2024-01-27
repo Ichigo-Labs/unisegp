@@ -8,7 +8,7 @@ UAX #14: Unicode Line Breaking Algorithm
 from unicodedata import east_asian_width
 
 from uniseg.breaking import boundaries, break_units
-from uniseg.codepoint import ord, unichr, code_point, code_points
+from uniseg.codepoint import ord, chr, code_point, code_points
 from uniseg.db import line_break as _line_break
 
 
@@ -291,7 +291,7 @@ def line_break_breakables(s, legacy=False):
 
         if legacy:
             if lb == AL:
-                cp = unichr(ord(s, pos))
+                cp = chr(ord(s, pos))
                 lb = ID if east_asian_width(cp) == 'A' else AL
             elif lb == AI:
                 lb = ID

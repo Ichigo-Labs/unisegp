@@ -6,7 +6,7 @@ import sys
 import unittest
 from functools import wraps
 
-from uniseg.codepoint import unichr
+from uniseg.codepoint import chr
 
 
 preferred_encoding = locale.getpreferredencoding()
@@ -27,7 +27,7 @@ def parse_breaking_test_pattern(pattern):
             pass
         else:
             cp = int(token, 16)
-            u = unichr(cp)
+            u = chr(cp)
             codepoint_list.append(u)
             codepoint_count += len(u)
     string = ''.join(codepoint_list)
