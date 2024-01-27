@@ -125,7 +125,7 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
         i += len(c)
 
 
-def grapheme_cluster_boundaries(s: str, tailor: Optional[TailorFunc], /) -> Iterator[int]:
+def grapheme_cluster_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
 
     """Iterate indices of the grapheme cluster boundaries of `s`
 
@@ -145,7 +145,7 @@ def grapheme_cluster_boundaries(s: str, tailor: Optional[TailorFunc], /) -> Iter
     return boundaries(breakables)
 
 
-def grapheme_clusters(s: str, tailor: Optional[TailorFunc], /) -> Iterator[str]:
+def grapheme_clusters(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
 
     r"""Iterate every grapheme cluster token of `s`
 
