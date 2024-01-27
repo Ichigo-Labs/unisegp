@@ -100,7 +100,7 @@ break_table = [
 ]
 
 
-def word_break(c: str, index: int = 0) -> str:
+def word_break(c: str, index: int = 0, /) -> str:
 
     r"""Return the Word_Break property of `c`
 
@@ -124,7 +124,7 @@ def word_break(c: str, index: int = 0) -> str:
     return _word_break(code_point(c, index))
 
 
-def _preprocess_boundaries(s: str) -> Iterator[Tuple[int, str]]:
+def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, str]]:
 
     r"""(internal) Preprocess WB4; X [Extend Format]* -> X
 
@@ -159,7 +159,7 @@ def _preprocess_boundaries(s: str) -> Iterator[Tuple[int, str]]:
         i += len(c)
 
 
-def word_breakables(s: str) -> Breakables:
+def word_breakables(s: str, /) -> Breakables:
 
     r"""Iterate word breaking opportunities for every position of `s`
 
@@ -236,7 +236,7 @@ def word_breakables(s: str) -> Breakables:
         prev_wb = wb
 
 
-def word_boundaries(s: str, tailor: Optional[TailorFunc] = None) -> Iterator[int]:
+def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
 
     """Iterate indices of the word boundaries of `s`
 
@@ -250,7 +250,7 @@ def word_boundaries(s: str, tailor: Optional[TailorFunc] = None) -> Iterator[int
     return boundaries(breakables)
 
 
-def words(s: str, tailor: Optional[TailorFunc] = None) -> Iterator[str]:
+def words(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
 
     """Iterate *user-perceived* words of `s`
 

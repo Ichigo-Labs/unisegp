@@ -35,7 +35,7 @@ STerm = 'STerm'
 Close = 'Close'
 
 
-def sentence_break(c: str, index: int = 0) -> str:
+def sentence_break(c: str, index: int = 0, /) -> str:
 
     r"""Return Sentence_Break property value of `c`
 
@@ -59,7 +59,7 @@ def sentence_break(c: str, index: int = 0) -> str:
     return _sentence_break(code_point(c, index))
 
 
-def _preprocess_boundaries(s: str) -> Iterator[Tuple[int, str]]:
+def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, str]]:
 
     r"""(internal)
 
@@ -94,7 +94,7 @@ def _preprocess_boundaries(s: str) -> Iterator[Tuple[int, str]]:
 
 def _next_break(primitive_boundaries: Sequence[Tuple[int, str]],
                 pos: int,
-                expects: Sequence[str]) -> Optional[str]:
+                expects: Sequence[str], /) -> Optional[str]:
 
     """(internal)
     """
@@ -106,7 +106,7 @@ def _next_break(primitive_boundaries: Sequence[Tuple[int, str]],
     return None
 
 
-def sentence_breakables(s: str) -> Breakables:
+def sentence_breakables(s: str, /) -> Breakables:
 
     r"""Iterate sentence breaking opportunities for every position of
     `s`
@@ -216,7 +216,7 @@ def sentence_breakables(s: str) -> Breakables:
         pos = next_pos
 
 
-def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None) -> Iterator[int]:
+def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
 
     """Iterate indices of the sentence boundaries of `s`
 
@@ -237,7 +237,7 @@ def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None) -> Iterator
     return boundaries(breakables)
 
 
-def sentences(s: str, tailor: Optional[TailorFunc] = None) -> List[str]:
+def sentences(s: str, tailor: Optional[TailorFunc] = None, /) -> List[str]:
 
     """Iterate every sentence of `s`
 

@@ -1,13 +1,13 @@
-"""Unicode line breaking algorithm
+"""Unicode line breaking algorithm.
 
-UAX #14: Unicode Line Breaking Algorithm
-    http://www.unicode.org/reports/tr14/tr14-24.html
+UAX #29: Unicode Text Segmentation (Unicode 15.1.0)
+https://www.unicode.org/reports/tr29/tr29-43.html
 """
 
-
+from typing import Iterator, Optional, Tuple, List
 from unicodedata import east_asian_width
 
-from uniseg.breaking import boundaries, break_units
+from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
 from uniseg.codepoint import ord, chr, code_point, code_points
 from uniseg.db import line_break as _line_break
 
@@ -18,6 +18,7 @@ __all__ = [
     'line_break_boundaries',
     'line_break_units',
 ]
+
 
 BK = 'BK'   # Mandatory Break
 CR = 'CR'   # Carriage Return
@@ -207,7 +208,7 @@ CB: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '_',
 }
 
 
-def line_break(c, index=0):
+def line_break(c: str, index: int = 0, /) -> str:
 
     r"""Return the Line_Break property of `c`
 
@@ -231,7 +232,7 @@ def line_break(c, index=0):
     return _line_break(code_point(c, index))
 
 
-def _preprocess_boundaries(s):
+def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, str]]:
 
     r"""(internal) Preprocess LB9: X CM* -> X
 
@@ -264,7 +265,7 @@ def _preprocess_boundaries(s):
         i += len(c)
 
 
-def line_break_breakables(s, legacy=False):
+def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
 
     """Iterate line breaking opportunities for every position of `s`
 
@@ -414,12 +415,14 @@ def line_break_breakables(s, legacy=False):
         else:
             do_break = True
         for j in range(next_pos-pos):
-            yield int(j==0 and do_break)
+            yield 1 if j==0 and do_break else 0
         prev_prev_lb = prev_lb
         prev_lb = lb
 
 
-def line_break_boundaries(s, legacy=False, tailor=None):
+def line_break_boundaries(s: str,
+                          legacy: bool = False,
+                          tailor:Optional[TailorFunc] = None) -> Iterator[int]:
 
     """Iterate indices of the line breaking boundaries of `s`
 
@@ -432,7 +435,9 @@ def line_break_boundaries(s, legacy=False, tailor=None):
     return boundaries(breakables)
 
 
-def line_break_units(s, legacy=False, tailor=None):
+def line_break_units(s: str,
+                     legacy: bool = False,
+                     tailor:Optional[TailorFunc] = None, /) -> Iterator[str]:
 
     r"""Iterate every line breaking token of `s`
 
