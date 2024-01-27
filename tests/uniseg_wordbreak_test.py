@@ -5,7 +5,7 @@ import unittest
 
 from uniseg import wordbreak
 
-from db_lookups_test import word_break_test
+from uniseg_db_lookups_test import word_break_test
 from uniseg_test import implement_break_tests
 
 

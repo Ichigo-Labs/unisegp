@@ -5,7 +5,7 @@ data/
 docs/_build
 
 src/uniseg/db_lookups.py
-tests/db_lookups_test.py
+tests/uniseg_db_lookups_test.py
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,windows,python

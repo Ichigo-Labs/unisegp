@@ -3,7 +3,7 @@ import unittest
 
 from uniseg import linebreak
 
-from db_lookups_test import line_break_test
+from uniseg_db_lookups_test import line_break_test
 from uniseg_test import implement_break_tests
 
 

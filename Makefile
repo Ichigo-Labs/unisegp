@@ -17,7 +17,7 @@ DIR_DIST = dist
 DIR_SRC = src/uniseg
 DIR_TESTS = tests
 DB_LOOKUPS = $(DIR_SRC)/db_lookups.py
-DB_LOOKUPS_TEST = $(DIR_TESTS)/db_lookups_test.py
+DB_LOOKUPS_TEST = $(DIR_TESTS)/uniseg_db_lookups_test.py
 DIR_DOCS = docs
 DIR_DOCS_BUILD = docs/_build
 
