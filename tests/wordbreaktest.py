@@ -4,9 +4,8 @@ import doctest
 import unittest
 
 from uniseg import wordbreak
-from uniseg.db import iter_word_break_tests
 
-from .test import implement_break_tests
+from .test import iter_word_break_tests, implement_break_tests
 
 
 @implement_break_tests(wordbreak.word_boundaries,

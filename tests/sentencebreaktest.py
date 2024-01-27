@@ -5,9 +5,8 @@ import doctest
 import unittest
 
 from uniseg import sentencebreak
-from uniseg.db import iter_sentence_break_tests
 
-from .test import implement_break_tests
+from .test import iter_sentence_break_tests, implement_break_tests
 
 
 @implement_break_tests(sentencebreak.sentence_boundaries,

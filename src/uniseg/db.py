@@ -20,33 +20,13 @@ def grapheme_cluster_break(u):
     return db_lookups.grapheme_cluster_break_list[_find_break(u)]
 
 
-def iter_grapheme_cluster_break_tests():
-    from . import db_lookups_test
-    return db_lookups_test.grapheme_cluster_break_test
-
-
 def word_break(u):
     return db_lookups.word_break_list[_find_break(u)]
-
-
-def iter_word_break_tests():
-    from . import db_lookups_test
-    return db_lookups_test.word_break_test
 
 
 def sentence_break(u):
     return db_lookups.sentence_break_list[_find_break(u)]
 
 
-def iter_sentence_break_tests():
-    from . import db_lookups_test
-    return db_lookups_test.sentence_break_test
-
-
 def line_break(u):
     return db_lookups.line_break_list[_find_break(u)]
-
-
-def iter_line_break_tests():
-    from . import db_lookups_test
-    return db_lookups_test.line_break_test

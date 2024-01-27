@@ -2,9 +2,8 @@ import doctest
 import unittest
 
 from uniseg import linebreak
-from uniseg.db import iter_line_break_tests
 
-from .test import implement_break_tests
+from .test import iter_line_break_tests, implement_break_tests
 
 
 skips = [

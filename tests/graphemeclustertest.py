@@ -4,9 +4,8 @@ import doctest
 import unittest
 
 from uniseg import graphemecluster
-from uniseg.db import iter_grapheme_cluster_break_tests
 
-from .test import implement_break_tests
+from .test import iter_grapheme_cluster_break_tests, implement_break_tests
 
 
 @implement_break_tests(graphemecluster.grapheme_cluster_boundaries,
