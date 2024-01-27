@@ -47,7 +47,7 @@ def ord(c: str, index: Optional[int] = None, /) -> int:
     return _ord(c if index is None else c[index])
 
 
-def chr(cp: int) -> str:
+def chr(cp: int, /) -> str:
 
     """Return the unicode object represents the code point integer `cp`
 
@@ -60,7 +60,7 @@ def chr(cp: int) -> str:
     return _chr(cp)
 
 
-def code_point(s: str, index: int = 0) -> str:
+def code_point(s: str, index: int = 0, /) -> str:
 
     """Return code point at s[index]
 
@@ -77,7 +77,7 @@ def code_point(s: str, index: int = 0) -> str:
     return s[index]
 
 
-def code_points(s: str) -> Sequence[str]:
+def code_points(s: str, /) -> Sequence[str]:
 
     """Iterate every Unicode code points of the unicode string `s`
 

@@ -1,13 +1,14 @@
-"""Unicode grapheme cluster breaking
+"""Unicode grapheme cluster breaking.
 
-UAX #29: Unicode Text Segmentation (Unicode 6.2.0)
-http://www.unicode.org/reports/tr29/tr29-21.html
+UAX #29: Unicode Text Segmentation (Unicode 15.1.0)
+https://www.unicode.org/reports/tr29/tr29-43.html
 """
 
-from uniseg.breaking import boundaries, break_units
+from typing import Callable, Iterator, Optional
+
+from uniseg.breaking import boundaries, break_units, Breakables
 from uniseg.codepoint import code_point, code_points
 from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
-
 
 __all__ = [
     'grapheme_cluster_break',
@@ -15,6 +16,9 @@ __all__ = [
     'grapheme_cluster_boundaries',
     'grapheme_clusters',
 ]
+
+# type alias for annotation
+TailorFunc = Callable[[str, Breakables], Breakables]
 
 
 Other = 0
@@ -63,7 +67,7 @@ break_table = [
 ]
 
 
-def grapheme_cluster_break(c, index=0):
+def grapheme_cluster_break(c: str, index: int = 0, /) -> str:
 
     r"""Return the Grapheme_Cluster_Break property of `c`
 
@@ -87,7 +91,7 @@ def grapheme_cluster_break(c, index=0):
     return _grapheme_cluster_break(code_point(c, index))
 
 
-def grapheme_cluster_breakables(s):
+def grapheme_cluster_breakables(s: str, /) -> Breakables:
 
     """Iterate grapheme cluster breaking opportunities for every
     position of `s`
@@ -116,12 +120,12 @@ def grapheme_cluster_breakables(s):
         else:
             breakable = 1
         for j in range(len(c)):
-            yield int(j==0 and breakable)
+            yield 1 if (j==0 and breakable) else 0
         prev_gcbi = gcbi
         i += len(c)
 
 
-def grapheme_cluster_boundaries(s, tailor=None):
+def grapheme_cluster_boundaries(s: str, tailor: Optional[TailorFunc], /) -> Iterator[int]:
 
     """Iterate indices of the grapheme cluster boundaries of `s`
 
@@ -141,7 +145,7 @@ def grapheme_cluster_boundaries(s, tailor=None):
     return boundaries(breakables)
 
 
-def grapheme_clusters(s, tailor=None):
+def grapheme_clusters(s: str, tailor: Optional[TailorFunc], /) -> Iterator[str]:
 
     r"""Iterate every grapheme cluster token of `s`
 

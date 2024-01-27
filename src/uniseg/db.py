@@ -1,9 +1,12 @@
+"""uniseg database lookup interface. """
+
+from typing import List
 
 from uniseg import db_lookups
 from uniseg.codepoint import ord
 
 
-def _find_break(u):
+def _find_break(u: str, /) -> int:
     """
     find code code point in hashmap
     """
@@ -16,17 +19,17 @@ def _find_break(u):
             (index << db_lookups.shift) + (code & ((1 << db_lookups.shift) - 1))
         ]
 
-def grapheme_cluster_break(u):
+def grapheme_cluster_break(u: str, /) -> str:
     return db_lookups.grapheme_cluster_break_list[_find_break(u)]
 
 
-def word_break(u):
+def word_break(u: str, /) -> str:
     return db_lookups.word_break_list[_find_break(u)]
 
 
-def sentence_break(u):
+def sentence_break(u: str, /) -> str:
     return db_lookups.sentence_break_list[_find_break(u)]
 
 
-def line_break(u):
+def line_break(u: str, /) -> str:
     return db_lookups.line_break_list[_find_break(u)]
