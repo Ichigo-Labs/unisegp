@@ -4,6 +4,7 @@ UAX #29: Unicode Text Segmentation (Unicode 15.1.0)
 https://www.unicode.org/reports/tr29/tr29-43.html
 """
 
+import enum
 from typing import Callable, Iterator, Optional
 
 from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
@@ -18,35 +19,29 @@ __all__ = [
 ]
 
 
-Other = 0
-CR = 1
-LF = 2
-Control = 3
-Extend = 4
-SpacingMark = 5
-L = 6
-V = 7
-T = 8
-LV = 9
-LVT = 10
-Regional_Indicator = 11
+@enum.unique
+class GraphemeClusterBreakProperty(enum.Enum):
+    """Grapheme_Cluster_Break property values in UAX #29.
 
-names = [
-    'Other',        # 0
-    'CR',           # 1
-    'LF',           # 2
-    'Control',      # 3
-    'Extend',       # 4
-    'SpacingMark',  # 5
-    'L',            # 6
-    'V',            # 7
-    'T',            # 8
-    'LV',           # 9
-    'LVT',          # 10
-    'Regional_Indicator',   # 11
-]
+    Listed in `Table 2. Grapheme_Cluster_Break Property Values
+    <https://www.unicode.org/reports/tr29/tr29-43.html#Grapheme_Cluster_Break_Property_Values>`_.
+    """
+    Other = 0
+    CR = 1
+    LF = 2
+    Control = 3
+    Extend = 4
+    Regional_Indicator = 11
+    Prepend = 13
+    SpacingMark = 5
+    L = 6
+    V = 7
+    T = 8
+    LV = 9
+    LVT = 10
 
-# cf. http://www.unicode.org/Public/6.2.0/ucd/auxiliary/GraphemeBreakTest.html
+
+# cf. https://www.unicode.org/Public/15.1.0/ucd/auxiliary/GraphemeBreakTest.html
 # 0: not break, 1: break
 break_table = [
     [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1],
@@ -64,28 +59,29 @@ break_table = [
 ]
 
 
-def grapheme_cluster_break(c: str, index: int = 0, /) -> str:
+def grapheme_cluster_break(c: str, index: int = 0, /) -> GraphemeClusterBreakProperty:
 
     r"""Return the Grapheme_Cluster_Break property of `c`
 
     `c` must be a single Unicode code point string.
 
-    >>> print(grapheme_cluster_break('\x0d'))
-    CR
-    >>> print(grapheme_cluster_break('\x0a'))
-    LF
-    >>> print(grapheme_cluster_break('a'))
-    Other
+    >>> grapheme_cluster_break('a')
+    <GraphemeClusterBreakProperty.Other: 0>
+    >>> grapheme_cluster_break('\x0d')
+    <GraphemeClusterBreakProperty.CR: 1>
+    >>> grapheme_cluster_break('\x0a').name
+    'LF'
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Grapheme_Cluster_Break property of the code
     point at c[index].
 
-    >>> print(grapheme_cluster_break('a\x0d', 1))
-    CR
+    >>> grapheme_cluster_break('a\x0d', 1).name
+    'CR'
     """
 
-    return _grapheme_cluster_break(code_point(c, index))
+    name = _grapheme_cluster_break(code_point(c, index))
+    return GraphemeClusterBreakProperty[name]
 
 
 def grapheme_cluster_breakables(s: str, /) -> Breakables:
@@ -111,7 +107,7 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     i = 0
     for c in code_points(s):
         gcb = grapheme_cluster_break(c)
-        gcbi = names.index(gcb)
+        gcbi = gcb.value
         if i > 0:
             breakable = break_table[prev_gcbi][gcbi]
         else:
