@@ -38,7 +38,8 @@ DATA_FILES = \
 	$(DIR_DOWNLOAD)/auxiliary/SentenceBreakProperty.txt \
 	$(DIR_DOWNLOAD)/auxiliary/SentenceBreakTest.txt \
 	$(DIR_DOWNLOAD)/LineBreak.txt \
-	$(DIR_DOWNLOAD)/auxiliary/LineBreakTest.txt
+	$(DIR_DOWNLOAD)/auxiliary/LineBreakTest.txt \
+	$(DIR_DOWNLOAD)/DerivedCoreProperties.txt
 
 
 
