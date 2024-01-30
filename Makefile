@@ -42,8 +42,6 @@ DATA_FILES = \
 	$(DIR_DOWNLOAD)/auxiliary/LineBreakTest.txt \
 	$(DIR_DOWNLOAD)/DerivedCoreProperties.txt
 
-
-
 db_lookups: $(CSV_FILES)
 	$(PYTHON) tools/build_db_lookups.py $(DB_LOOKUPS)
 	$(PYTHON) tools/build_db_lookups_test.py $(DB_LOOKUPS_TEST)
@@ -57,7 +55,6 @@ build: db_lookups
 
 test: db_lookups
 	$(PYTHON) -m $(DIR_SRC).test
-
 
 clean:
 	-$(RM) $(DIR_SRC)/*.pyc
