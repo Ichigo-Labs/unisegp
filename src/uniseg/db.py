@@ -33,3 +33,7 @@ def sentence_break(u: str, /) -> str:
 
 def line_break(u: str, /) -> str:
     return db_lookups.line_break_list[_find_break(u)]
+
+
+def indic_conjunct_break(u: str, /) -> str:
+    return db_lookups.indic_conjunct_break_list[_find_break(u)]

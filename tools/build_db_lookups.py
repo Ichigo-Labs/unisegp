@@ -1,6 +1,8 @@
 import csv
 import os
 import sys
+from typing import Sequence, Tuple, List
+
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -12,6 +14,8 @@ reader = csv.reader(open(path + '/../csv/SentenceBreak.csv', 'r'))
 SentenceBreak = {int(k):v for k, v in reader}
 reader = csv.reader(open(path + '/../csv/GraphemeClusterBreak.csv', 'r'))
 GraphemeClusterBreak = {int(k):v for k, v in reader}
+reader = csv.reader(open(path + '/../csv/DerivedCoreProperties.csv', 'r'))
+IndicConjunctBreak = {int(r[0]):r[2] for r in reader if len(r) > 2 and r[1] == 'InCB'}
 
 mapping = [
     (
@@ -19,21 +23,24 @@ mapping = [
         LineBreak.get(x, 'Other'),
         SentenceBreak.get(x, 'Other'),
         GraphemeClusterBreak.get(x, 'Other'),
+        IndicConjunctBreak.get(x, 'None_')
     )
     for x in range(sys.maxunicode + 1)
 ]
 
-def getsize(data):
-    # return smallest possible integer size for the given array
-    maxdata = max(data)
-    if maxdata < 256:
-        return 1
-    elif maxdata < 65536:
-        return 2
-    else:
-        return 4
 
-def splitbins(t, trace=0):
+def getsize(data: Sequence) -> int:
+    """return smallest possible integer size for the given array. """
+
+    maxdata = max(data)
+    if maxdata < 0x100:
+        return 1
+    if maxdata < 0x10000:
+        return 2
+    return 4
+
+
+def splitbins(t: Sequence[int]) -> Tuple[List[int], List[int], int]:
     """t, trace=0 -> (t1, t2, shift).  Split a table to save space.
     t is a sequence of ints.  This function can be useful to save space if
     many of the ints are the same.  t1 and t2 are lists of ints, and shift
@@ -41,23 +48,21 @@ def splitbins(t, trace=0):
     code), and where for each i in range(len(t)),
         t[i] == t2[(t1[i >> shift] << shift) + (i & mask)]
     where mask is a bitmask isolating the last "shift" bits.
-    If optional arg trace is non-zero (default zero), progress info
-    is printed to sys.stderr.  The higher the value, the more info
-    you'll get.
     """
-    n = len(t)-1    # last valid index
+    n = len(t) - 1  # last valid index
     maxshift = 0    # the most we can shift n and still have something left
     if n > 0:
         while n >> 1:
             n >>= 1
             maxshift += 1
     del n
-    bytes = sys.maxsize  # smallest total size so far
-    t = tuple(t)    # so slices can be dict keys
+
+    bytes = sys.maxsize # smallest total size so far
+    t = tuple(t)        # so slices can be dict keys
     for shift in range(maxshift + 1):
         t1 = []
         t2 = []
-        size = 2**shift
+        size = 2 ** shift
         bincache = {}
         for i in range(0, len(t), size):
             bin = t[i:i+size]
@@ -68,7 +73,7 @@ def splitbins(t, trace=0):
                 t2.extend(bin)
             t1.append(index >> shift)
         # determine memory size
-        b = len(t1)*getsize(t1) + len(t2)*getsize(t2)
+        b = len(t1) * getsize(t1) + len(t2) * getsize(t2)
         if b < bytes:
             best = t1, t2, shift
             bytes = b
@@ -96,6 +101,7 @@ word_break_list={repr([x[0] for x in unique])}
 line_break_list={repr([x[1] for x in unique])}
 sentence_break_list={repr([x[2] for x in unique])}
 grapheme_cluster_break_list={repr([x[3] for x in unique])}
+indic_conjunct_break_list={repr([x[4] for x in unique])}
 index1={repr(index1_bytes)}
 index2={repr(index2_bytes)}
 """
