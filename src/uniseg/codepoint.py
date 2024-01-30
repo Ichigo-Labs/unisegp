@@ -84,11 +84,6 @@ def code_points(s: str, /) -> Sequence[str]:
     >>> s = 'hello'
     >>> list(code_points(s)) == ['h', 'e', 'l', 'l', 'o']
     True
-
-    The number of iteration may differ from the ``len(s)``, because some
-    code points may be represented as a couple of other code points
-    ("surrogate pair") in narrow-build Python.
-
     >>> s = 'abc\\U00020b9f\\u3042'
     >>> list(code_points(s)) == ['a', 'b', 'c', '\\U00020b9f', '\\u3042']
     True
