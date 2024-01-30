@@ -22,14 +22,15 @@ DIR_DOCS = docs
 DIR_DOCS_BUILD = docs/_build
 
 CSV_FILES =\
-    csv/GraphemeClusterBreak.csv\
-    csv/GraphemeClusterBreakTest.csv\
-    csv/WordBreak.csv\
-    csv/WordBreakTest.csv\
-    csv/SentenceBreak.csv\
-    csv/SentenceBreakTest.csv\
-    csv/LineBreak.csv\
-    csv/LineBreakTest.csv
+    csv/GraphemeClusterBreak.csv \
+    csv/GraphemeClusterBreakTest.csv \
+    csv/WordBreak.csv \
+    csv/WordBreakTest.csv \
+    csv/SentenceBreak.csv \
+    csv/SentenceBreakTest.csv \
+    csv/LineBreak.csv \
+    csv/LineBreakTest.csv \
+	csv/DerivedCoreProperties.csv
 DATA_FILES = \
     $(DIR_DOWNLOAD)/auxiliary/GraphemeBreakProperty.txt \
 	$(DIR_DOWNLOAD)/auxiliary/GraphemeBreakTest.txt \
@@ -117,6 +118,10 @@ csv/LineBreak.csv: $(DIR_DOWNLOAD)/LineBreak.txt
 csv/LineBreakTest.csv: $(DIR_DOWNLOAD)/auxiliary/LineBreakTest.txt
 	-$(MKDIR) -p $(dir $@)
 	$(PYTHON) tools/test2csv.py -p LB -o $@ $<
+
+csv/DerivedCoreProperties.csv: $(DIR_DOWNLOAD)/DerivedCoreProperties.txt
+	-$(MKDIR) -p $(dir $@)
+	$(PYTHON) tools/prop2csv.py -o $@ $<
 
 # Use 'mkdir -p' instead of --create-dirs option of curl because it
 # doesn't work well with path names with '/' on Windows.
