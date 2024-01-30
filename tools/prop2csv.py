@@ -1,14 +1,13 @@
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
+"""Convert UCD property .txt files to CSV. """
+
 import re
+from typing import Any, List, Sequence, Tuple
 
 
 rx_csv_special_characters = re.compile(r'[,"\n]')
 
 
-def split_record(line, separator=';'):
+def split_record(line: str, separator: str = ';') -> Tuple[List[str], str]:
 
     """Split `line` to a list of fields and a comment
 
@@ -32,7 +31,7 @@ def split_record(line, separator=';'):
     return fields, comment
 
 
-def codepoint_range(data, separator='..'):
+def codepoint_range(data: str, separator: str = '..') -> Sequence[int]:
 
     """Return the list of code point integers described in `data`
 
@@ -52,7 +51,7 @@ def codepoint_range(data, separator='..'):
     return range(start, end+1)
 
 
-def csv_escape(value):
+def csv_escape(value: Any) -> str:
 
     '''Return escaped string suitable as a CSV field
 
@@ -74,21 +73,21 @@ def csv_escape(value):
     return s
 
 
-def main():
+def main() -> None:
 
-    import argparse
+    from argparse import ArgumentParser, FileType
     from sys import stdin, stdout, stderr
 
-    parser = argparse.ArgumentParser()
+    parser = ArgumentParser()
     parser.add_argument('-t', '--testmod',
                         action='store_true',
                         help='do doctest.testmod() and exit')
     parser.add_argument('-o', '--output',
-                        type=argparse.FileType('w'),
+                        type=FileType('w'),
                         default=stdout)
     parser.add_argument('file',
                         nargs='?',
-                        type=argparse.FileType('r'),
+                        type=FileType('r'),
                         default=stdin)
     args = parser.parse_args()
 
@@ -105,10 +104,10 @@ def main():
             continue
         if line.startswith('#'):
             continue
-        fields, comment = split_record(line)
+        fields, _ = split_record(line)
         cprange = fields[0]
         for cp in codepoint_range(cprange):
-            fields[0] = cp
+            fields[0] = str(cp)
             print(','.join(csv_escape(x) for x in fields), file=fout)
 
 
