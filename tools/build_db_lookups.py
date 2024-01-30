@@ -20,7 +20,7 @@ mapping = [
         SentenceBreak.get(x, 'Other'),
         GraphemeClusterBreak.get(x, 'Other'),
     )
-    for x in range(0x110000)
+    for x in range(sys.maxunicode + 1)
 ]
 
 def getsize(data):
