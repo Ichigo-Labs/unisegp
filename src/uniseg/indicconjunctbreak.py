@@ -13,6 +13,7 @@ from uniseg.db import indic_conjunct_break as _indic_conjunct_break
 
 __all__ = [
     'IndicConjunctBreakProperty',
+    'indic_conjunct_break',
 ]
 
 
