@@ -70,7 +70,7 @@ def code_point(s: str, index: int = 0, /) -> str:
     True
     >>> code_point('\\U00020b9f\\u3042') == '\\U00020b9f'
     True
-    >>> code_point('\\U00020b9f\u3042', 1) == '\\u3042'
+    >>> code_point('\\U00020b9f\\u3042', 1) == '\\u3042'
     True
     """
 
