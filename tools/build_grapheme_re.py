@@ -123,7 +123,7 @@ def main() -> None:
 
     with open(emoji_file_name) as f:
         for fields in iter_records(f):
-            if not (len(fields) == 2 and fields[1] == 'Extended_Pictographic'):
+            if not (len(fields) == 2 and fields[1] == EXTENDED_PICTOGRAPHIC):
                 continue
             f1, f2 = fields
             cprange = CodePointRange.from_literal(f1)
@@ -134,10 +134,10 @@ def main() -> None:
     for prop_value, cpranges in prop_to_cpranges.items():
         cpranges[:] = optimize_code_point_ranges(cpranges)
 
-    pat_extended_grapheme_cluster = generate_pattern(prop_to_cpranges)
+    PAT_EXTENDED_GRAPHEME_CLUSTER = generate_pattern(prop_to_cpranges)
     print('\n'.join([
         '# DO NOT EDIT. This file is generated automatically.',
-        f'{pat_extended_grapheme_cluster=}',
+        f'{PAT_EXTENDED_GRAPHEME_CLUSTER=}',
     ]), file=fout)
 
 

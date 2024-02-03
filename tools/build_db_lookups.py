@@ -14,8 +14,6 @@ reader = csv.reader(open(path + '/../csv/SentenceBreak.csv', 'r'))
 SentenceBreak = {int(k):v for k, v in reader}
 reader = csv.reader(open(path + '/../csv/GraphemeClusterBreak.csv', 'r'))
 GraphemeClusterBreak = {int(k):v for k, v in reader}
-reader = csv.reader(open(path + '/../csv/emoji-data.csv', 'r'))
-ExtendedPictographic = {int(k):'Yes' for k, v in reader if v == 'Extended_Pictographic'}
 
 mapping = [
     (
@@ -23,7 +21,6 @@ mapping = [
         LineBreak.get(x, 'Other'),
         SentenceBreak.get(x, 'Other'),
         GraphemeClusterBreak.get(x, 'Other'),
-        ExtendedPictographic.get(x, 'No')
     )
     for x in range(sys.maxunicode + 1)
 ]
@@ -101,7 +98,6 @@ word_break_list={repr([x[0] for x in unique])}
 line_break_list={repr([x[1] for x in unique])}
 sentence_break_list={repr([x[2] for x in unique])}
 grapheme_cluster_break_list={repr([x[3] for x in unique])}
-extended_pictographic_list={repr([x[4] for x in unique])}
 index1={repr(index1_bytes)}
 index2={repr(index2_bytes)}
 """

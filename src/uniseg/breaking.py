@@ -4,8 +4,10 @@ from typing import Callable, Iterator, Literal
 
 
 __all__ = [
-    'Breakables', 'TailorFunc',
-    'boundaries', 'break_units',
+    'Breakables',
+    'TailorFunc',
+    'boundaries',
+    'break_units',
 ]
 
 

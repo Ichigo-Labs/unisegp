@@ -9,9 +9,9 @@ import re
 from typing import Iterator, Optional
 
 from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
-from uniseg.codepoint import code_point, code_points
+from uniseg.codepoint import code_point
 from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
-from uniseg.grapheme_re import pat_extended_grapheme_cluster
+from uniseg.grapheme_re import PAT_EXTENDED_GRAPHEME_CLUSTER
 
 
 __all__ = [
@@ -24,7 +24,7 @@ __all__ = [
 ]
 
 
-_rx_grapheme = re.compile(pat_extended_grapheme_cluster)
+_rx_grapheme = re.compile(PAT_EXTENDED_GRAPHEME_CLUSTER)
 
 
 class GraphemeClusterBreak(enum.Enum):

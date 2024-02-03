@@ -14,13 +14,13 @@ UNICODE_VERSION = 15.0.0
 URL_DOWNLOAD = http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 DIR_DOWNLOAD = data/$(UNICODE_VERSION)/ucd
 DIR_DIST = dist
-DIR_SRC = src/uniseg
+DIR_SRC = src
 DIR_TESTS = tests
 DIR_DOCS = docs
 DIR_DOCS_BUILD = docs/_build
 
-GREPHEME_RE_PY = $(DIR_SRC)/grapheme_re.py
-DB_LOOKUPS = $(DIR_SRC)/db_lookups.py
+GREPHEME_RE_PY = $(DIR_SRC)/uniseg/grapheme_re.py
+DB_LOOKUPS = $(DIR_SRC)/uniseg/db_lookups.py
 DB_LOOKUPS_TEST = $(DIR_TESTS)/uniseg_db_lookups_test.py
 AUTOGEN_FILES = $(GREPHEME_RE_PY) $(DB_LOOKUPS) $(DB_LOOKUPS_TEST)
 
@@ -32,8 +32,7 @@ CSV_FILES =\
     csv/SentenceBreak.csv \
     csv/SentenceBreakTest.csv \
     csv/LineBreak.csv \
-    csv/LineBreakTest.csv \
-	csv/emoji-data.csv
+    csv/LineBreakTest.csv
 
 DATA_FILES = \
     $(DIR_DOWNLOAD)/auxiliary/GraphemeBreakProperty.txt \
@@ -69,16 +68,13 @@ test: db_lookups
 	$(PYTHON) -m $(DIR_SRC).test
 
 clean:
-	-$(RM) $(DIR_SRC)/*.pyc
+	-$(RM) $(AUTOGEN_FILES)
+	-$(RM) -r $(DIR_SRC)/uniseg/__pycache__
 	-$(RM) -r csv
 
 cleanall: clean cleandocs
-	-$(RM) $(DB_LOOKUPS)
-	-$(RM) $(DB_LOOKUPS_TEST)
 	-$(RM) -r $(DIR_DOWNLOAD)
-	-$(RM) MANIFEST
 	-$(RM) -r dist
-	-$(RM) -r data
 	-$(RM) -r build
 
 testpypi: sdist wheel
@@ -127,10 +123,6 @@ csv/LineBreak.csv: $(DIR_DOWNLOAD)/LineBreak.txt
 csv/LineBreakTest.csv: $(DIR_DOWNLOAD)/auxiliary/LineBreakTest.txt
 	-$(MKDIR) -p $(dir $@)
 	$(PYTHON) tools/test2csv.py -p LB -o $@ $<
-
-csv/emoji-data.csv: $(DIR_DOWNLOAD)/emoji/emoji-data.txt
-	-$(MKDIR) -p $(dir $@)
-	$(PYTHON) tools/prop2csv.py -o $@ $<
 
 # Use 'mkdir -p' instead of --create-dirs option of curl because it
 # doesn't work well with path names with '/' on Windows.
