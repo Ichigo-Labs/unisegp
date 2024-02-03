@@ -1,4 +1,4 @@
-"""Unicode grapheme cluster breaking.
+"""Unicode grapheme cluster boundaries.
 
 UAX #29: Unicode Text Segmentation (Unicode 15.0.0)
 https://www.unicode.org/reports/tr29/tr29-41.html
@@ -15,6 +15,8 @@ from uniseg.grapheme_re import pat_extended_grapheme_cluster
 
 
 __all__ = [
+    'GraphemeClusterBreak',
+    'GCB',
     'grapheme_cluster_break',
     'grapheme_cluster_breakables',
     'grapheme_cluster_boundaries',
@@ -25,27 +27,30 @@ __all__ = [
 _rx_grapheme = re.compile(pat_extended_grapheme_cluster)
 
 
-@enum.unique
 class GraphemeClusterBreak(enum.Enum):
     """Grapheme_Cluster_Break property values in UAX #29.
 
     Listed in `Table 2. Grapheme_Cluster_Break Property Values
     <https://www.unicode.org/reports/tr29/tr29-41.html#Grapheme_Cluster_Break_Property_Values>`_.
     """
-    OTHER = 0
-    CR = 1
-    LF = 2
-    CONTROL = 3
-    EXTEND = 4
-    ZWJ = 5
-    REGIONAL_INDICATOR = 6
-    PREPEND = 7
-    SPACINGMARK = 8
-    L = 9
-    V = 10
-    T = 11
-    LV = 12
-    LVT = 13
+    OTHER = 'Other'
+    CR = 'CR'
+    LF = 'LF'
+    CONTROL = 'Control'
+    EXTEND = 'Extend'
+    ZWJ = 'ZWJ'
+    REGIONAL_INDICATOR = 'Regional_Indicator'
+    PREPEND = 'Prepend'
+    SPACINGMARK = 'SpacingMark'
+    L = 'L'
+    V = 'V'
+    T = 'T'
+    LV = 'LV'
+    LVT = 'LVT'
+
+
+# type alias for `GraphemeClusterBreak`
+GCB = GraphemeClusterBreak
 
 
 def grapheme_cluster_break(c: str, index: int = 0, /) -> GraphemeClusterBreak:
@@ -55,9 +60,9 @@ def grapheme_cluster_break(c: str, index: int = 0, /) -> GraphemeClusterBreak:
     `c` must be a single Unicode code point string.
 
     >>> grapheme_cluster_break('a')
-    <GraphemeClusterBreak.OTHER: 0>
+    <GraphemeClusterBreak.OTHER: 'Other'>
     >>> grapheme_cluster_break('\x0d')
-    <GraphemeClusterBreak.CR: 1>
+    <GraphemeClusterBreak.CR: 'CR'>
     >>> grapheme_cluster_break('\x0a').name
     'LF'
 
