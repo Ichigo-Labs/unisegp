@@ -1,4 +1,4 @@
-.PHONY: db_lookups download csv clean build test upload docs testpypi pypi
+.PHONY: all download csv clean build test upload docs testpypi pypi
 
 PROJ_NAME = uniseg
 
@@ -10,16 +10,19 @@ PYTHON = python
 PIP = pip
 SPHINX_BUILD = sphinx-build
 
-UNICODE_VERSION = 15.1.0
+UNICODE_VERSION = 15.0.0
 URL_DOWNLOAD = http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
-DIR_DOWNLOAD = data/$(UNICODE_VERSION)
+DIR_DOWNLOAD = data/$(UNICODE_VERSION)/ucd
 DIR_DIST = dist
 DIR_SRC = src/uniseg
 DIR_TESTS = tests
-DB_LOOKUPS = $(DIR_SRC)/db_lookups.py
-DB_LOOKUPS_TEST = $(DIR_TESTS)/uniseg_db_lookups_test.py
 DIR_DOCS = docs
 DIR_DOCS_BUILD = docs/_build
+
+GREPHEME_RE_PY = $(DIR_SRC)/grapheme_re.py
+DB_LOOKUPS = $(DIR_SRC)/db_lookups.py
+DB_LOOKUPS_TEST = $(DIR_TESTS)/uniseg_db_lookups_test.py
+AUTOGEN_FILES = $(GREPHEME_RE_PY) $(DB_LOOKUPS) $(DB_LOOKUPS_TEST)
 
 CSV_FILES =\
     csv/GraphemeClusterBreak.csv \
@@ -30,7 +33,8 @@ CSV_FILES =\
     csv/SentenceBreakTest.csv \
     csv/LineBreak.csv \
     csv/LineBreakTest.csv \
-	csv/DerivedCoreProperties.csv
+	csv/emoji-data.csv
+
 DATA_FILES = \
     $(DIR_DOWNLOAD)/auxiliary/GraphemeBreakProperty.txt \
 	$(DIR_DOWNLOAD)/auxiliary/GraphemeBreakTest.txt \
@@ -40,11 +44,19 @@ DATA_FILES = \
 	$(DIR_DOWNLOAD)/auxiliary/SentenceBreakTest.txt \
 	$(DIR_DOWNLOAD)/LineBreak.txt \
 	$(DIR_DOWNLOAD)/auxiliary/LineBreakTest.txt \
-	$(DIR_DOWNLOAD)/DerivedCoreProperties.txt
+	$(DIR_DOWNLOAD)/emoji/emoji-data.txt
 
-db_lookups: $(CSV_FILES)
-	$(PYTHON) tools/build_db_lookups.py $(DB_LOOKUPS)
-	$(PYTHON) tools/build_db_lookups_test.py $(DB_LOOKUPS_TEST)
+all: $(AUTOGEN_FILES)
+
+$(GREPHEME_RE_PY): $(DIR_DOWNLOAD)/auxiliary/GraphemeBreakProperty.txt \
+                   $(DIR_DOWNLOAD)/emoji/emoji-data.txt
+	$(PYTHON) tools/build_grapheme_re.py -o $@ $^
+
+$(DB_LOOKUPS): $(CSV_FILES)
+	$(PYTHON) tools/build_db_lookups.py $@
+
+$(DB_LOOKUPS_TEST): $(CSV_FILES)
+	$(PYTHON) tools/build_db_lookups_test.py $@
 
 csv: $(CSV_FILES)
 
@@ -116,7 +128,7 @@ csv/LineBreakTest.csv: $(DIR_DOWNLOAD)/auxiliary/LineBreakTest.txt
 	-$(MKDIR) -p $(dir $@)
 	$(PYTHON) tools/test2csv.py -p LB -o $@ $<
 
-csv/DerivedCoreProperties.csv: $(DIR_DOWNLOAD)/DerivedCoreProperties.txt
+csv/emoji-data.csv: $(DIR_DOWNLOAD)/emoji/emoji-data.txt
 	-$(MKDIR) -p $(dir $@)
 	$(PYTHON) tools/prop2csv.py -o $@ $<
 

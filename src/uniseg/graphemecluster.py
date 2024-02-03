@@ -1,15 +1,18 @@
 """Unicode grapheme cluster breaking.
 
-UAX #29: Unicode Text Segmentation (Unicode 15.1.0)
-https://www.unicode.org/reports/tr29/tr29-43.html
+UAX #29: Unicode Text Segmentation (Unicode 15.0.0)
+https://www.unicode.org/reports/tr29/tr29-41.html
 """
 
 import enum
-from typing import Callable, Iterator, Optional
+import re
+from typing import Iterator, Optional
 
 from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
 from uniseg.codepoint import code_point, code_points
 from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
+from uniseg.grapheme_re import pat_extended_grapheme_cluster
+
 
 __all__ = [
     'grapheme_cluster_break',
@@ -19,56 +22,42 @@ __all__ = [
 ]
 
 
+_rx_grapheme = re.compile(pat_extended_grapheme_cluster)
+
+
 @enum.unique
-class GraphemeClusterBreakProperty(enum.Enum):
+class GraphemeClusterBreak(enum.Enum):
     """Grapheme_Cluster_Break property values in UAX #29.
 
     Listed in `Table 2. Grapheme_Cluster_Break Property Values
-    <https://www.unicode.org/reports/tr29/tr29-43.html#Grapheme_Cluster_Break_Property_Values>`_.
+    <https://www.unicode.org/reports/tr29/tr29-41.html#Grapheme_Cluster_Break_Property_Values>`_.
     """
-    Other = 0
+    OTHER = 0
     CR = 1
     LF = 2
-    Control = 3
-    Extend = 4
-    Regional_Indicator = 11
-    Prepend = 13
-    SpacingMark = 5
-    L = 6
-    V = 7
-    T = 8
-    LV = 9
-    LVT = 10
+    CONTROL = 3
+    EXTEND = 4
+    ZWJ = 5
+    REGIONAL_INDICATOR = 6
+    PREPEND = 7
+    SPACINGMARK = 8
+    L = 9
+    V = 10
+    T = 11
+    LV = 12
+    LVT = 13
 
 
-# cf. https://www.unicode.org/Public/15.1.0/ucd/auxiliary/GraphemeBreakTest.html
-# 0: not break, 1: break
-break_table = [
-    [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1],
-    [1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1],
-    [1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
-    [1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1],
-    [1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
-    [1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1],
-    [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0],
-]
-
-
-def grapheme_cluster_break(c: str, index: int = 0, /) -> GraphemeClusterBreakProperty:
+def grapheme_cluster_break(c: str, index: int = 0, /) -> GraphemeClusterBreak:
 
     r"""Return the Grapheme_Cluster_Break property of `c`
 
     `c` must be a single Unicode code point string.
 
     >>> grapheme_cluster_break('a')
-    <GraphemeClusterBreakProperty.Other: 0>
+    <GraphemeClusterBreak.OTHER: 0>
     >>> grapheme_cluster_break('\x0d')
-    <GraphemeClusterBreakProperty.CR: 1>
+    <GraphemeClusterBreak.CR: 1>
     >>> grapheme_cluster_break('\x0a').name
     'LF'
 
@@ -81,7 +70,7 @@ def grapheme_cluster_break(c: str, index: int = 0, /) -> GraphemeClusterBreakPro
     """
 
     name = _grapheme_cluster_break(code_point(c, index))
-    return GraphemeClusterBreakProperty[name]
+    return GraphemeClusterBreak[name.upper()]
 
 
 def grapheme_cluster_breakables(s: str, /) -> Breakables:
@@ -103,22 +92,13 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     if not s:
         return
 
-    prev_gcbi = 0
-    i = 0
-    for c in code_points(s):
-        gcb = grapheme_cluster_break(c)
-        gcbi = gcb.value
-        if i > 0:
-            breakable = break_table[prev_gcbi][gcbi]
-        else:
-            breakable = 1
-        for j in range(len(c)):
-            yield 1 if (j==0 and breakable) else 0
-        prev_gcbi = gcbi
-        i += len(c)
+    for graphem in _rx_grapheme.findall(s):
+        yield 1
+        yield from (0 for _ in range(len(graphem) - 1))
 
 
-def grapheme_cluster_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
+def grapheme_cluster_boundaries(
+        s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
 
     """Iterate indices of the grapheme cluster boundaries of `s`
 
@@ -138,7 +118,8 @@ def grapheme_cluster_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) 
     return boundaries(breakables)
 
 
-def grapheme_clusters(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
+def grapheme_clusters(
+        s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
 
     r"""Iterate every grapheme cluster token of `s`
 
@@ -181,7 +162,8 @@ def grapheme_clusters(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterato
     >>> s = 'Czech'
     >>> list(grapheme_clusters(s)) == ['C', 'z', 'e', 'c', 'h']
     True
-    >>> list(grapheme_clusters(s, tailor_grapheme_cluster_breakables)) == ['C', 'z', 'e', 'ch']
+    >>> list(grapheme_clusters(
+    ...     s, tailor_grapheme_cluster_breakables)) == ['C', 'z', 'e', 'ch']
     True
     """
 

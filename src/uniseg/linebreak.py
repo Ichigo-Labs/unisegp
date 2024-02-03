@@ -1,7 +1,7 @@
 """Unicode line breaking algorithm.
 
-UAX #29: Unicode Text Segmentation (Unicode 15.1.0)
-https://www.unicode.org/reports/tr29/tr29-43.html
+UAX #14: Unicode Line Breaking Algorithm (Unicode 15.0.0)
+https://www.unicode.org/reports/tr14/tr14-49.html
 """
 
 from typing import Iterator, Optional, Tuple, List

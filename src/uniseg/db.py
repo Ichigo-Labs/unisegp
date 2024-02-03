@@ -37,3 +37,7 @@ def line_break(u: str, /) -> str:
 
 def indic_conjunct_break(u: str, /) -> str:
     return db_lookups.indic_conjunct_break_list[_find_break(u)]
+
+
+def extended_pictographic(u: str, /) -> str:
+    return db_lookups.extended_pictographic_list[_find_break(u)]
