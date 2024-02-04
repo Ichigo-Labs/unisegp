@@ -4,8 +4,8 @@ UAX #29: Unicode Text Segmentation (Unicode 15.0.0)
 https://www.unicode.org/reports/tr29/tr29-41.html
 """
 
-import enum
 import re
+from enum import Enum
 from typing import Iterator, Optional
 
 from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
@@ -27,12 +27,9 @@ __all__ = [
 _rx_grapheme = re.compile(PAT_EXTENDED_GRAPHEME_CLUSTER)
 
 
-class GraphemeClusterBreak(enum.Enum):
-    """Grapheme_Cluster_Break property values in UAX #29.
+class GraphemeClusterBreak(Enum):
+    """Grapheme_Cluster_Break property values in UAX #29. """
 
-    Listed in `Table 2. Grapheme_Cluster_Break Property Values
-    <https://www.unicode.org/reports/tr29/tr29-41.html#Grapheme_Cluster_Break_Property_Values>`_.
-    """
     OTHER = 'Other'
     CR = 'CR'
     LF = 'LF'

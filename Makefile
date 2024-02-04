@@ -74,6 +74,7 @@ clean:
 
 cleanall: clean cleandocs
 	-$(RM) -r $(DIR_DOWNLOAD)
+	-$(RM) -r $(DIR_SRC)/uniseg.egg-info
 	-$(RM) -r dist
 	-$(RM) -r build
 
@@ -84,7 +85,7 @@ pypi: sdist wheel
 	twine upload dist/*
 
 install:
-	$(PIP) install -e .
+	$(PIP) install -e '.[dev]'
 
 docs:
 	$(SPHINX_BUILD) -b html $(DIR_DOCS) $(DIR_DOCS_BUILD)/html

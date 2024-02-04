@@ -4,7 +4,7 @@ UAX #29: Unicode Text Segmentation (Unicode 15.0.0)
 https://www.unicode.org/reports/tr29/tr29-41.html
 """
 
-import enum
+from enum import Enum
 from typing import Iterator, Optional, Tuple
 
 from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-class WordBreak(enum.Enum):
+class WordBreak(Enum):
     """Word_Break property values. """
 
     OTHER = 'Other'
