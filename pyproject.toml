@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61", "wheel", "setuptools-scm>=8"]
+requires = ["setuptools>=61", "setuptools-scm>=8", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -34,6 +34,7 @@ dev = [
     "setuptools>=61",
     "setuptools-scm",
     "twine",
+    "wxPython",
 ]
 
 [project.urls]
