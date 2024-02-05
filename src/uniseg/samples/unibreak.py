@@ -1,72 +1,55 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+"""unibreak.py - show Unicode segmentation breaks.
 
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
-import io
-import sys
+A sample script for uniseg package.
 
-from uniseg.codepoint       import code_points
+This work is marked with CC0 1.0
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The uniseg package is licensed under the MIT License.
+https://uniseg-py.readthedocs.io/
+"""
+
+
+from typing import Callable, Iterator, TextIO
+from argparse import ArgumentParser, FileType
+
+from uniseg.codepoint import code_points
 from uniseg.graphemecluster import grapheme_clusters
-from uniseg.wordbreak       import words
-from uniseg.sentencebreak   import sentences
-from uniseg.linebreak       import line_break_units
+from uniseg.linebreak import line_break_units
+from uniseg.sentencebreak import sentences
+from uniseg.wordbreak import words
 
 
-def argopen(file, mode, encoding=None, errors=None):
-    
-    closefd = True
-    if file == '-':
-        closefd = False
-        if 'r' in mode:
-            file = sys.stdin.fileno()
-        else:
-            file = sys.stdout.fileno()
-    return io.open(file, mode, encoding=encoding, errors=errors,
-                   closefd=closefd)
+def main() -> None:
 
-
-def main():
-    
-    import argparse
-    from locale import getpreferredencoding
-    
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-e', '--encoding',
-                        default=getpreferredencoding(),
-                        help="""text encoding of the input (%(default)s)""")
-    parser.add_argument('-l', '--legacy',
-                        action='store_true',
-                        help="""legacy mode (makes sense only with
-                        '--mode l')""")
-    parser.add_argument('-m', '--mode',
-                        choices=['c', 'g', 'l', 's', 'w'],
-                        default='w',
-                        help="""breaking algorithm (%(default)s)
-                        (c: code points, g: grapheme clusters,
-                        s: sentences l: line breaking units, w: words)""")
-    parser.add_argument('-o', '--output',
-                        default='-',
-                        help="""leave output to specified file""")
-    parser.add_argument('file',
-                        nargs='?',
-                        default='-',
-                        help="""input text file""")
+    parser = ArgumentParser()
+    parser.add_argument(
+        '-m', '--mode',
+        default='w',
+        choices=['c', 'g', 'l', 's', 'w'],
+        help="""breaking algorithm (c: code points, g: grapheme clusters,
+        s: sentences l: line breaking units, w: words) default: %(default)s"""
+    )
+    parser.add_argument(
+        'file',
+        default='-',
+        type=FileType(),
+        help="""input text file. '-' for stdin. """
+    )
     args = parser.parse_args()
-    
-    encoding = args.encoding
-    fin = argopen(args.file, 'r', encoding)
-    fout = argopen(args.output, 'w', encoding)
-    _words = {'c': code_points,
-              'g': grapheme_clusters,
-              'l': lambda x: line_break_units(x, args.legacy),
-              's': sentences,
-              'w': words,
-              }[args.mode]
+
+    fin: TextIO = args.file
+    seg_func :Callable[[str], Iterator[str]] = {
+        'c': code_points,
+        'g': grapheme_clusters,
+        'l': line_break_units,
+        's': sentences,
+        'w': words
+    }[args.mode]
     for line in fin:
-        for w in _words(line):
-            print(w, file=fout)
+        for segment in seg_func(line):
+            print(repr(segment))
 
 
 if __name__ == '__main__':

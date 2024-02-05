@@ -1,12 +1,16 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""Text wrapping demo on uniseg + wxPython """
+#!/usr/bin/env python3
+"""Text wrapping demo with uniseg / wxPython.
 
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
-from locale import getpreferredencoding
+A sample script for uniseg package.
+
+This work is marked with CC0 1.0
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The uniseg package is licensed under the MIT License.
+https://uniseg-py.readthedocs.io/
+"""
+
+from typing import List, Optional, Sequence
 
 import wx
 
@@ -52,35 +56,32 @@ conversation?'
 """
 
 
-_preferredencoding = getpreferredencoding()
-
-
 class SampleWxFormatter(Formatter):
-    
-    def __init__(self, dc, log_width):
-        
+
+    def __init__(self, dc: wx.DC, log_width: int) -> None:
+
         self._dc = dc
         self._log_width = log_width
         self._log_cur_x = 0
         self._log_cur_y = 0
-    
+
     @property
-    def wrap_width(self):
+    def wrap_width(self) -> int:
 
         return self._log_width
 
-    def reset(self):
-        
+    def reset(self) -> None:
+
         self._log_cur_x = 0
         self._log_cur_y = 0
 
-    def text_extents(self, s):
-        
+    def text_extents(self, s: str) -> Sequence[int]:
+
         dc = self._dc
         return dc.GetPartialTextExtents(s)
 
-    def handle_text(self, text, extents):
-        
+    def handle_text(self, text: str, extents: List[int]) -> None:
+
         if not text or not extents:
             return
 
@@ -88,8 +89,8 @@ class SampleWxFormatter(Formatter):
         dc.DrawText(text, self._log_cur_x, self._log_cur_y)
         self._log_cur_x += extents[-1]
 
-    def handle_new_line(self):
-        
+    def handle_new_line(self) -> None:
+
         dc = self._dc
         log_line_height = dc.GetCharHeight()
         self._log_cur_y += log_line_height
@@ -97,32 +98,35 @@ class SampleWxFormatter(Formatter):
 
 
 class App(wx.App):
-    
-    def OnInit(self):
-        
+
+    def OnInit(self) -> bool:
+
         frame = Frame(None, wx.ID_ANY, __file__)
-        
+
         self.SetTopWindow(frame)
         frame.Show()
         return True
 
 
 class Frame(wx.Frame):
-    
-    ID_FONT = wx.NewId()
-    
-    def __init__(self, parent, id_, title,
-                 pos=wx.DefaultPosition,
-                 size=wx.DefaultSize,
-                 style=wx.DEFAULT_FRAME_STYLE,
-                 name='frame'):
-        
-        wx.Frame.__init__(self, parent, id_, title, pos, size, style, name)
-        
+
+    ID_FONT: int = wx.Window.NewControlId()
+
+    def __init__(self,
+                 parent: Optional[wx.Window],
+                 id_: int = wx.ID_ANY,
+                 title :str = wx.EmptyString,
+                 pos: wx.Point = wx.DefaultPosition,
+                 size: wx.Size = wx.DefaultSize,
+                 style: int = wx.DEFAULT_FRAME_STYLE,
+                 name: str = wx.FrameNameStr) -> None:
+
+        super(wx.Frame, self).__init__(parent, id_, title, pos, size, style, name)
+
         self.Bind(wx.EVT_MENU, self.OnCmdOpen, id=wx.ID_OPEN)
         self.Bind(wx.EVT_MENU, self.OnCmdExit, id=wx.ID_EXIT)
         self.Bind(wx.EVT_MENU, self.OnCmdFont, id=self.ID_FONT)
-        
+
         menubar = wx.MenuBar()
         menu = wx.Menu()
         menu.Append(wx.ID_OPEN, '&Open')
@@ -133,38 +137,28 @@ class Frame(wx.Frame):
         menu.Append(self.ID_FONT, '&Font...')
         menubar.Append(menu, 'F&ormat')
         self.SetMenuBar(menubar)
-        
+
         self.wrap_window = WrapWindow(self, wx.ID_ANY)
-    
-    def OnCmdOpen(self, evt):
-        
+
+    def OnCmdOpen(self, evt: wx.CommandEvent) -> None:
+
         filename = wx.FileSelector('Open')
         if not filename:
             return
-        raw_text = open(filename, 'rU').read()
-        for enc in {'utf-8', _preferredencoding}:
-            try:
-                text = raw_text.decode(enc)
-            except UnicodeDecodeError:
-                continue
-            else:
-                break
-        else:
-            wx.MessageBox('Couldn\'t open this file.', 'Open', wx.ICON_ERROR)
-            return
+        text = open(filename, 'rU').read()
         self.wrap_window.SetText(text)
         self.wrap_window.Refresh()
-    
-    def OnCmdExit(self, evt):
-        
+
+    def OnCmdExit(self, evt: wx.CommandEvent) -> None:
+
         self.Close()
-    
-    def OnCmdFont(self, evt):
-        
+
+    def OnCmdFont(self, evt: wx.CommandEvent) -> None:
+
         data = wx.FontData()
         font = self.wrap_window.GetFont()
         data.SetInitialFont(font)
-        
+
         dlg = wx.FontDialog(self, data)
         if dlg.ShowModal() == wx.ID_OK:
             ret_data = dlg.GetFontData()
@@ -174,22 +168,26 @@ class Frame(wx.Frame):
 
 
 class WrapWindow(wx.Window):
-    
+
     _text = default_text
     _default_fontface = 'Times New Roman'
     _default_fontsize = 18
-    
-    def __init__(self, parent, id_,
-                 pos=wx.DefaultPosition, size=wx.DefaultSize,
-                 style=0, name=wx.PanelNameStr):
-        
+
+    def __init__(self,
+                 parent: Optional[wx.Window],
+                 id_: int = wx.ID_ANY,
+                 pos: wx.Point = wx.DefaultPosition,
+                 size: wx.Size = wx.DefaultSize,
+                 style: int = 0,
+                 name: str = wx.PanelNameStr) -> None:
+
         wx.Window.__init__(self, parent, id_, pos, size, style, name)
-        
+
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
-        
+
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_SIZE, self.OnSize)
-        
+
         self.SetBackgroundColour(wx.WHITE)
         self.SetForegroundColour(wx.BLACK)
         font = wx.Font(self._default_fontsize,
@@ -199,38 +197,38 @@ class WrapWindow(wx.Window):
                        False,
                        self._default_fontface)
         self.SetFont(font)
-    
-    def GetText(self, value):
-        
-        return _text
-    
-    def SetText(self, value):
-        
+
+    def GetText(self) -> str:
+
+        return self._text
+
+    def SetText(self, value: str) -> None:
+
         self._text = value
-    
-    def OnPaint(self, evt):
-        
+
+    def OnPaint(self, evt: wx.PaintEvent) -> None:
+
         dc = wx.AutoBufferedPaintDC(self)
         dc.Clear()
-        
+
         font = self.GetFont()
         dc.SetFont(font)
 
         dev_width, dev_height = self.GetClientSize()
         log_width   = dc.DeviceToLogicalX(dev_width)
         log_height  = dc.DeviceToLogicalY(dev_height)
-        
+
         formatter = SampleWxFormatter(dc, log_width)
         wrap(formatter, self._text)
-    
-    def OnSize(self, evt):
-        
+
+    def OnSize(self, evt: wx.SizeEvent):
+
         self.Refresh()
 
 
-def main():
-    
-    app = App(0)
+def main() -> None:
+
+    app = App(False)
     app.MainLoop()
 
 

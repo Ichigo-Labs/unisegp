@@ -10,9 +10,9 @@ from uniseg.linebreak import line_break_boundaries
 
 
 __all__ = [
+    'Formatter',
     'Wrapper',
     'wrap',
-    'Formatter',
     'TTFormatter',
     'tt_width',
     'tt_text_extents',
@@ -87,7 +87,8 @@ class Wrapper(object):
              s: str,
              cur: int = 0,
              offset: int = 0,
-             char_wrap: bool = False, /) -> int:
+             *,
+             char_wrap: bool = False) -> int:
 
         """Wrap string `s` with `formatter` and invoke its handlers
 
@@ -158,14 +159,15 @@ class Wrapper(object):
 
 
 ### static objects
-__wrapper__ = Wrapper()
+_wrapper = Wrapper()
 
 
 def wrap(formatter: Formatter,
          s: str,
          cur: int = 0,
          offset: int = 0,
-         char_wrap: bool = False, /) -> int:
+         *,
+         char_wrap: bool = False) -> int:
 
     """Wrap string `s` with `formatter` using the module's static
     :class:`Wrapper` instance
@@ -174,7 +176,7 @@ def wrap(formatter: Formatter,
 
     - *Changed in version 0.7.1:* It returns the count of lines now.
     """
-    return __wrapper__.wrap(formatter, s, cur, offset, char_wrap)
+    return _wrapper.wrap(formatter, s, cur, offset, char_wrap=char_wrap)
 
 
 ### TT
@@ -183,9 +185,9 @@ class TTFormatter(Formatter):
     """A Fixed-width text wrapping formatter. """
 
     def __init__(self,
+                 *,
                  wrap_width: int,
                  tab_width: int = 8,
-                 /,
                  tab_char: str = ' ',
                  ambiguous_as_wide: bool = False):
 
@@ -247,7 +249,7 @@ class TTFormatter(Formatter):
         """Return a list of logical lengths from start of the string to
         each of characters in `s`
         """
-        return tt_text_extents(s, self.ambiguous_as_wide)
+        return tt_text_extents(s, ambiguous_as_wide=self.ambiguous_as_wide)
 
     def handle_text(self, text: str, extents: Sequence[int], /) -> None:
 
@@ -309,19 +311,19 @@ def tt_width(s: str, index: int = 0, ambiguous_as_wide: bool = False) -> Literal
     return 1
 
 
-def tt_text_extents(s: str, ambiguous_as_wide: bool = False, /) -> List[int]:
+def tt_text_extents(s: str, *, ambiguous_as_wide: bool = False) -> List[int]:
 
-    """Return a list of logical widths from the start of `s` to each of
+    r"""Return a list of logical widths from the start of `s` to each of
     characters *(not of code points)* on fixed-width typography
 
     >>> tt_text_extents('')
     []
     >>> tt_text_extents('abc')
     [1, 2, 3]
-    >>> tt_text_extents('\\u3042\\u3044\\u3046')
+    >>> tt_text_extents('\u3042\u3044\u3046')
     [2, 4, 6]
     >>> import sys
-    >>> s = '\\U00029e3d'   # test a code point out of BMP
+    >>> s = '\U00029e3d'   # test a code point out of BMP
     >>> actual = tt_text_extents(s)
     >>> expect = [2] if sys.maxunicode > 0xffff else [2, 2]
     >>> len(s) == len(expect)
@@ -340,8 +342,8 @@ def tt_text_extents(s: str, ambiguous_as_wide: bool = False, /) -> List[int]:
     return widths
 
 
-def tt_wrap(s: str,
-            wrap_width: int,
+def tt_wrap(s: str, wrap_width: int, /,
+            *,
             tab_width: int = 8,
             tab_char: str = ' ',
             ambiguous_as_wide: bool = False,
@@ -353,9 +355,9 @@ def tt_wrap(s: str,
     See :class:`TTFormatter` for `wrap_width`, `tab_width` and `tab_char`, and
     :func:`tt_wrap` for `cur`, `offset` and `char_wrap`.
     """
-    formatter = TTFormatter(wrap_width, tab_width, tab_char,
-                            ambiguous_as_wide)
-    __wrapper__.wrap(formatter, s, cur, offset, char_wrap)
+    formatter = TTFormatter(wrap_width=wrap_width, tab_width=tab_width,
+                            tab_char=tab_char, ambiguous_as_wide=ambiguous_as_wide)
+    _wrapper.wrap(formatter, s, cur, offset, char_wrap=char_wrap)
     return formatter.lines()
 
 

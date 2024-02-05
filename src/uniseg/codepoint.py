@@ -1,7 +1,7 @@
 """Unicode code point. """
 
 from builtins import ord as _ord, chr as _chr
-from typing import Optional, Sequence
+from typing import Optional, Iterator
 
 
 __all__ = [
@@ -77,7 +77,7 @@ def code_point(s: str, index: int = 0, /) -> str:
     return s[index]
 
 
-def code_points(s: str, /) -> Sequence[str]:
+def code_points(s: str, /) -> Iterator[str]:
 
     """Iterate every Unicode code points of the unicode string `s`
 
@@ -89,7 +89,7 @@ def code_points(s: str, /) -> Sequence[str]:
     True
     """
 
-    return list(s)
+    return iter(s)
 
 
 if __name__ == '__main__':

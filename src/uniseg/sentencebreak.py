@@ -254,7 +254,7 @@ def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Itera
     return boundaries(breakables)
 
 
-def sentences(s: str, tailor: Optional[TailorFunc] = None, /) -> List[str]:
+def sentences(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
 
     r"""Iterate every sentence of `s`
 
@@ -266,7 +266,7 @@ def sentences(s: str, tailor: Optional[TailorFunc] = None, /) -> List[str]:
     breakables = sentence_breakables(s)
     if tailor is not None:
         breakables = tailor(s, breakables)
-    return list(break_units(s, breakables))
+    return break_units(s, breakables)
 
 
 if __name__ == '__main__':

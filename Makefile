@@ -9,6 +9,7 @@ CURL = curl --compressed
 PYTHON = python
 PIP = pip
 SPHINX_BUILD = sphinx-build
+PYTEST = pytest
 
 UNICODE_VERSION = 15.0.0
 URL_DOWNLOAD = http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
@@ -61,11 +62,11 @@ csv: $(CSV_FILES)
 
 download: $(DATA_FILES)
 
-build: db_lookups
+build: all
 	$(PYTHON) -m build .
 
-test: db_lookups
-	$(PYTHON) -m $(DIR_SRC).test
+test: all
+	$(PYTEST)
 
 clean:
 	-$(RM) $(AUTOGEN_FILES)
