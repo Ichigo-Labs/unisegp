@@ -33,6 +33,7 @@ dev = [
     "pytest",
     "setuptools>=61",
     "setuptools-scm",
+    "sphinx",
     "twine",
     "wxPython",
 ]

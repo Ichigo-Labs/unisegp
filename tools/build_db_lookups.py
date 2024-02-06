@@ -1,18 +1,17 @@
 import csv
-import os
 import sys
 from typing import Sequence, Tuple, List
 
 
-path = os.path.dirname(os.path.abspath(__file__))
+base_dir = 'data/15.0.0/csv'
 
-reader = csv.reader(open(path + '/../csv/WordBreak.csv', 'r'))
+reader = csv.reader(open(f'{base_dir}/auxiliary/WordBreakProperty.csv', 'r'))
 WordBreak = {int(k):v for k, v in reader}
-reader = csv.reader(open(path + '/../csv/LineBreak.csv', 'r'))
+reader = csv.reader(open(f'{base_dir}/LineBreak.csv', 'r'))
 LineBreak = {int(k):v for k, v in reader}
-reader = csv.reader(open(path + '/../csv/SentenceBreak.csv', 'r'))
+reader = csv.reader(open(f'{base_dir}/auxiliary/SentenceBreakProperty.csv', 'r'))
 SentenceBreak = {int(k):v for k, v in reader}
-reader = csv.reader(open(path + '/../csv/GraphemeClusterBreak.csv', 'r'))
+reader = csv.reader(open(f'{base_dir}/auxiliary/GraphemeBreakProperty.csv', 'r'))
 GraphemeClusterBreak = {int(k):v for k, v in reader}
 
 mapping = [

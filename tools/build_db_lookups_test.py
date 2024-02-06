@@ -1,7 +1,7 @@
 import csv
 import os
 
-path = os.path.dirname(os.path.abspath(__file__))
+base_dir = 'data/15.0.0/csv'
 
 def get_break_tests(path):
     seq = list(csv.reader(open(path, 'r')))
@@ -12,10 +12,10 @@ def get_break_tests(path):
     return s
 
 form = f"""
-word_break_test={get_break_tests(path + '/../csv/WordBreakTest.csv')}
-line_break_test={get_break_tests(path + '/../csv/LineBreakTest.csv')}
-sentence_break_test={get_break_tests(path + '/../csv/SentenceBreakTest.csv')}
-grapheme_cluster_break_test={get_break_tests(path + '/../csv/GraphemeClusterBreakTest.csv')}
+word_break_test={get_break_tests(f'{base_dir}/auxiliary/WordBreakTest.csv')}
+line_break_test={get_break_tests(f'{base_dir}/auxiliary/LineBreakTest.csv')}
+sentence_break_test={get_break_tests(f'{base_dir}/auxiliary/SentenceBreakTest.csv')}
+grapheme_cluster_break_test={get_break_tests(f'{base_dir}/auxiliary/GraphemeBreakTest.csv')}
 """
 
 def main() -> None:

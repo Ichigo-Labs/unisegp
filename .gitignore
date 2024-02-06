@@ -1,7 +1,5 @@
 # generated files
-csv/
 data/
-*.sqlite3
 docs/_build
 
 src/uniseg/grapheme_re.py
