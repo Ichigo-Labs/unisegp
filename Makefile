@@ -3,7 +3,7 @@
 # project metadata
 NAME = uniseg
 UNICODE_VERSION = 15.0.0
-UCD_BASE_URL = http://www.unicode.org/Public
+UCD_BASE_URL = https://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 
 
 # directories
@@ -27,13 +27,13 @@ GENERATED_DIRS = $(DIR_DATA) $(DIR_DIST)
 
 
 # commands
-CURL = curl --compressed
-MKDIR = "mkdir"
 MV = mv
+RM = rm -v
+MKDIR = "mkdir"
+CURL = curl --compressed -s
+PYTHON = python
 PIP = python -m pip
 PYTEST = pytest
-PYTHON = python
-RM = rm -v
 SPHINX_BUILD = sphinx-build
 TWINE = twine
 
@@ -52,8 +52,8 @@ UCD_TEST_FILES = \
 	$(DIR_DATA_UCD)/auxiliary/LineBreakTest.txt
 UCD_FILES = $(UCD_PROP_FILES) $(UCD_TEST_FILES)
 
-CSV_PROP_FILES = $(patsubst $(PATH_UCD)/%.txt, $(PATH_CSV)/%.csv, $(UCD_PROP_FILES))
-CSV_TEST_FILES = $(patsubst $(PATH_UCD)/%.txt, $(PATH_CSV)/%.csv, $(UCD_TEST_FILES))
+CSV_PROP_FILES = $(patsubst $(DIR_DATA_UCD)/%.txt, $(DIR_DATA_CSV)/%.csv, $(UCD_PROP_FILES))
+CSV_TEST_FILES = $(patsubst $(DIR_DATA_UCD)/%.txt, $(DIR_DATA_CSV)/%.csv, $(UCD_TEST_FILES))
 CSV_FILES = $(CSV_PROP_FILES) $(CSV_TEST_FILES)
 
 
@@ -93,10 +93,10 @@ clean:
 	-$(RM) -r csv
 
 cleanall: clean cleandocs
-	-$(RM) -r $(DIR_UCD)
+	-$(RM) -r $(DIR_DATA)
 	-$(RM) -r $(DIR_SRC)/$(NAME).egg-info
 	-$(RM) -r dist
-	-$(RM) -r build
+
 
 testpypi: sdist wheel
 	$(TWINE) upload -r testpypi --skip-existing dist/*
@@ -117,14 +117,14 @@ cleandocs:
 # pattern rules
 
 # csv files from ucd txt
-$(DIR_CSV)/%Test.csv: $(DIR_UCD)/%Test.txt
+$(DIR_DATA_CSV)/%Test.csv: $(DIR_DATA_UCD)/%Test.txt
 	-$(MKDIR) -p $(dir $@)
 	$(PYTHON) $(DIR_TOOLS)/test2csv.py -p $(basename $(notdir $@)) -o $@ $<
 
-$(DIR_CSV)/%.csv: $(DIR_UCD)/%.txt
+$(DIR_DATA_CSV)/%.csv: $(DIR_DATA_UCD)/%.txt
 	-$(MKDIR) -p $(dir $@)
 	$(PYTHON) $(DIR_TOOLS)/prop2csv.py -o $@ $<
 
 # download ucd files
 $(DIR_DATA_UCD)/%:
-	$(CURL) -o $@ --create-dirs $(subst $(DIR_DATA),$(UCD_BASE_URL),$@)
+	$(CURL) --create-dirs -o $@ $(subst $(DIR_DATA_UCD),$(UCD_BASE_URL),$@)
