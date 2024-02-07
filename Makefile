@@ -3,7 +3,7 @@
 # project metadata
 NAME = uniseg
 UNICODE_VERSION = 15.0.0
-UCD_BASE_URL = http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
+UCD_BASE_URL = http://www.unicode.org/Public
 
 
 # directories
@@ -13,19 +13,21 @@ DIR_TOOLS = tools
 
 
 # directories automatically created
-DIR_CSV = data/$(UNICODE_VERSION)/csv
+PATH_CSV = $(UNICODE_VERSION)/csv
+PATH_UCD = $(UNICODE_VERSION)/ucd
+
+DIR_DATA = data
+DIR_DATA_CSV = $(DIR_DATA)/$(PATH_CSV)
+DIR_DATA_UCD = $(DIR_DATA)/$(PATH_UCD)
 DIR_DIST = dist
 DIR_DOCS = docs
-DIR_UCD = data/$(UNICODE_VERSION)/ucd
+DIR_DOCS_BUILD = $(DIR_DOCS)/_build
 
-GENERATED_DIRS = $(DIR_CSV) $(DIR_DIST)
-ALL_GENERATED_DIRS = $(GENERATED_DIRS) $(DIR_DOCS) $(DIR_UCD)
-
-DIR_DOCS_BUILD = docs/_build
+GENERATED_DIRS = $(DIR_DATA) $(DIR_DIST)
 
 
 # commands
-CURL = curl --compressed
+CURL = curl --compressed --create-dirs
 MKDIR = "mkdir"
 MV = mv
 PIP = python -m pip
@@ -38,20 +40,20 @@ TWINE = twine
 
 # generated data files
 UCD_PROP_FILES = \
-    $(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
-	$(DIR_UCD)/auxiliary/SentenceBreakProperty.txt \
-	$(DIR_UCD)/auxiliary/WordBreakProperty.txt \
-	$(DIR_UCD)/emoji/emoji-data.txt \
-	$(DIR_UCD)/LineBreak.txt
+    $(DIR_DATA_UCD)/auxiliary/GraphemeBreakProperty.txt \
+	$(DIR_DATA_UCD)/auxiliary/SentenceBreakProperty.txt \
+	$(DIR_DATA_UCD)/auxiliary/WordBreakProperty.txt \
+	$(DIR_DATA_UCD)/emoji/emoji-data.txt \
+	$(DIR_DATA_UCD)/LineBreak.txt
 UCD_TEST_FILES = \
-	$(DIR_UCD)/auxiliary/GraphemeBreakTest.txt \
-	$(DIR_UCD)/auxiliary/SentenceBreakTest.txt \
-	$(DIR_UCD)/auxiliary/WordBreakTest.txt \
-	$(DIR_UCD)/auxiliary/LineBreakTest.txt
+	$(DIR_DATA_UCD)/auxiliary/GraphemeBreakTest.txt \
+	$(DIR_DATA_UCD)/auxiliary/SentenceBreakTest.txt \
+	$(DIR_DATA_UCD)/auxiliary/WordBreakTest.txt \
+	$(DIR_DATA_UCD)/auxiliary/LineBreakTest.txt
 UCD_FILES = $(UCD_PROP_FILES) $(UCD_TEST_FILES)
 
-CSV_PROP_FILES = $(patsubst $(DIR_UCD)/%.txt, $(DIR_CSV)/%.csv, $(UCD_PROP_FILES))
-CSV_TEST_FILES = $(patsubst $(DIR_UCD)/%.txt, $(DIR_CSV)/%.csv, $(UCD_TEST_FILES))
+CSV_PROP_FILES = $(patsubst $(PATH_UCD)/%.txt, $(PATH_CSV)/%.csv, $(UCD_PROP_FILES))
+CSV_TEST_FILES = $(patsubst $(PATH_UCD)/%.txt, $(PATH_CSV)/%.csv, $(UCD_TEST_FILES))
 CSV_FILES = $(CSV_PROP_FILES) $(CSV_TEST_FILES)
 
 
@@ -65,8 +67,8 @@ GENERATED_CODE_FILES = $(GREPHEME_RE_PY) $(DB_LOOKUPS_PY) $(DB_LOOKUPS_TEST_PY)
 # targets
 all: $(GENERATED_CODE_FILES)
 
-$(GREPHEME_RE_PY): $(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
-                   $(DIR_UCD)/emoji/emoji-data.txt
+$(GREPHEME_RE_PY): $(DIR_DATA_UCD)/auxiliary/GraphemeBreakProperty.txt \
+                   $(DIR_DATA_UCD)/emoji/emoji-data.txt
 	$(PYTHON) $(DIR_TOOLS)/build_grapheme_re.py -o $@ $^
 
 $(DB_LOOKUPS_PY): $(CSV_PROP_FILES)
@@ -124,8 +126,5 @@ $(DIR_CSV)/%.csv: $(DIR_UCD)/%.txt
 	$(PYTHON) $(DIR_TOOLS)/prop2csv.py -o $@ $<
 
 # download ucd files
-# Use 'mkdir -p' instead of --create-dirs option of curl because it
-# doesn't work well with path names with '/' on Windows.
-$(DIR_UCD)/%:
-	-$(MKDIR) -p $(dir $@)
-	$(CURL) -o $@ $(subst $(DIR_UCD),$(UCD_BASE_URL),$@)
+$(DIR_DATA_UCD)/%:
+	$(CURL) -o $@ $(subst $(DIR_DATA),$(UCD_BASE_URL),$@)
