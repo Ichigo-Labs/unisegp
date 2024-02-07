@@ -27,7 +27,7 @@ GENERATED_DIRS = $(DIR_DATA) $(DIR_DIST)
 
 
 # commands
-CURL = curl --compressed --create-dirs
+CURL = curl --compressed
 MKDIR = "mkdir"
 MV = mv
 PIP = python -m pip
@@ -127,4 +127,4 @@ $(DIR_CSV)/%.csv: $(DIR_UCD)/%.txt
 
 # download ucd files
 $(DIR_DATA_UCD)/%:
-	$(CURL) -o $@ $(subst $(DIR_DATA),$(UCD_BASE_URL),$@)
+	$(CURL) -o $@ --create-dirs $(subst $(DIR_DATA),$(UCD_BASE_URL),$@)
