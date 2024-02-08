@@ -1,4 +1,11 @@
-.PHONY: all ucd csv clean build test upload docs testpypi pypi
+.PHONY: all \
+        data ucd csv \
+		code \
+		docs \
+		build test \
+		pypi testpypi \
+		install check_git_status \
+        cleanall clean cleandata cleancsv cleanucd cleancode cleandocs
 
 # project metadata
 NAME = uniseg
@@ -65,7 +72,15 @@ GENERATED_CODE_FILES = $(GREPHEME_RE_PY) $(DB_LOOKUPS_PY) $(DB_LOOKUPS_TEST_PY)
 
 
 # targets
-all: $(GENERATED_CODE_FILES) docs
+all: data code docs
+
+data: ucd csv
+
+ucd: $(UCD_FILES)
+
+csv: $(CSV_FILES)
+
+code: $(GENERATED_CODE_FILES)
 
 $(GREPHEME_RE_PY): $(DIR_DATA_UCD)/auxiliary/GraphemeBreakProperty.txt \
                    $(DIR_DATA_UCD)/emoji/emoji-data.txt
@@ -77,37 +92,45 @@ $(DB_LOOKUPS_PY): $(CSV_PROP_FILES)
 $(DB_LOOKUPS_TEST_PY): $(CSV_TEST_FILES)
 	$(PYTHON) $(DIR_TOOLS)/build_db_lookups_test.py $@
 
-csv: $(CSV_FILES)
-
-ucd: $(UCD_FILES)
+docs:
+	$(SPHINX_BUILD) -b html $(DIR_DOCS) $(DIR_DOCS_OUT)/html
 
 build: all
-	$(PYTHON) -m build .
+	$(PYTHON) -m build -o $(DIR_DIST) .
 
-test: all
+test: code
 	$(PYTEST)
 
-clean:
-	-$(RM) $(GENERATED_CODE_FILES)
-	-$(RM) -r $(DIR_SRC)/$(NAME)/__pycache__
-	-$(RM) -r csv
+pypi: check_git_status build
+	$(TWINE) upload $(DIR_DIST)/*
 
-cleanall: clean cleandocs
-	-$(RM) -r $(DIR_DATA)
-	-$(RM) -r $(DIR_SRC)/$(NAME).egg-info
-	-$(RM) -r dist
-
-testpypi: sdist wheel
-	$(TWINE) upload -r testpypi --skip-existing dist/*
-
-pypi: sdist wheel
-	$(TWINE) upload dist/*
+testpypi: check_git_status build
+	$(TWINE) upload -r testpypi --skip-existing $(DIR_DIST)/*
 
 install:
 	$(PIP) install -e '.[dev]'
 
-docs:
-	$(SPHINX_BUILD) -b html $(DIR_DOCS) $(DIR_DOCS_OUT)/html
+check_git_status:
+	@test -z "`git status -s`" || (echo "Repository is not clean" && exit 1)
+
+cleanall: clean cleandata cleancode cleandocs
+	-$(RM) -r $(DIR_SRC)/$(NAME).egg-info
+	-$(RM) -r $(DIR_DIST)
+
+clean:
+	-$(RM) -r $(DIR_SRC)/**/__pycache__
+
+cleandata: cleancsv cleanucd
+	-$(RM) -r $(DIR_DATA)
+
+cleancsv:
+	-$(RM) -r $(DIR_DATA_CSV)
+
+cleanucd:
+	-$(RM) -r $(DIR_DATA_UCD)
+
+cleancode:
+	-$(RM) $(GENERATED_CODE_FILES)
 
 cleandocs:
 	-$(RM) -r $(DIR_DOCS_OUT)
