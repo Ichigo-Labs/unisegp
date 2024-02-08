@@ -34,7 +34,7 @@ CURL = curl --compressed -s
 PYTHON = python
 PIP = python -m pip
 PYTEST = pytest
-SPHINX_BUILD = sphinx-build
+SPHINX_BUILD = python -m sphinx.cmd.build
 TWINE = twine
 
 
