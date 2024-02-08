@@ -2,6 +2,8 @@
 uniseg
 ======
 
+Release: |release|
+
 .. toctree::
    :maxdepth: 2
    :numbered:
