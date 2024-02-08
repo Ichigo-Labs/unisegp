@@ -14,7 +14,7 @@ uniseg
 * :ref:`search`
 
 
-.. include:: ../README
+.. include:: ../README.rst
 
 
 License
@@ -22,5 +22,5 @@ License
 
 .. literalinclude:: ../LICENSE
 
-(This is the output of the sample script, ``uniwrap.py`` with the option 
+(This is the output of the sample script, ``uniwrap.py`` with the option
 ``-w 76``.)
