@@ -1,7 +1,7 @@
 # generated files
 data/
-docs/_build
 
+src/uniseg/docs/
 src/uniseg/grapheme_re.py
 src/uniseg/db_lookups.py
 tests/uniseg_db_lookups_test.py

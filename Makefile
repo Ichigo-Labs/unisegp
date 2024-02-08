@@ -10,6 +10,7 @@ UCD_BASE_URL = https://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 DIR_SRC = src
 DIR_TESTS = tests
 DIR_TOOLS = tools
+DIR_DOCS = docs
 
 
 # directories automatically created
@@ -20,10 +21,9 @@ DIR_DATA = data
 DIR_DATA_CSV = $(DIR_DATA)/$(PATH_CSV)
 DIR_DATA_UCD = $(DIR_DATA)/$(PATH_UCD)
 DIR_DIST = dist
-DIR_DOCS = docs
-DIR_DOCS_BUILD = $(DIR_DOCS)/_build
+DIR_DOCS_OUT = $(DIR_SRC)/$(NAME)/docs
 
-GENERATED_DIRS = $(DIR_DATA) $(DIR_DIST)
+GENERATED_DIRS = $(DIR_DATA) $(DIR_DIST) $(DIR_DOCS_OUT)
 
 
 # commands
@@ -65,7 +65,7 @@ GENERATED_CODE_FILES = $(GREPHEME_RE_PY) $(DB_LOOKUPS_PY) $(DB_LOOKUPS_TEST_PY)
 
 
 # targets
-all: $(GENERATED_CODE_FILES)
+all: $(GENERATED_CODE_FILES) docs
 
 $(GREPHEME_RE_PY): $(DIR_DATA_UCD)/auxiliary/GraphemeBreakProperty.txt \
                    $(DIR_DATA_UCD)/emoji/emoji-data.txt
@@ -97,7 +97,6 @@ cleanall: clean cleandocs
 	-$(RM) -r $(DIR_SRC)/$(NAME).egg-info
 	-$(RM) -r dist
 
-
 testpypi: sdist wheel
 	$(TWINE) upload -r testpypi --skip-existing dist/*
 
@@ -108,10 +107,10 @@ install:
 	$(PIP) install -e '.[dev]'
 
 docs:
-	$(SPHINX_BUILD) -b html $(DIR_DOCS) $(DIR_DOCS_BUILD)/html
+	$(SPHINX_BUILD) -b html $(DIR_DOCS) $(DIR_DOCS_OUT)/html
 
 cleandocs:
-	-$(RM) -r $(DIR_DOCS_BUILD)
+	-$(RM) -r $(DIR_DOCS_OUT)
 
 
 # pattern rules
