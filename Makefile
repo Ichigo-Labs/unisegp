@@ -43,7 +43,7 @@ CURL = curl -s
 PYTHON = python
 PIP = python -m pip
 PYTEST = pytest
-SPHINX_BUILD = python -m sphinx.cmd.build -d $(DIR_DOCS_BUILD_DOCTREE)
+SPHINX_BUILD = python -m sphinx.cmd.build -q -d $(DIR_DOCS_BUILD_DOCTREE)
 TWINE = twine
 
 
