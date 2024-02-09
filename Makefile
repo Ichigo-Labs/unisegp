@@ -38,7 +38,7 @@ GENERATED_DIRS = $(DIR_DATA) $(DIR_DIST) $(DIR_DOCS_OUT)
 # commands
 MV = mv
 RM = rm -v
-MKDIR = "mkdir"
+MKDIR = mkdir
 CURL = curl -s
 PYTHON = python
 PIP = python -m pip
