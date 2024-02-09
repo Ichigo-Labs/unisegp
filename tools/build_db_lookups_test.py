@@ -4,7 +4,7 @@ import os
 base_dir = 'data/15.0.0/csv'
 
 def get_break_tests(path):
-    seq = list(csv.reader(open(path, 'r')))
+    seq = list(csv.reader(open(path, 'r', encoding='utf-8')))
     s = "[\n"
     for elem in seq:
         s += "    " + repr(elem) + ',\n'

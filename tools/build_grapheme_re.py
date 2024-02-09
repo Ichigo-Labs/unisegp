@@ -121,7 +121,7 @@ def main() -> None:
             prop_value = f2
             prop_to_cpranges.setdefault(prop_value, []).append(cprange)
 
-    with open(emoji_file_name) as f:
+    with open(emoji_file_name, encoding='utf-8') as f:
         for fields in iter_records(f):
             if not (len(fields) == 2 and fields[1] == EXTENDED_PICTOGRAPHIC):
                 continue

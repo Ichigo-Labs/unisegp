@@ -83,11 +83,11 @@ def main() -> None:
                         action='store_true',
                         help='do doctest.testmod() and exit')
     parser.add_argument('-o', '--output',
-                        type=FileType('w'),
+                        type=FileType('w', encoding='utf-8'),
                         default=stdout)
     parser.add_argument('file',
                         nargs='?',
-                        type=FileType('r'),
+                        type=FileType('r', encoding='utf-8'),
                         default=stdin)
     args = parser.parse_args()
 
