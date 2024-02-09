@@ -1,9 +1,9 @@
 ==============
-Sample scripts
+Sample Scripts
 ==============
 
 .. toctree::
-   
+
    unibreak
    uniwrap
    wxwrapdemo

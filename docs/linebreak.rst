@@ -1,4 +1,5 @@
-:mod:`uniseg.linebreak` --- Line break
+======================================
+:mod:`uniseg.linebreak` --- Line Break
 ======================================
 
 .. automodule:: uniseg.linebreak

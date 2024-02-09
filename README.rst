@@ -1,16 +1,8 @@
-Introduction
-============
+======
+uniseg
+======
 
- A Python package to determine Unicode text segmentations.
-
-You can see the full documentation including the package reference on
-https://uniseg-py.readthedocs.io.
-
-**Note (2022-09-26):**  This version (0.7.2) will be the last version which says
-that supports old Python interpreters. Actually, 2.x interpreters are no longer
-tested and versions less than 3.8 are not considered as taget platform
-versions now. Compatible codes for 2.x will be removed in further releases.
-They remain just because of historical reasons and my laziness.
+A Python package to determine Unicode text segmentations.
 
 
 Features
@@ -57,78 +49,89 @@ Supporting segmentations are:
 Requirements
 ============
 
-- Python 2.7 / 3.4 / 3.5 / 3.6
-
-
-Download
-========
-
-Source / binary distributions (PyPI)
-    https://pypi.python.org/pypi/uniseg
-All sources and build tools etc. (Bitbucket)
-    https://bitbucket.org/emptypage/uniseg-py
+Python 3.8 or later.
 
 
 Install
 =======
 
-Just type::
+::
 
-    % pip install uniseg
-
-or download the archive and::
-
-    % python setup.py install
+  pip install uniseg
 
 
 Changes
 =======
 
+0.8.0 (2024-02-08)
+
+- Unicode 15.0.0.
+- Regex-based grapheme cluster segmentation.
+- Quit supporting Python versions < 3.8.
+
 0.7.2 (2022-09-20)
-  - Improve performance of Unicode lookups. PR by Max Bachmann.
-    https://bitbucket.org/emptypage/uniseg-py/pull-requests/1
+
+- Improve performance of Unicode lookups. PR by Max Bachmann.
+  <https://bitbucket.org/emptypage/uniseg-py/pull-requests/1>
+
 0.7.1 (2015-05-02)
-  - CHANGE: wrap.Wrapper.wrap(): returns the count of lines now.
-  - Separate LICENSE from README.txt for the packaging-related reason in some
-    environments.
+
+- CHANGE: wrap.Wrapper.wrap(): returns the count of lines now.
+- Separate LICENSE from README.txt for the packaging-related reason in some
+  environments.
+
 0.7.0 (2015-02-27)
-  - CHANGE: Quitted gathering all submodules's members on the top, uniseg
-    module.
-  - CHANGE: Reform ``uniseg.wrap`` module and sample scripts.
-  - Maintained uniseg.wrap module, and sample scripts work again.
+
+- CHANGE: Quitted gathering all submodules's members on the top, uniseg
+  module.
+- CHANGE: Reform ``uniseg.wrap`` module and sample scripts.
+- Maintained uniseg.wrap module, and sample scripts work again.
+
 0.6.4 (2015-02-10)
-  - Add ``uniseg-dbpath`` console command, which just print the path of
-    ``ucd.sqlite3``.
-  - Include sample scripts under the package's subdirectory.
+
+- Add ``uniseg-dbpath`` console command, which just print the path of
+  ``ucd.sqlite3``.
+- Include sample scripts under the package's subdirectory.
+
 0.6.3 (2015-01-25)
-  - Python 3.4
-  - Support modern setuptools, pip and wheel.
+
+- Python 3.4
+- Support modern setuptools, pip and wheel.
+
 0.6.2 (2013-06-09)
-  - Python 3.3
+
+- Python 3.3
+
 0.6.1 (2013-06-08)
-  - Unicode 6.2.0
+
+- Unicode 6.2.0
 
 
 References
 ==========
 
-*UAX #14: Unicode Line Breaking Algorithm* (6.2.0)
-    https://www.unicode.org/reports/tr14/tr14-30.html
-*UAX #29 Unicode Text Segmentation* (6.2.0)
-    https://www.unicode.org/reports/tr29/tr29-21.html
+- *UAX #29 Unicode Text Segmentation* (15.0.0)
+    <https://www.unicode.org/reports/tr29/tr29-41.html>
+- *UAX #14: Unicode Line Breaking Algorithm* (15.0.0)
+    <https://www.unicode.org/reports/tr14/tr14-49.html>
 
 
 Related / Similar Projects
 ==========================
 
-`PyICU <https://pypi.python.org/pypi/PyICU>`_ - Python extension wrapping the ICU C++ API
+`PyICU <https://pypi.python.org/pypi/PyICU>`_ - Python extension wrapping the
+ICU C++ API
+
     *PyICU* is a Python extension wrapping International Components for
     Unicode library (ICU). It also provides text segmentation supports and
     they just perform richer and faster than those of ours. PyICU is an
     extension library so it requires ICU dynamic library (binary files) and
     compiler to build the extension. Our package is written in pure Python;
     it runs slower but is more portable.
-`pytextseg <https://pypi.python.org/pypi/pytextseg>`_ - Python module for text segmentation
+
+`pytextseg <https://pypi.python.org/pypi/pytextseg>`_ - Python module for text
+segmentation
+
     *pytextseg* package focuses very similar goal to ours; it provides
     Unicode-aware text wrapping features. They designed and uses their
     original string class (not built-in ``unicode`` / ``str`` classes) for the

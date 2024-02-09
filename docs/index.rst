@@ -2,27 +2,21 @@
 uniseg
 ======
 
-Release: |release|
+
+A Python package to determine Unicode text segmentations.
+
+Table of Contents
+=================
 
 .. toctree::
    :maxdepth: 2
    :numbered:
 
+   introduction
    modules
    samples
+   license
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-
-.. include:: ../README.rst
-
-
-License
-=======
-
-.. literalinclude:: ../LICENSE
-
-(This is the output of the sample script, ``uniwrap.py`` with the option
-``-w 76``.)

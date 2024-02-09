@@ -1,7 +1,7 @@
 ``unibreak.py``
 ===============
 
-::
+.. code-block:: none
 
   usage: unibreak.py [-h] [-e ENCODING] [-l] [-m {c,g,l,s,w}] [-o OUTPUT] [file]
 
@@ -19,4 +19,3 @@
                           words)
     -o OUTPUT, --output OUTPUT
                           leave output to specified file
-                          

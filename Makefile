@@ -29,6 +29,8 @@ DIR_DATA_CSV = $(DIR_DATA)/$(SUBDIR_CSV)
 DIR_DATA_UCD = $(DIR_DATA)/$(SUBDIR_UCD)
 DIR_DIST = dist
 DIR_DOCS_OUT = $(DIR_SRC)/$(NAME)/docs
+DIR_DOCS_BUILD = $(DIR_DOCS)/_build
+DIR_DOCS_BUILD_DOCTREE = $(DIR_DOCS)/_build/doctree
 
 GENERATED_DIRS = $(DIR_DATA) $(DIR_DIST) $(DIR_DOCS_OUT)
 
@@ -41,7 +43,7 @@ CURL = curl --compressed -s
 PYTHON = python
 PIP = python -m pip
 PYTEST = pytest
-SPHINX_BUILD = python -m sphinx.cmd.build
+SPHINX_BUILD = python -m sphinx.cmd.build -d $(DIR_DOCS_BUILD_DOCTREE)
 TWINE = twine
 
 
@@ -72,7 +74,7 @@ GENERATED_CODE_FILES = $(GREPHEME_RE_PY) $(DB_LOOKUPS_PY) $(DB_LOOKUPS_TEST_PY)
 
 
 # targets
-all: data code docs
+all: data code docs $(GENERATED_CONTENTS)
 
 data: ucd csv
 
@@ -133,7 +135,7 @@ cleancode:
 	-$(RM) $(GENERATED_CODE_FILES)
 
 cleandocs:
-	-$(RM) -r $(DIR_DOCS_OUT)
+	-$(RM) -r $(DIR_DOCS_OUT) $(DIR_DOCS_BUILD)
 
 
 # pattern rules

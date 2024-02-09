@@ -1,4 +1,5 @@
-:mod:`uniseg.wordbreak` --- Word break
+======================================
+:mod:`uniseg.wordbreak` --- Word Break
 ======================================
 
 .. automodule:: uniseg.wordbreak

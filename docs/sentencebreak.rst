@@ -1,8 +1,6 @@
-:mod:`uniseg.sentencebreak` --- Sentence break
 ==============================================
-
-.. toctree::
-   :maxdepth: 2
+:mod:`uniseg.sentencebreak` --- Sentence Break
+==============================================
 
 .. automodule:: uniseg.sentencebreak
    :members:

@@ -1,7 +1,7 @@
 ``uniwrap.py``
 ==============
 
-::
+.. code-block:: none
 
   usage: uniwrap.py [-h] [-e ENCODING] [-r] [-t TAB_WIDTH] [-l] [-o OUTPUT]
                     [-w WRAP_WIDTH] [-c]

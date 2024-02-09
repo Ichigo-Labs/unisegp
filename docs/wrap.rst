@@ -1,4 +1,5 @@
-:mod:`uniseg.wrap` --- Text wrapping
+====================================
+:mod:`uniseg.wrap` --- Text Wrapping
 ====================================
 
 .. automodule:: uniseg.wrap

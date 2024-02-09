@@ -1,5 +1,6 @@
-:mod:`uniseg.codepoint` --- Unicode code point
-==============================================
+======================================
+:mod:`uniseg.codepoint` --- Code Point
+======================================
 
 .. automodule:: uniseg.codepoint
    :members:
