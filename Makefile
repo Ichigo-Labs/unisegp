@@ -121,6 +121,7 @@ cleanall: clean cleandata cleancode cleandocs
 
 clean:
 	-$(RM) -r $(DIR_SRC)/**/__pycache__
+	-$(RM) $(DIR_DIST)/*
 
 cleandata: cleancsv cleanucd
 	-$(RM) -r $(DIR_DATA)
