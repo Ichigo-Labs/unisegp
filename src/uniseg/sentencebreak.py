@@ -25,6 +25,7 @@ __all__ = [
 class SentenceBreak(Enum):
     """Sentence_Break property values. """
 
+    OTHER = 'Other'
     CR = 'CR'
     LF = 'LF'
     EXTEND = 'Extend'
