@@ -63,7 +63,7 @@ Install
 Changes
 =======
 
-0.8.0.1 (2024-08-13)
+0.8.1 (2024-08-13)
 
 - Fix `sentence_break('/')` raised an exception. (Thanks to Nathaniel Mills)
 
