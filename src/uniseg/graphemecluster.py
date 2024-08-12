@@ -96,7 +96,8 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
 
     for graphem in _rx_grapheme.findall(s):
         yield 1
-        yield from (0 for _ in range(len(graphem) - 1))
+        for _ in range(len(graphem) - 1):
+            yield 0
 
 
 def grapheme_cluster_boundaries(
