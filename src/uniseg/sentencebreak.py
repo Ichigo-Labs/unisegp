@@ -64,6 +64,9 @@ def sentence_break(c: str, index: int = 0, /) -> SentenceBreak:
 
     >>> sentence_break('a\x0d', 1)
     <SentenceBreak.CR: 'CR'>
+
+    >>> sentence_break('/')
+    <SentenceBreak.OTHER: 'Other'>
     """
 
     return SentenceBreak[_sentence_break(code_point(c, index)).upper()]
