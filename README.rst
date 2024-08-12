@@ -63,6 +63,10 @@ Install
 Changes
 =======
 
+0.8.0.1 (2024-08-13)
+
+- Fix `sentence_break('/')` raised an exception. (Thanks to Nathaniel Mills)
+
 0.8.0 (2024-02-08)
 
 - Unicode 15.0.0.
