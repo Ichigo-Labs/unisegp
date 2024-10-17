@@ -7,6 +7,7 @@ RX_CODE_POINT_RANGE_LITERAL = re.compile(
 
 
 class CodePointRange(object):
+    """a class which represents a certain range of code points """
 
     __slots__ = ['_start', '_end']
 
