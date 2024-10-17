@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, Iterator, Optional, TextIO, Tuple
+from typing import Iterable, Iterator, Optional, TextIO
 
 
 RX_CODE_POINT_RANGE_LITERAL = re.compile(
@@ -83,7 +83,7 @@ def code_literal(code_point: int) -> str:
         return f'\\U{code_point:08x}'
 
 
-def iter_records(f: TextIO) -> Iterable[Tuple[str, ...]]:
+def iter_records(f: TextIO) -> Iterable[tuple[str, ...]]:
 
     for raw_line in f:
         # strip comment
