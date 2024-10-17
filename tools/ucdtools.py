@@ -110,8 +110,8 @@ def group_continuous(iterable: Iterable[int]) -> Iterator[Iterable[int]]:
         if start is None:
             start = i
         if prev is not None and prev + 1 != i:
-                yield range(start, prev+1)
-                start = i
+            yield range(start, prev+1)
+            start = i
         prev = i
     if start is not None and prev is not None:
         yield range(start, prev+1)
