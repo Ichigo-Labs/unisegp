@@ -85,6 +85,7 @@ def code_point_literal(code_point: int) -> str:
 
 
 def iter_records(f: TextIO) -> Iterable[tuple[str, ...]]:
+    """iterate tuples of tokens on the text data (comments are removed) """
 
     for raw_line in f:
         # strip comment
@@ -95,7 +96,7 @@ def iter_records(f: TextIO) -> Iterable[tuple[str, ...]]:
 
 
 def group_continuous(iterable: Iterable[int]) -> Iterator[Iterable[int]]:
-    """Iterate continuous `int` sequences in `iterable`.
+    """iterate continuous `int` sequences in `iterable`
 
     >>> L = [1, 2, 3, 10, 11, 21, 22, 23]
     >>> [list(x) for x in group_continuous(L)]
