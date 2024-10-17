@@ -49,11 +49,11 @@ class CodePointRange(object):
 
     def re_chars(self) -> str:
 
-        esc_start = code_literal(self.start)
+        esc_start = code_point_literal(self.start)
         if self.end is None:
             return f'{esc_start}'
         else:
-            esc_end = code_literal(self.end)
+            esc_end = code_point_literal(self.end)
             if self.end - self.start == 1:
                 return f'{esc_start}{esc_end}'
             else:
@@ -69,11 +69,12 @@ class CodePointRange(object):
         return cls(cp1, cp2)
 
 
-def code_literal(code_point: int) -> str:
-    r"""
-    >>> literal_escape(0x0030)
+def code_point_literal(code_point: int) -> str:
+    r"""return str literal expression for the code point
+
+    >>> code_point_literal(0x0030)
     '\\u0030'
-    >>> literal_escape(0x10030)
+    >>> code_point_literal(0x10030)
     '\\U00010030'
     """
 
