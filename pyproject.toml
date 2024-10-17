@@ -27,17 +27,6 @@ classifiers = [
     "Topic :: Text Processing",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "build",
-    "pytest",
-    "setuptools>=61",
-    "setuptools-scm",
-    "sphinx",
-    "sphinx_rtd_theme",
-    "twine",
-]
-
 [project.urls]
 Documentation = "https://uniseg-py.readthedocs.io/"
 Repository = "https://bitbucket.org/emptypage/uniseg-py/"
