@@ -1,18 +1,20 @@
+import array
 import csv
 import sys
-from typing import Sequence, Tuple, List
-
+from typing import List, Sequence, Tuple
 
 base_dir = 'data/15.0.0/csv'
 
 reader = csv.reader(open(f'{base_dir}/auxiliary/WordBreakProperty.csv', 'r'))
-WordBreak = {int(k):v for k, v in reader}
+WordBreak = {int(k): v for k, v in reader}
 reader = csv.reader(open(f'{base_dir}/LineBreak.csv', 'r'))
-LineBreak = {int(k):v for k, v in reader}
-reader = csv.reader(open(f'{base_dir}/auxiliary/SentenceBreakProperty.csv', 'r'))
-SentenceBreak = {int(k):v for k, v in reader}
-reader = csv.reader(open(f'{base_dir}/auxiliary/GraphemeBreakProperty.csv', 'r'))
-GraphemeClusterBreak = {int(k):v for k, v in reader}
+LineBreak = {int(k): v for k, v in reader}
+reader = csv.reader(
+    open(f'{base_dir}/auxiliary/SentenceBreakProperty.csv', 'r'))
+SentenceBreak = {int(k): v for k, v in reader}
+reader = csv.reader(
+    open(f'{base_dir}/auxiliary/GraphemeBreakProperty.csv', 'r'))
+GraphemeClusterBreak = {int(k): v for k, v in reader}
 
 mapping = [
     (
@@ -53,7 +55,7 @@ def splitbins(t: Sequence[int]) -> Tuple[List[int], List[int], int]:
             maxshift += 1
     del n
 
-    bytes = sys.maxsize # smallest total size so far
+    bytes = sys.maxsize  # smallest total size so far
     t = tuple(t)        # so slices can be dict keys
     for shift in range(maxshift + 1):
         t1 = []
@@ -76,12 +78,12 @@ def splitbins(t: Sequence[int]) -> Tuple[List[int], List[int], int]:
     t1, t2, shift = best
     return best
 
+
 unique = [x for x in sorted(set(mapping))]
 
 index = [unique.index(x) for x in mapping]
 index1, index2, shift = splitbins(index)
 
-import array
 
 index1_arr = array.array('B')
 index1_arr.extend(index1)
@@ -100,6 +102,7 @@ grapheme_cluster_break_list={repr([x[3] for x in unique])}
 index1={repr(index1_bytes)}
 index2={repr(index2_bytes)}
 """
+
 
 def main() -> None:
     from argparse import ArgumentParser, FileType
