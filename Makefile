@@ -9,7 +9,7 @@
 
 # project metadata
 NAME = uniseg
-UNICODE_VERSION = 15.0.0
+UNICODE_VERSION = 16.0.0
 UCD_BASE_URL = https://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 
 
