@@ -1,7 +1,7 @@
 import csv
-import os
 
-base_dir = 'data/15.0.0/csv'
+base_dir = 'data/16.0.0/csv'
+
 
 def get_break_tests(path):
     seq = list(csv.reader(open(path, 'r', encoding='utf-8')))
@@ -11,12 +11,14 @@ def get_break_tests(path):
     s += "]\n"
     return s
 
+
 form = f"""
 word_break_test={get_break_tests(f'{base_dir}/auxiliary/WordBreakTest.csv')}
 line_break_test={get_break_tests(f'{base_dir}/auxiliary/LineBreakTest.csv')}
 sentence_break_test={get_break_tests(f'{base_dir}/auxiliary/SentenceBreakTest.csv')}
 grapheme_cluster_break_test={get_break_tests(f'{base_dir}/auxiliary/GraphemeBreakTest.csv')}
 """
+
 
 def main() -> None:
     from argparse import ArgumentParser, FileType

@@ -3,7 +3,7 @@ import csv
 import sys
 from collections.abc import Sequence
 
-base_dir = 'data/15.0.0/csv'
+base_dir = 'data/16.0.0/csv'
 
 reader = csv.reader(open(f'{base_dir}/auxiliary/WordBreakProperty.csv', 'r'))
 WordBreak = {int(k): v for k, v in reader}
