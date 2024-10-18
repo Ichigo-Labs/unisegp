@@ -1,7 +1,7 @@
 import array
 import csv
 import sys
-from typing import List, Sequence, Tuple
+from collections.abc import Sequence
 
 base_dir = 'data/15.0.0/csv'
 
@@ -38,7 +38,7 @@ def getsize(data: Sequence) -> int:
     return 4
 
 
-def splitbins(t: Sequence[int]) -> Tuple[List[int], List[int], int]:
+def splitbins(t: Sequence[int]) -> tuple[list[int], list[int], int]:
     """t, trace=0 -> (t1, t2, shift).  Split a table to save space.
     t is a sequence of ints.  This function can be useful to save space if
     many of the ints are the same.  t1 and t2 are lists of ints, and shift
