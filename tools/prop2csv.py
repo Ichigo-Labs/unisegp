@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Extract UCD properties in CSV format."""
 
+
 import re
 from argparse import ArgumentParser, FileType
 from collections.abc import Sequence
@@ -80,8 +81,9 @@ def main() -> None:
                         help='do doctest.testmod() and exit')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='verbose mode in testmod')
-    parser.add_argument('file', type=FileType('r', encoding='utf-8'),
-                        help='UCD text file')
+    parser.add_argument('file', nargs='?', default='-',
+                        type=FileType('r', encoding='utf-8'),
+                        help='UCD test file (default: stdin)')
     args = parser.parse_args()
 
     if args.testmod:

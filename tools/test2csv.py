@@ -1,16 +1,15 @@
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals)
-import os.path
+#!/usr/bin/env python3
+"""Extract UCD test cases in CSV format."""
+
+
 import re
-import sys
-if sys.version < '3':
-    from io import open
+from argparse import ArgumentParser, FileType
+from io import TextIOBase
+from typing import Union
 
 
-def csv_escape(value):
-    '''Return escaped string suitable as a CSV field
+def csv_escape(value: Union[int, str]) -> str:
+    '''Return escaped string suitable as a CSV field.
 
     >>> csv_escape(1)
     '1'
@@ -28,7 +27,14 @@ def csv_escape(value):
     return s
 
 
-def split_comment(line):
+def split_comment(line: str) -> tuple[str, str]:
+    """Split a line into a data part and a comment.
+
+    >>> split_comment('data # comment')
+    ('data', 'comment')
+    >>> split_comment('data')
+    ('data', '')
+    """
 
     if '#' in line:
         data, comment = line.split('#', 1)
@@ -38,41 +44,38 @@ def split_comment(line):
     return data.strip(), comment.strip()
 
 
-def main():
+def main() -> None:
+    """Main entry point."""
 
-    import argparse
-    from sys import stdin, stdout, stderr
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--testmod',
-                        action='store_true',
+    parser = ArgumentParser()
+    parser.add_argument('-o', '--output', default='-',
+                        type=FileType('w', encoding='utf-8'))
+    parser.add_argument('-p', '--prefix', default='TEST')
+    parser.add_argument('-t', '--testmod', action='store_true',
                         help='do doctest.testmod() and exit')
-    parser.add_argument('-p', '--prefix',
-                        default='TEST')
-    parser.add_argument('-o', '--output',
-                        type=lambda x: open(x, 'w', encoding='utf-8'),
-                        default=stdout)
-    parser.add_argument('file',
-                        type=lambda x: open(x, 'r', encoding='utf-8'),
-                        default=stdin)
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='verbose mode in testmod')
+    parser.add_argument('file', nargs='?', default='-',
+                        type=FileType('r', encoding='utf-8'),
+                        help='UCD test file (default: stdin)')
     args = parser.parse_args()
 
     if args.testmod:
         import doctest
-        doctest.testmod()
+        doctest.testmod(verbose=args.verbose)
         exit()
 
-    fin = args.file
-    fout = args.output
-    name_prefix = args.prefix
+    input: TextIOBase = args.file
+    output: TextIOBase = args.output
+    name_prefix: str = args.prefix
     test_num = 1
-    for line in fin:
+    for line in input:
         data, comment = split_comment(line)
         if not data:
             continue
         name = '%s%04d' % (name_prefix, test_num)
         fields = [name, data, comment]
-        print(','.join(csv_escape(x) for x in fields), file=fout)
+        print(','.join(csv_escape(x) for x in fields), file=output)
         test_num += 1
 
 
