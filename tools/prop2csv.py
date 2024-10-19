@@ -1,4 +1,5 @@
-"""Convert UCD property .txt files to CSV. """
+#!/usr/bin/env python3
+"""Extract UCD properties in CSV format."""
 
 import re
 from argparse import ArgumentParser, FileType
