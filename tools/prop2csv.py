@@ -1,19 +1,19 @@
 """Convert UCD property .txt files to CSV. """
 
 import re
-from typing import Any, List, Sequence, Tuple
-
+from argparse import ArgumentParser, FileType
+from collections.abc import Sequence
+from io import TextIOBase
+from typing import Any
 
 rx_csv_special_characters = re.compile(r'[,"\n]')
 
 
-def split_record(line: str, separator: str = ';') -> Tuple[List[str], str]:
-
-    """Split `line` to a list of fields and a comment
+def split_record(line: str, separator: str = ';') -> tuple[list[str], str]:
+    """Split `line` to a list of fields and a comment.
 
     >>> split_record('0000..0009 ; XXX # some value')
     (['0000..0009', 'XXX'], 'some value')
-
     """
 
     try:
@@ -32,14 +32,12 @@ def split_record(line: str, separator: str = ';') -> Tuple[List[str], str]:
 
 
 def codepoint_range(data: str, separator: str = '..') -> Sequence[int]:
-
-    """Return the list of code point integers described in `data`
+    """Return a sequence of code point integers described in `data`.
 
     >>> list(codepoint_range('000D'))
     [13]
     >>> list(codepoint_range('0000..0009'))
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-
     """
 
     if separator in data:
@@ -52,8 +50,7 @@ def codepoint_range(data: str, separator: str = '..') -> Sequence[int]:
 
 
 def csv_escape(value: Any) -> str:
-
-    '''Return escaped string suitable as a CSV field
+    '''Return escaped string suitable as a CSV field.
 
     >>> csv_escape(1)
     '1'
@@ -63,7 +60,6 @@ def csv_escape(value: Any) -> str:
     '","'
     >>> csv_escape('"hi"')
     '"""hi"""'
-
     '''
 
     s = str(value)
@@ -74,31 +70,27 @@ def csv_escape(value: Any) -> str:
 
 
 def main() -> None:
-
-    from argparse import ArgumentParser, FileType
-    from sys import stdin, stdout, stderr
+    """Main entry point."""
 
     parser = ArgumentParser()
-    parser.add_argument('-t', '--testmod',
-                        action='store_true',
+    parser.add_argument('-o', '--output', default='-',
+                        type=FileType('w', encoding='utf-8'))
+    parser.add_argument('-t', '--testmod', action='store_true',
                         help='do doctest.testmod() and exit')
-    parser.add_argument('-o', '--output',
-                        type=FileType('w', encoding='utf-8'),
-                        default=stdout)
-    parser.add_argument('file',
-                        nargs='?',
-                        type=FileType('r', encoding='utf-8'),
-                        default=stdin)
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='verbose mode in testmod')
+    parser.add_argument('file', type=FileType('r', encoding='utf-8'),
+                        help='UCD text file')
     args = parser.parse_args()
 
     if args.testmod:
         import doctest
-        doctest.testmod()
+        doctest.testmod(verbose=args.verbose)
         exit()
 
-    fin = args.file
-    fout = args.output
-    for line in fin:
+    input: TextIOBase = args.file
+    output: TextIOBase = args.output
+    for line in input:
         line = line.strip()
         if not line:
             continue
@@ -108,7 +100,7 @@ def main() -> None:
         cprange = fields[0]
         for cp in codepoint_range(cprange):
             fields[0] = str(cp)
-            print(','.join(csv_escape(x) for x in fields), file=fout)
+            print(','.join(csv_escape(x) for x in fields), file=output)
 
 
 if __name__ == '__main__':
