@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
+"""Generate regex to determine grapheme cluster boundaries."""
+
 from argparse import ArgumentParser, FileType
+from io import TextIOBase
 from itertools import chain
-from typing import Dict, List, TextIO, cast
 
-from ucdtools import CodePointRange, iter_records, group_continuous
-
+from ucdtools import CodePointRange, group_continuous, iter_records
 
 OTHER = 'Other'
 CR = 'CR'
@@ -23,10 +25,10 @@ LVT = 'LVT'
 EXTENDED_PICTOGRAPHIC = 'Extended_Pictographic'
 
 
-def generate_pattern(cprange_dict: Dict[str, List[CodePointRange]]) -> str:
+def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
 
     # charset[prop_value] -> re_charset_pattern
-    charset: Dict[str, str] = {}
+    charset: dict[str, str] = {}
 
     for prop_value, cpranges in cprange_dict.items():
         re_character_set = f'{"".join(cpr.re_chars() for cpr in cpranges)}'
@@ -80,14 +82,14 @@ def generate_pattern(cprange_dict: Dict[str, List[CodePointRange]]) -> str:
     return pat_extended_grapheme_cluster
 
 
-def optimize_code_point_ranges(
-        cpranges: List[CodePointRange]) -> List[CodePointRange]:
-    """Return re-ordered / optimized `CodePointRange` object list. """
+def optimize_code_point_ranges(cpranges: list[CodePointRange]
+                               ) -> list[CodePointRange]:
+    """Return re-ordered / optimized `CodePointRange` object list."""
 
     code_points = list(chain.from_iterable(cpranges))
     code_points.sort()
 
-    new_cpranges: List[CodePointRange] = []
+    new_cpranges: list[CodePointRange] = []
     for grouped_iter in group_continuous(code_points):
         grouped_cps = list(grouped_iter)
         cp1 = grouped_cps[0]
@@ -98,19 +100,21 @@ def optimize_code_point_ranges(
 
 
 def main() -> None:
+    """"Main entry point."""
 
     parser = ArgumentParser()
-    parser.add_argument('-o', '--output', type=FileType('w'), default='-')
+    parser.add_argument('-o', '--output', default='-',
+                        type=FileType('w', encoding='utf-8'))
     parser.add_argument('path_grapheme_breake_property_txt')
     parser.add_argument('path_emoji_data_txt')
     args = parser.parse_args()
 
-    gcb_file_name = str(args.path_grapheme_breake_property_txt)
-    emoji_file_name = str(args.path_emoji_data_txt)
-    fout = cast(TextIO, args.output)
+    gcb_file_name: str = args.path_grapheme_breake_property_txt
+    emoji_file_name: str = args.path_emoji_data_txt
+    output: TextIOBase = args.output
 
     # prop_to_cpranges[prop_value] -> list_of_code_point_ranges
-    prop_to_cpranges: Dict[str, List[CodePointRange]] = {}
+    prop_to_cpranges: dict[str, list[CodePointRange]] = {}
 
     with open(gcb_file_name) as f:
         for fields in iter_records(f):
@@ -138,7 +142,7 @@ def main() -> None:
     print('\n'.join([
         '# DO NOT EDIT. This file is generated automatically.',
         f'{PAT_EXTENDED_GRAPHEME_CLUSTER=}',
-    ]), file=fout)
+    ]), file=output)
 
 
 if __name__ == '__main__':
