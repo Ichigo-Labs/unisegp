@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate regex to determine grapheme cluster boundaries."""
 
+import re
 from argparse import ArgumentParser, FileType
 from itertools import chain
 from typing import TextIO
@@ -100,6 +101,27 @@ def optimize_code_point_ranges(cpranges: list[CodePointRange]
     return new_cpranges
 
 
+def pretty_string(s: str, width: int) -> str:
+    """Return prettified string literal expression for `s`."""
+    L = []
+    w = 0
+    line = ''
+    for m in re.finditer(
+            r'(\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|\\x[0-9a-fA-F]|\\.|.)', s):
+        token = m.group()
+        w_token = len(token) if '\\' not in token else len(token) + 1
+        if w + w_token > (width - 3):
+            L.append(line)
+            w = w_token
+            line = token
+        else:
+            w += w_token
+            line += token
+    if line:
+        L.append(line)
+    return '(' + '\n '.join(repr(x) for x in L) + ')'
+
+
 def main() -> None:
     """"Main entry point."""
 
@@ -140,10 +162,11 @@ def main() -> None:
         cpranges[:] = optimize_code_point_ranges(cpranges)
 
     PAT_EXTENDED_GRAPHEME_CLUSTER = generate_pattern(prop_to_cpranges)
-    print('\n'.join([
-        '# DO NOT EDIT. This file is generated automatically.',
-        f'{PAT_EXTENDED_GRAPHEME_CLUSTER=}',
-    ]), file=output)
+    output.writelines([
+        '# DO NOT EDIT.  This file is generated automatically.\n',
+        'PAT_EXTENDED_GRAPHEME_CLUSTER = \\\n',
+        pretty_string(PAT_EXTENDED_GRAPHEME_CLUSTER, 80) + '\n',
+    ])
 
 
 if __name__ == '__main__':
