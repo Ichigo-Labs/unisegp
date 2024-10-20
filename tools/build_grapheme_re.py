@@ -2,8 +2,8 @@
 """Generate regex to determine grapheme cluster boundaries."""
 
 from argparse import ArgumentParser, FileType
-from io import TextIOBase
 from itertools import chain
+from typing import TextIO
 
 from ucdtools import CodePointRange, group_continuous, iter_records
 
@@ -112,7 +112,7 @@ def main() -> None:
 
     gcb_file_name: str = args.path_grapheme_breake_property_txt
     emoji_file_name: str = args.path_emoji_data_txt
-    output: TextIOBase = args.output
+    output: TextIO = args.output
 
     # prop_to_cpranges[prop_value] -> list_of_code_point_ranges
     prop_to_cpranges: dict[str, list[CodePointRange]] = {}
