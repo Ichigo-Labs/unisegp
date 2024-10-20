@@ -4,8 +4,7 @@
 
 import re
 from argparse import ArgumentParser, FileType
-from io import TextIOBase
-from typing import Union
+from typing import Union, TextIO
 
 
 def csv_escape(value: Union[int, str]) -> str:
@@ -65,8 +64,8 @@ def main() -> None:
         doctest.testmod(verbose=args.verbose)
         exit()
 
-    input: TextIOBase = args.file
-    output: TextIOBase = args.output
+    input: TextIO = args.file
+    output: TextIO = args.output
     name_prefix: str = args.prefix
     test_num = 1
     for line in input:

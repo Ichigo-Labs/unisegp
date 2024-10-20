@@ -5,8 +5,7 @@
 import re
 from argparse import ArgumentParser, FileType
 from collections.abc import Sequence
-from io import TextIOBase
-from typing import Any
+from typing import Any, TextIO
 
 rx_csv_special_characters = re.compile(r'[,"\n]')
 
@@ -91,8 +90,8 @@ def main() -> None:
         doctest.testmod(verbose=args.verbose)
         exit()
 
-    input: TextIOBase = args.file
-    output: TextIOBase = args.output
+    input: TextIO = args.file
+    output: TextIO = args.output
     for line in input:
         line = line.strip()
         if not line:
