@@ -26,6 +26,7 @@ EXTENDED_PICTOGRAPHIC = 'Extended_Pictographic'
 
 
 def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
+    """Generate regex pattern to determine grapheme cluster boundaries."""
 
     # charset[prop_value] -> re_charset_pattern
     charset: dict[str, str] = {}
