@@ -2,6 +2,7 @@ import array
 import csv
 import sys
 from collections.abc import Sequence
+from pprint import pformat
 
 base_dir = 'data/16.0.0/csv'
 
@@ -93,14 +94,20 @@ index2_arr = array.array('B')
 index2_arr.extend(index2)
 index2_bytes = index2_arr.tobytes()
 
-form = f"""
-shift={shift}
-word_break_list={repr([x[0] for x in unique])}
-line_break_list={repr([x[1] for x in unique])}
-sentence_break_list={repr([x[2] for x in unique])}
-grapheme_cluster_break_list={repr([x[3] for x in unique])}
-index1={repr(index1_bytes)}
-index2={repr(index2_bytes)}
+form = f"""# DO NOT EDIT.  This file is generated automatically.
+shift = {shift}
+word_break_list = \\
+{pformat([x[0] for x in unique], compact=True)}
+line_break_list = \\
+{pformat([x[1] for x in unique], compact=True)}
+sentence_break_list = \\
+{pformat([x[2] for x in unique], compact=True)}
+grapheme_cluster_break_list = \\
+{pformat([x[3] for x in unique], compact=True)}
+index1 = \\
+{pformat(index1_bytes, compact=True)}
+index2 = \\
+{pformat(index2_bytes, compact=True)}
 """
 
 
