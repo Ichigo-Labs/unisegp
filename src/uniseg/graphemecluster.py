@@ -1,7 +1,7 @@
 """Unicode grapheme cluster boundaries.
 
-UAX #29: Unicode Text Segmentation (Unicode 15.0.0)
-https://www.unicode.org/reports/tr29/tr29-41.html
+UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
+https://www.unicode.org/reports/tr29/tr29-45.html
 """
 
 import re
