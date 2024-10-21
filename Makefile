@@ -132,39 +132,32 @@ cleandocs:
 
 # generate source files
 
-$(DIR_SRC)/uniseg/db_lookups.py: $(DIR_TOOLS)/build_db_lookups.py \
-		$(CSV_PROP_FILES)
+$(DIR_SRC)/uniseg/db_lookups.py: $(CSV_PROP_FILES)
 	$(PYTHON) $(DIR_TOOLS)/build_db_lookups.py $@
 
-$(DIR_SRC)/uniseg/grapheme_re.py: $(DIR_TOOLS)/build_grapheme_re.py \
+$(DIR_SRC)/uniseg/grapheme_re.py: \
 		$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
 		$(DIR_UCD)/emoji/emoji-data.txt
-	$(PYTHON) $(DIR_TOOLS)/build_grapheme_re.py -o $@ \
-		$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
-		$(DIR_UCD)/emoji/emoji-data.txt
+	$(PYTHON) $(DIR_TOOLS)/build_grapheme_re.py -o $@ $^
 
 
 # generate test files
 
-$(DIR_TESTS)/test_graphemebreak.py: $(DIR_TOOLS)/build_break_test.py \
-		$(DIR_CSV)/auxiliary/GraphemeBreakTest.csv
+$(DIR_TESTS)/test_graphemebreak.py: $(DIR_CSV)/auxiliary/GraphemeBreakTest.csv
 	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.graphemecluster -o $@ \
-		grapheme_cluster_boundaries $(DIR_CSV)/auxiliary/GraphemeBreakTest.csv
+		grapheme_cluster_boundaries $^
 
-$(DIR_TESTS)/test_wordbreak.py: $(DIR_TOOLS)/build_break_test.py \
-		$(DIR_CSV)/auxiliary/WordBreakTest.csv
+$(DIR_TESTS)/test_wordbreak.py: $(DIR_CSV)/auxiliary/WordBreakTest.csv
 	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.wordbreak -o $@ \
-		word_boundaries $(DIR_CSV)/auxiliary/WordBreakTest.csv
+		word_boundaries $^
 
-$(DIR_TESTS)/test_linebreak.py: $(DIR_TOOLS)/build_break_test.py \
-		$(DIR_CSV)/auxiliary/LineBreakTest.csv
+$(DIR_TESTS)/test_linebreak.py: $(DIR_CSV)/auxiliary/LineBreakTest.csv
 	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.linebreak -o $@ \
-		line_break_boundaries $(DIR_CSV)/auxiliary/LineBreakTest.csv
+		line_break_boundaries $^
 
-$(DIR_TESTS)/test_sentencebreak.py: $(DIR_TOOLS)/build_break_test.py \
-		$(DIR_CSV)/auxiliary/SentenceBreakTest.csv
+$(DIR_TESTS)/test_sentencebreak.py: $(DIR_CSV)/auxiliary/SentenceBreakTest.csv
 	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.sentencebreak -o $@ \
-		sentence_boundaries $(DIR_CSV)/auxiliary/SentenceBreakTest.csv
+		sentence_boundaries $^
 
 
 # pattern rules
