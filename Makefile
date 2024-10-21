@@ -1,41 +1,32 @@
-.PHONY: all \
-        data ucd csv \
-		code \
-		docs \
-		build test \
+.PHONY: all ucd csv code docs build test \
 		pypi testpypi \
 		install check_git_status \
-        cleanall clean cleandata cleancsv cleanucd cleancode cleandocs
+		cleanall clean cleancsv cleanucd cleancode cleandocs
 
-# project metadata
+# project
+
 NAME = uniseg
 UNICODE_VERSION = 16.0.0
 UCD_BASE_URL = https://www.unicode.org/Public/$(UNICODE_VERSION)/ucd
 
 
 # directories
+
 DIR_SRC = src
 DIR_TESTS = tests
 DIR_TOOLS = tools
 DIR_DOCS = docs
-
-
-# directories automatically created
-SUBDIR_CSV = $(UNICODE_VERSION)/csv
-SUBDIR_UCD = $(UNICODE_VERSION)/ucd
-
 DIR_DATA = data
-DIR_DATA_CSV = $(DIR_DATA)/$(SUBDIR_CSV)
-DIR_DATA_UCD = $(DIR_DATA)/$(SUBDIR_UCD)
+DIR_CSV = $(DIR_DATA)/$(UNICODE_VERSION)/csv
+DIR_UCD = $(DIR_DATA)/$(UNICODE_VERSION)/ucd
 DIR_DIST = dist
 DIR_DOCS_OUT = $(DIR_SRC)/$(NAME)/docs
 DIR_DOCS_BUILD = $(DIR_DOCS)/_build
 DIR_DOCS_BUILD_DOCTREE = $(DIR_DOCS)/_build/doctree
 
-GENERATED_DIRS = $(DIR_DATA) $(DIR_DIST) $(DIR_DOCS_OUT)
-
 
 # commands
+
 MV = mv
 RM = rm -v
 MKDIR = mkdir
@@ -47,78 +38,61 @@ SPHINX_BUILD = python -m sphinx.cmd.build -q -d $(DIR_DOCS_BUILD_DOCTREE)
 TWINE = twine
 
 
-# generated data files
+# data files
+
 UCD_PROP_FILES = \
-    $(DIR_DATA_UCD)/auxiliary/GraphemeBreakProperty.txt \
-	$(DIR_DATA_UCD)/auxiliary/SentenceBreakProperty.txt \
-	$(DIR_DATA_UCD)/auxiliary/WordBreakProperty.txt \
-	$(DIR_DATA_UCD)/emoji/emoji-data.txt \
-	$(DIR_DATA_UCD)/LineBreak.txt
+    $(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
+	$(DIR_UCD)/auxiliary/WordBreakProperty.txt \
+	$(DIR_UCD)/auxiliary/SentenceBreakProperty.txt \
+	$(DIR_UCD)/LineBreak.txt \
+	$(DIR_UCD)/emoji/emoji-data.txt
+
 UCD_TEST_FILES = \
-	$(DIR_DATA_UCD)/auxiliary/GraphemeBreakTest.txt \
-	$(DIR_DATA_UCD)/auxiliary/SentenceBreakTest.txt \
-	$(DIR_DATA_UCD)/auxiliary/WordBreakTest.txt \
-	$(DIR_DATA_UCD)/auxiliary/LineBreakTest.txt
+	$(DIR_UCD)/auxiliary/GraphemeBreakTest.txt \
+	$(DIR_UCD)/auxiliary/WordBreakTest.txt \
+	$(DIR_UCD)/auxiliary/LineBreakTest.txt \
+	$(DIR_UCD)/auxiliary/SentenceBreakTest.txt
+
 UCD_FILES = $(UCD_PROP_FILES) $(UCD_TEST_FILES)
 
-CSV_PROP_FILES = $(patsubst $(DIR_DATA_UCD)/%.txt, $(DIR_DATA_CSV)/%.csv, $(UCD_PROP_FILES))
-CSV_TEST_FILES = $(patsubst $(DIR_DATA_UCD)/%.txt, $(DIR_DATA_CSV)/%.csv, $(UCD_TEST_FILES))
+CSV_PROP_FILES = \
+	$(patsubst $(DIR_UCD)/%.txt, $(DIR_CSV)/%.csv, $(UCD_PROP_FILES))
+
+CSV_TEST_FILES = \
+	$(patsubst $(DIR_UCD)/%.txt, $(DIR_CSV)/%.csv, $(UCD_TEST_FILES))
+
 CSV_FILES = $(CSV_PROP_FILES) $(CSV_TEST_FILES)
 
 
-# generated code files
-GREPHEME_RE_PY = $(DIR_SRC)/uniseg/grapheme_re.py
-DB_LOOKUPS_PY = $(DIR_SRC)/uniseg/db_lookups.py
-DB_LOOKUPS_TEST_PY = $(DIR_TESTS)/uniseg_db_lookups_test.py
-GENERATED_CODE_FILES = $(GREPHEME_RE_PY) $(DB_LOOKUPS_PY) $(DB_LOOKUPS_TEST_PY) \
+# generated code
+
+GEN_SRC_FILES = \
+	 $(DIR_SRC)/uniseg/db_lookups.py \
+	 $(DIR_SRC)/uniseg/grapheme_re.py
+
+GEN_TEST_FILES = \
 	$(DIR_TESTS)/test_graphemebreak.py \
-	$(DIR_TESTS)/test_wordbreak.py
+	$(DIR_TESTS)/test_wordbreak.py \
+	$(DIR_TESTS)/test_linebreak.py \
+	$(DIR_TESTS)/test_sentencebreak.py
+
+GEN_FILES = $(GEN_SRC_FILES) $(GEN_TEST_FILES)
 
 
 # targets
-all: data code docs $(GENERATED_CONTENTS)
-
-data: ucd csv
+all: ucd csv code docs
 
 ucd: $(UCD_FILES)
 
 csv: $(CSV_FILES)
 
-code: $(GENERATED_CODE_FILES)
-
-$(GREPHEME_RE_PY): $(DIR_DATA_UCD)/auxiliary/GraphemeBreakProperty.txt \
-                   $(DIR_DATA_UCD)/emoji/emoji-data.txt
-	$(PYTHON) $(DIR_TOOLS)/build_grapheme_re.py -o $@ $^
-
-$(DB_LOOKUPS_PY): $(CSV_PROP_FILES)
-	$(PYTHON) $(DIR_TOOLS)/build_db_lookups.py $@
-
-$(DB_LOOKUPS_TEST_PY): $(CSV_TEST_FILES)
-	$(PYTHON) $(DIR_TOOLS)/build_db_lookups_test.py $@
-
-$(DIR_TESTS)/test_graphemebreak.py: \
-		$(DIR_DATA_CSV)/auxiliary/GraphemeBreakTest.csv \
-		$(DIR_TOOLS)/build_break_test.py
-	$(PYTHON) $(DIR_TOOLS)/build_break_test.py \
-		-m uniseg.graphemecluster \
-		-o $@ \
-		grapheme_cluster_boundaries \
-		$(DIR_DATA_CSV)/auxiliary/GraphemeBreakTest.csv
-
-$(DIR_TESTS)/test_wordbreak.py: \
-		$(DIR_DATA_CSV)/auxiliary/WordBreakTest.csv \
-		$(DIR_TOOLS)/build_break_test.py
-	$(PYTHON) $(DIR_TOOLS)/build_break_test.py \
-		-m uniseg.wordbreak \
-		-o $@ \
-		word_boundaries \
-		$(DIR_DATA_CSV)/auxiliary/WordBreakTest.csv
+code: $(GEN_FILES)
 
 docs:
 	$(SPHINX_BUILD) -b html $(DIR_DOCS) $(DIR_DOCS_OUT)/html
 
 build: all
-	$(PYTHON) -m build -o $(DIR_DIST) .
+	$(PYTHON) -m build
 
 test: code
 	$(PYTEST)
@@ -130,12 +104,12 @@ testpypi: check_git_status build
 	$(TWINE) upload -r testpypi --skip-existing $(DIR_DIST)/*
 
 install:
-	$(PIP) install -e '.[dev]'
+	$(PIP) install -e .
 
 check_git_status:
 	@test -z "`git status -s`" || (echo "Repository is not clean" && exit 1)
 
-cleanall: clean cleandata cleancode cleandocs
+cleanall: clean cleancsv cleanucd cleancode cleandocs
 	-$(RM) -r $(DIR_SRC)/$(NAME).egg-info
 	-$(RM) -r $(DIR_DIST)
 
@@ -143,33 +117,65 @@ clean:
 	-$(RM) -r $(DIR_SRC)/**/__pycache__
 	-$(RM) $(DIR_DIST)/*
 
-cleandata: cleancsv cleanucd
-	-$(RM) -r $(DIR_DATA)
-
 cleancsv:
-	-$(RM) -r $(DIR_DATA_CSV)
+	-$(RM) -r $(DIR_CSV)
 
 cleanucd:
-	-$(RM) -r $(DIR_DATA_UCD)
+	-$(RM) -r $(DIR_UCD)
 
 cleancode:
-	-$(RM) $(GENERATED_CODE_FILES)
+	-$(RM) $(GEN_FILES)
 
 cleandocs:
 	-$(RM) -r $(DIR_DOCS_OUT) $(DIR_DOCS_BUILD)
 
 
+# generate source files
+
+$(DIR_SRC)/uniseg/db_lookups.py: $(DIR_TOOLS)/build_db_lookups.py \
+		$(CSV_PROP_FILES)
+	$(PYTHON) $(DIR_TOOLS)/build_db_lookups.py $@
+
+$(DIR_SRC)/uniseg/grapheme_re.py: $(DIR_TOOLS)/build_grapheme_re.py \
+		$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
+		$(DIR_UCD)/emoji/emoji-data.txt
+	$(PYTHON) $(DIR_TOOLS)/build_grapheme_re.py -o $@ \
+		$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
+		$(DIR_UCD)/emoji/emoji-data.txt
+
+
+# generate test files
+
+$(DIR_TESTS)/test_graphemebreak.py: $(DIR_TOOLS)/build_break_test.py \
+		$(DIR_CSV)/auxiliary/GraphemeBreakTest.csv
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.graphemecluster -o $@ \
+		grapheme_cluster_boundaries $(DIR_CSV)/auxiliary/GraphemeBreakTest.csv
+
+$(DIR_TESTS)/test_wordbreak.py: $(DIR_TOOLS)/build_break_test.py \
+		$(DIR_CSV)/auxiliary/WordBreakTest.csv
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.wordbreak -o $@ \
+		word_boundaries $(DIR_CSV)/auxiliary/WordBreakTest.csv
+
+$(DIR_TESTS)/test_linebreak.py: $(DIR_TOOLS)/build_break_test.py \
+		$(DIR_CSV)/auxiliary/LineBreakTest.csv
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.linebreak -o $@ \
+		line_break_boundaries $(DIR_CSV)/auxiliary/LineBreakTest.csv
+
+$(DIR_TESTS)/test_sentencebreak.py: $(DIR_TOOLS)/build_break_test.py \
+		$(DIR_CSV)/auxiliary/SentenceBreakTest.csv
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.sentencebreak -o $@ \
+		sentence_boundaries $(DIR_CSV)/auxiliary/SentenceBreakTest.csv
+
+
 # pattern rules
 
-# csv files from ucd txt
-$(DIR_DATA_CSV)/%Test.csv: $(DIR_DATA_UCD)/%Test.txt
+$(DIR_UCD)/%:
+	$(CURL) --create-dirs -o $@ $(subst $(DIR_UCD),$(UCD_BASE_URL),$@)
+
+$(DIR_CSV)/%Test.csv: $(DIR_UCD)/%Test.txt
 	-$(MKDIR) -p $(dir $@)
 	$(PYTHON) $(DIR_TOOLS)/test2csv.py -p $(basename $(notdir $@)) -o $@ $<
 
-$(DIR_DATA_CSV)/%.csv: $(DIR_DATA_UCD)/%.txt
+$(DIR_CSV)/%.csv: $(DIR_UCD)/%.txt
 	-$(MKDIR) -p $(dir $@)
 	$(PYTHON) $(DIR_TOOLS)/prop2csv.py -o $@ $<
-
-# download ucd files
-$(DIR_DATA_UCD)/%:
-	$(CURL) --create-dirs -o $@ $(subst $(DIR_DATA_UCD),$(UCD_BASE_URL),$@)

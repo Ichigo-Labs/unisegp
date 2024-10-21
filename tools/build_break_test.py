@@ -87,7 +87,7 @@ def main() -> None:
     codes.append(
         'if __name__ == "__main__":\n'
         '    import pytest\n'
-        '    pytest.main(__file__)\n'
+        '    pytest.main([__file__])\n'
     )
 
     output.write('\n\n'.join(codes))
