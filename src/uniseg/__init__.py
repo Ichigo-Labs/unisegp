@@ -1,6 +1,6 @@
 """Determine Unicode text segmentations. """
 
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
 try:
     __version__ = version(__name__)
