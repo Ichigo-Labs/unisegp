@@ -70,7 +70,9 @@ CSV_FILES = $(CSV_PROP_FILES) $(CSV_TEST_FILES)
 GREPHEME_RE_PY = $(DIR_SRC)/uniseg/grapheme_re.py
 DB_LOOKUPS_PY = $(DIR_SRC)/uniseg/db_lookups.py
 DB_LOOKUPS_TEST_PY = $(DIR_TESTS)/uniseg_db_lookups_test.py
-GENERATED_CODE_FILES = $(GREPHEME_RE_PY) $(DB_LOOKUPS_PY) $(DB_LOOKUPS_TEST_PY)
+GENERATED_CODE_FILES = $(GREPHEME_RE_PY) $(DB_LOOKUPS_PY) $(DB_LOOKUPS_TEST_PY) \
+	$(DIR_TESTS)/test_graphemebreak.py \
+	$(DIR_TESTS)/test_wordbreak.py
 
 
 # targets
@@ -93,6 +95,24 @@ $(DB_LOOKUPS_PY): $(CSV_PROP_FILES)
 
 $(DB_LOOKUPS_TEST_PY): $(CSV_TEST_FILES)
 	$(PYTHON) $(DIR_TOOLS)/build_db_lookups_test.py $@
+
+$(DIR_TESTS)/test_graphemebreak.py: \
+		$(DIR_DATA_CSV)/auxiliary/GraphemeBreakTest.csv \
+		$(DIR_TOOLS)/build_break_test.py
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py \
+		-m uniseg.graphemecluster \
+		-o $@ \
+		grapheme_cluster_boundaries \
+		$(DIR_DATA_CSV)/auxiliary/GraphemeBreakTest.csv
+
+$(DIR_TESTS)/test_wordbreak.py: \
+		$(DIR_DATA_CSV)/auxiliary/WordBreakTest.csv \
+		$(DIR_TOOLS)/build_break_test.py
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py \
+		-m uniseg.wordbreak \
+		-o $@ \
+		word_boundaries \
+		$(DIR_DATA_CSV)/auxiliary/WordBreakTest.csv
 
 docs:
 	$(SPHINX_BUILD) -b html $(DIR_DOCS) $(DIR_DOCS_OUT)/html

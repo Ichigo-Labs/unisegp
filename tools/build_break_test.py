@@ -38,7 +38,8 @@ def generate_break_test_code(test: TestEntry, break_func_name: str) -> str:
     """Return test function code."""
 
     string, expect = parse_breaking_test_pattern(test.pattern)
-    string_literal = string.encode('unicode_escape').decode('ascii')
+    string_literal = string.encode('unicode_escape').decode(
+        'ascii').replace("'", "\\'")
     doc_string = '\n    '.join(wrap(test.comment, 76))
 
     return (
@@ -47,7 +48,6 @@ def generate_break_test_code(test: TestEntry, break_func_name: str) -> str:
         f'\n'
         f'    {doc_string}\n'
         f'    """\n'
-        f'    # {string}\n'
         f'    actual = list({break_func_name}(\'{string_literal}\'))\n'
         f'    expect = {repr(expect)}\n'
         f'    assert expect == actual\n'
@@ -83,6 +83,12 @@ def main() -> None:
     for fields in csv.reader(input):
         test = TestEntry(*fields)
         codes.append(generate_break_test_code(test, break_func))
+
+    codes.append(
+        'if __name__ == "__main__":\n'
+        '    import pytest\n'
+        '    pytest.main(__file__)\n'
+    )
 
     output.write('\n\n'.join(codes))
 
