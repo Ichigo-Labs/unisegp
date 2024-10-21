@@ -1,7 +1,7 @@
-"""Breakable table and string tokenization. """
+"""Breakable table and string tokenization."""
 
-from typing import Callable, Iterator, Literal
-
+from collections.abc import Callable, Iterator
+from typing import Literal
 
 __all__ = [
     'Breakables',
@@ -17,8 +17,7 @@ TailorFunc = Callable[[str, Breakables], Breakables]
 
 
 def boundaries(breakables: Breakables, /) -> Iterator[int]:
-
-    """Iterate boundary indices of the breakabe table, `breakables`
+    """Iterate boundary indices of the breakabe table, `breakables`.
 
     The boundaries start from 0 to the end of the sequence (==
     len(breakables)).
@@ -35,7 +34,6 @@ def boundaries(breakables: Breakables, /) -> Iterator[int]:
     >>> list(boundaries([]))
     []
     """
-
     i = None
     for i, breakable in enumerate(breakables):
         if breakable:
@@ -45,8 +43,7 @@ def boundaries(breakables: Breakables, /) -> Iterator[int]:
 
 
 def break_units(s: str, breakables: Breakables, /) -> Iterator[str]:
-
-    """Iterate every tokens of `s` basing on breakable table, `breakables`
+    """Iterate every tokens of `s` basing on breakable table, `breakables`.
 
     >>> list(break_units('ABC', [1, 1, 1])) == ['A', 'B', 'C']
     True
@@ -57,7 +54,6 @@ def break_units(s: str, breakables: Breakables, /) -> Iterator[str]:
 
     The length of `s` must be equal to that of `breakables`.
     """
-
     i = 0
     for j, bk in enumerate(breakables):
         if bk:
