@@ -27,8 +27,7 @@ _rx_grapheme = re.compile(PAT_EXTENDED_GRAPHEME_CLUSTER)
 
 
 class GraphemeClusterBreak(Enum):
-    """Grapheme_Cluster_Break property values in UAX #29. """
-
+    """Grapheme_Cluster_Break property values in UAX #29."""
     OTHER = 'Other'
     CR = 'CR'
     LF = 'LF'
@@ -49,11 +48,10 @@ class GraphemeClusterBreak(Enum):
 GCB = GraphemeClusterBreak
 
 
-def grapheme_cluster_break(c: str, index: int = 0, /) -> GraphemeClusterBreak:
+def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
+    r"""Return the Grapheme_Cluster_Break property of `ch`
 
-    r"""Return the Grapheme_Cluster_Break property of `c`
-
-    `c` must be a single Unicode code point string.
+    `ch` must be a single Unicode string.
 
     >>> grapheme_cluster_break('a')
     <GraphemeClusterBreak.OTHER: 'Other'>
@@ -69,15 +67,13 @@ def grapheme_cluster_break(c: str, index: int = 0, /) -> GraphemeClusterBreak:
     >>> grapheme_cluster_break('a\x0d', 1).name
     'CR'
     """
-
-    name = _grapheme_cluster_break(code_point(c, index))
+    name = _grapheme_cluster_break(code_point(ch, index))
     return GraphemeClusterBreak[name.upper()]
 
 
 def grapheme_cluster_breakables(s: str, /) -> Breakables:
-
     """Iterate grapheme cluster breaking opportunities for every
-    position of `s`
+    position of `s`.
 
     1 for "break" and 0 for "do not break".  The length of iteration
     will be the same as ``len(s)``.
@@ -89,10 +85,8 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     >>> list(grapheme_cluster_breakables(''))
     []
     """
-
     if not s:
         return
-
     for graphem in _rx_grapheme.findall(s):
         yield 1
         for _ in range(len(graphem) - 1):
@@ -101,8 +95,7 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
 
 def grapheme_cluster_boundaries(
         s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
-
-    """Iterate indices of the grapheme cluster boundaries of `s`
+    """Iterate indices of the grapheme cluster boundaries of `s`.
 
     This function yields from 0 to the end of the string (== len(s)).
 
@@ -113,7 +106,6 @@ def grapheme_cluster_boundaries(
     >>> list(grapheme_cluster_boundaries(''))
     []
     """
-
     breakables = grapheme_cluster_breakables(s)
     if tailor is not None:
         breakables = tailor(s, breakables)
@@ -122,8 +114,7 @@ def grapheme_cluster_boundaries(
 
 def grapheme_clusters(
         s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
-
-    r"""Iterate every grapheme cluster token of `s`
+    r"""Iterate every grapheme cluster token of `s`.
 
     Grapheme clusters (both legacy and extended):
 
@@ -168,7 +159,6 @@ def grapheme_clusters(
     ...     s, tailor_grapheme_cluster_breakables)) == ['C', 'z', 'e', 'ch']
     True
     """
-
     breakables = grapheme_cluster_breakables(s)
     if tailor is not None:
         breakables = tailor(s, breakables)
