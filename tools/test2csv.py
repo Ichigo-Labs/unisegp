@@ -4,7 +4,7 @@
 
 import re
 from argparse import ArgumentParser, FileType
-from typing import Union, TextIO
+from typing import TextIO, Union
 
 
 def csv_escape(value: Union[int, str]) -> str:
