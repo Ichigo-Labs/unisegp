@@ -8,11 +8,10 @@ import re
 from enum import Enum
 from typing import Iterator, Optional
 
-from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
+from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
 from uniseg.codepoint import code_point
 from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
 from uniseg.grapheme_re import PAT_EXTENDED_GRAPHEME_CLUSTER
-
 
 __all__ = [
     'GraphemeClusterBreak',
