@@ -9,4 +9,4 @@ except PackageNotFoundError:
     pass
 
 # The version of the Unicode database used in the package
-unidata_version = '15.0.0'
+unidata_version = '16.0.0'
