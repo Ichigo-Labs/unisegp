@@ -24,6 +24,7 @@ LV = 'LV'
 LVT = 'LVT'
 
 EXTENDED_PICTOGRAPHIC = 'Extended_Pictographic'
+INDIC_SYLLABIC_CATEGORY = 'InCB'
 
 
 def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
@@ -44,41 +45,56 @@ def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
     pat_ri_sequence = f"{charset[RI]}{charset[RI]}"
     pat_hangul_syllable = (
         f"(?:"
-        f"[{charset[L]}]*"
-        f"(?:[{charset[V]}]+|[{charset[LV]}][{charset[V]}]*|[{charset[LVT]}])"
-        f"[{charset[T]}]*"
-        f"|"
-        f"[{charset[L]}]+"
-        f"|"
-        f"[{charset[T]}]+"
+            f"[{charset[L]}]*"
+            f"(?:[{charset[V]}]+|[{charset[LV]}][{charset[V]}]*|[{charset[LVT]}])"
+            f"[{charset[T]}]*"
+            f"|"
+            f"[{charset[L]}]+"
+            f"|"
+            f"[{charset[T]}]+"
         f")"
     )
     pat_xpicto_sequence = (
-        f"[{charset[EXTENDED_PICTOGRAPHIC]}]"
         f"(?:"
-        f"[{charset[EXTEND]}]*"
-        f"[{charset[ZWJ]}]"
-        f"[{charset[EXTENDED_PICTOGRAPHIC]}]"
-        f")*"
+            f"[{charset[EXTENDED_PICTOGRAPHIC]}]"
+            f"(?:"
+                f"[{charset[EXTEND]}]*"
+                f"[{charset[ZWJ]}]"
+                f"[{charset[EXTENDED_PICTOGRAPHIC]}]"
+            f")*"
+        f")"
+    )
+    pat_conjunct_cluster = (
+        f"(?:"
+            f"[{charset['InCB=Consonant']}]"
+            f"(?:"
+                f"[{charset['InCB=Extend']}{charset['InCB=Linker']}]*"
+                f"[{charset['InCB=Linker']}]"
+                f"[{charset['InCB=Extend']}{charset['InCB=Linker']}]*"
+                f"[{charset['InCB=Consonant']}]"
+            f")+"
+        f")"
     )
     pat_core = (
         f"(?:"
-        f"{pat_hangul_syllable}"
-        f"|"
-        f"{pat_ri_sequence}"
-        f"|"
-        f"{pat_xpicto_sequence}"
-        f"|"
-        f"[^{charset[CONTROL]}{charset[ZWJ]}{charset[SPACINGMARK]}]"
+            f"{pat_hangul_syllable}"
+            f"|"
+            f"{pat_ri_sequence}"
+            f"|"
+            f"{pat_xpicto_sequence}"
+            f"|"
+            f"{pat_conjunct_cluster}"
+            f"|"
+            f"[^{charset[CONTROL]}{charset[ZWJ]}{charset[SPACINGMARK]}]"
         f")"
     )
     pat_extended_grapheme_cluster = (
         f"(?:"
-        f"{pat_crlf}"
-        f"|"
-        f"{pat_control}"
-        f"|"
-        f"{pat_precore}*{pat_core}{pat_postcore}*"
+            f"{pat_crlf}"
+            f"|"
+            f"{pat_control}"
+            f"|"
+            f"{pat_precore}*{pat_core}{pat_postcore}*"
         f")"
     )
     return pat_extended_grapheme_cluster
@@ -128,34 +144,45 @@ def main() -> None:
     parser = ArgumentParser()
     parser.add_argument('-o', '--output', default='-',
                         type=FileType('w', encoding='utf-8'))
-    parser.add_argument('path_grapheme_breake_property_txt')
-    parser.add_argument('path_emoji_data_txt')
+    parser.add_argument('grapheme_breake_property',
+                        type=FileType('r', encoding='utf-8'))
+    parser.add_argument('emoji_data',
+                        type=FileType('r', encoding='utf-8'))
+    parser.add_argument('derived_core_properties',
+                        type=FileType('r', encoding='utf-8'))
     args = parser.parse_args()
 
-    gcb_file_name: str = args.path_grapheme_breake_property_txt
-    emoji_file_name: str = args.path_emoji_data_txt
     output: TextIO = args.output
+    grapheme_breake_property: TextIO = args.grapheme_breake_property
+    emoji_data: TextIO = args.emoji_data
+    derived_core_properties: TextIO = args.derived_core_properties
 
     # prop_to_cpranges[prop_value] -> list_of_code_point_ranges
     prop_to_cpranges: dict[str, list[CodePointRange]] = {}
 
-    with open(gcb_file_name) as f:
-        for fields in iter_records(f):
-            if len(fields) != 2:
-                continue
-            f1, f2 = fields
-            cprange = CodePointRange.from_literal(f1)
-            prop_value = f2
-            prop_to_cpranges.setdefault(prop_value, []).append(cprange)
+    for fields in iter_records(grapheme_breake_property):
+        if len(fields) != 2:
+            continue
+        f1, f2 = fields
+        cprange = CodePointRange.from_literal(f1)
+        prop_value = f2
+        prop_to_cpranges.setdefault(prop_value, []).append(cprange)
 
-    with open(emoji_file_name, encoding='utf-8') as f:
-        for fields in iter_records(f):
-            if not (len(fields) == 2 and fields[1] == EXTENDED_PICTOGRAPHIC):
-                continue
-            f1, f2 = fields
-            cprange = CodePointRange.from_literal(f1)
-            prop_value = f2
-            prop_to_cpranges.setdefault(prop_value, []).append(cprange)
+    for fields in iter_records(emoji_data):
+        if not (len(fields) == 2 and fields[1] == EXTENDED_PICTOGRAPHIC):
+            continue
+        f1, f2 = fields
+        cprange = CodePointRange.from_literal(f1)
+        prop_value = f2
+        prop_to_cpranges.setdefault(prop_value, []).append(cprange)
+
+    for fields in iter_records(derived_core_properties):
+        if not (len(fields) == 3 and fields[1] == INDIC_SYLLABIC_CATEGORY):
+            continue
+        f1, f2, f3 = fields
+        cprange = CodePointRange.from_literal(f1)
+        prop_value = f'{f2}={f3}'
+        prop_to_cpranges.setdefault(prop_value, []).append(cprange)
 
     # Optimize code points rangees
     for prop_value, cpranges in prop_to_cpranges.items():

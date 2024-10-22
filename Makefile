@@ -138,7 +138,8 @@ $(DIR_SRC)/uniseg/db_lookups.py: $(CSV_PROP_FILES)
 
 $(DIR_SRC)/uniseg/grapheme_re.py: \
 		$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
-		$(DIR_UCD)/emoji/emoji-data.txt
+		$(DIR_UCD)/emoji/emoji-data.txt \
+		$(DIR_UCD)/DerivedCoreProperties.txt
 	$(PYTHON) $(DIR_TOOLS)/build_grapheme_re.py -o $@ $^
 
 
