@@ -7,10 +7,9 @@ https://www.unicode.org/reports/tr29/tr29-41.html
 from enum import Enum
 from typing import Iterator, Optional, Tuple
 
-from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
+from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
 from uniseg.codepoint import code_point, code_points
 from uniseg.db import word_break as _word_break
-
 
 __all__ = [
     'WordBreak',
@@ -23,8 +22,7 @@ __all__ = [
 
 
 class WordBreak(Enum):
-    """Word_Break property values. """
-
+    """Word_Break property values."""
     OTHER = 'Other'
     CR = 'CR'
     LF = 'LF'
