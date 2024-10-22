@@ -37,7 +37,7 @@ def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
         charset[prop_value] = re_character_set
 
     # build patterns.
-    pat_crlf = f"{charset[CR]}{charset[LF]}"
+    pat_crlf = f"{charset[CR]}{charset[LF]}|{charset[CR]}|{charset[LF]}"
     pat_control = f"[{charset[CONTROL]}]"
     pat_postcore = f"[{charset[EXTEND]}{charset[ZWJ]}{charset[SPACINGMARK]}]"
     pat_precore = f"[{charset[PREPEND]}]"
