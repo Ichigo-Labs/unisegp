@@ -42,7 +42,7 @@ def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
     pat_control = f"[{charset[CONTROL]}]"
     pat_postcore = f"[{charset[EXTEND]}{charset[ZWJ]}{charset[SPACINGMARK]}]"
     pat_precore = f"[{charset[PREPEND]}]"
-    pat_ri_sequence = f"{charset[RI]}{charset[RI]}"
+    pat_ri_sequence = f"[{charset[RI]}][{charset[RI]}]"
     pat_hangul_syllable = (
         f"(?:"
             f"[{charset[L]}]*"
