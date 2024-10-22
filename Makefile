@@ -45,7 +45,8 @@ UCD_PROP_FILES = \
 	$(DIR_UCD)/auxiliary/WordBreakProperty.txt \
 	$(DIR_UCD)/auxiliary/SentenceBreakProperty.txt \
 	$(DIR_UCD)/LineBreak.txt \
-	$(DIR_UCD)/emoji/emoji-data.txt
+	$(DIR_UCD)/emoji/emoji-data.txt \
+	$(DIR_UCD)/DerivedCoreProperties.txt
 
 UCD_TEST_FILES = \
 	$(DIR_UCD)/auxiliary/GraphemeBreakTest.txt \
