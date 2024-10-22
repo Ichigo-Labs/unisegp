@@ -85,7 +85,7 @@ def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
             f"|"
             f"{pat_conjunct_cluster}"
             f"|"
-            f"[^{charset[CONTROL]}{charset[ZWJ]}{charset[SPACINGMARK]}]"
+            f"[^{charset[CONTROL]}{charset[CR]}{charset[LF]}]"
         f")"
     )
     pat_extended_grapheme_cluster = (
