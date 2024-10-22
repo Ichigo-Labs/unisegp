@@ -1,7 +1,7 @@
 """Unicode word boundaries.
 
-UAX #29: Unicode Text Segmentation (Unicode 15.0.0)
-https://www.unicode.org/reports/tr29/tr29-41.html
+UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
+https://www.unicode.org/reports/tr29/tr29-45.html
 """
 
 from enum import Enum
@@ -73,7 +73,7 @@ def word_break(c: str, index: int = 0, /) -> WordBreak:
 
 def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, WordBreak]]:
 
-    r"""(internal) Preprocess WB4; X [Extend Format]* -> X
+    r"""(internal) Preprocess WB4; X (Extend | Format | ZWJ)* -> X
 
     >>> list(_preprocess_boundaries('\r\n'))
     [(0, <WordBreak.CR: 'CR'>), (1, <WordBreak.LF: 'LF'>)]
@@ -92,7 +92,7 @@ def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, WordBreak]]:
         if prop in (WB.NEWLINE, WB.CR, WB.LF):
             yield (i, prop)
             prev_prop = None
-        elif prop in (WB.EXTEND, WB.FORMAT):
+        elif prop in (WB.EXTEND, WB.FORMAT, WB.ZWJ):
             if prev_prop is None:
                 yield (i, prop)
                 prev_prop = prop
