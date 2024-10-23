@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, Iterator, Optional, TextIO
+from typing import Any, Iterable, Iterator, Optional, TextIO, Union, overload
 
 RX_CODE_POINT_RANGE_LITERAL = re.compile(
     r'(?P<cp1>[0-9A-Fa-f]{4,5})(?:\.\.(?P<cp2>[0-9A-Fa-f]{4,5}))?')
@@ -10,13 +10,27 @@ class CodePointRange(object):
 
     __slots__ = ['_start', '_end']
 
-    def __init__(self, start: int, end: Optional[int] = None):
+    @overload
+    def __init__(self, arg1: str) -> None:
+        ...
 
-        if end is not None and end <= start:
+    @overload
+    def __init__(self, arg1: int, arg2: Optional[int] = None) -> None:
+        ...
+
+    def __init__(self, arg1: Union[str, int], arg2: Optional[int] = None) -> None:
+
+        if isinstance(arg1, str):
+            m = RX_CODE_POINT_RANGE_LITERAL.match(arg1)
+            if m is None:
+                raise ValueError(f'invalid code point range leteral: {arg1!r}')
+            arg1 = int(m.group('cp1'), 16)
+            arg2 = int(_, 16) if (_ := m.group('cp2')) else None
+
+        if arg2 is not None and arg2 <= arg1:
             raise ValueError('end is greater than start')
-
-        self._start = start
-        self._end = end
+        self._start = arg1
+        self._end = arg2
 
     @property
     def start(self) -> int:
@@ -58,15 +72,6 @@ class CodePointRange(object):
                 return f'{esc_start}{esc_end}'
             else:
                 return f'{esc_start}-{esc_end}'
-
-    @classmethod
-    def from_literal(cls, s: str) -> 'CodePointRange':
-        m = RX_CODE_POINT_RANGE_LITERAL.match(s)
-        if m is None:
-            raise ValueError(f'invalid code point range leteral: {s!r}')
-        cp1 = int(m.group('cp1'), 16)
-        cp2 = int(_, 16) if (_ := m.group('cp2')) else None
-        return cls(cp1, cp2)
 
 
 def code_point_literal(code_point: int) -> str:

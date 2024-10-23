@@ -161,7 +161,7 @@ def main() -> None:
         if len(fields) != 2:
             continue
         f1, f2 = fields
-        cprange = CodePointRange.from_literal(f1)
+        cprange = CodePointRange(f1)
         prop_value = f2
         prop_to_cpranges.setdefault(prop_value, []).append(cprange)
 
@@ -169,7 +169,7 @@ def main() -> None:
         if not (len(fields) == 2 and fields[1] == EXTENDED_PICTOGRAPHIC):
             continue
         f1, f2 = fields
-        cprange = CodePointRange.from_literal(f1)
+        cprange = CodePointRange(f1)
         prop_value = f2
         prop_to_cpranges.setdefault(prop_value, []).append(cprange)
 
@@ -177,7 +177,7 @@ def main() -> None:
         if not (len(fields) == 3 and fields[1] == INDIC_SYLLABIC_CATEGORY):
             continue
         f1, f2, f3 = fields
-        cprange = CodePointRange.from_literal(f1)
+        cprange = CodePointRange(f1)
         prop_value = f'{f2}={f3}'
         prop_to_cpranges.setdefault(prop_value, []).append(cprange)
 
