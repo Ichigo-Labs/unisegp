@@ -29,7 +29,6 @@ INDIC_SYLLABIC_CATEGORY = 'InCB'
 
 def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
     """Generate regex pattern to determine grapheme cluster boundaries."""
-
     # charset[prop_value] -> re_charset_pattern
     charset: dict[str, str] = {}
 
@@ -45,56 +44,56 @@ def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
     pat_ri_sequence = f"[{charset[RI]}][{charset[RI]}]"
     pat_hangul_syllable = (
         f"(?:"
-            f"[{charset[L]}]*"
-            f"(?:[{charset[V]}]+|[{charset[LV]}][{charset[V]}]*|[{charset[LVT]}])"
-            f"[{charset[T]}]*"
-            f"|"
-            f"[{charset[L]}]+"
-            f"|"
-            f"[{charset[T]}]+"
+        f"[{charset[L]}]*"
+        f"(?:[{charset[V]}]+|[{charset[LV]}][{charset[V]}]*|[{charset[LVT]}])"
+        f"[{charset[T]}]*"
+        f"|"
+        f"[{charset[L]}]+"
+        f"|"
+        f"[{charset[T]}]+"
         f")"
     )
     pat_xpicto_sequence = (
         f"(?:"
-            f"[{charset[EXTENDED_PICTOGRAPHIC]}]"
-            f"(?:"
-                f"[{charset[EXTEND]}]*"
-                f"[{charset[ZWJ]}]"
-                f"[{charset[EXTENDED_PICTOGRAPHIC]}]"
-            f")*"
+        f"[{charset[EXTENDED_PICTOGRAPHIC]}]"
+        f"(?:"
+        f"[{charset[EXTEND]}]*"
+        f"[{charset[ZWJ]}]"
+        f"[{charset[EXTENDED_PICTOGRAPHIC]}]"
+        f")*"
         f")"
     )
     pat_conjunct_cluster = (
         f"(?:"
-            f"[{charset['InCB=Consonant']}]"
-            f"(?:"
-                f"[{charset['InCB=Extend']}{charset['InCB=Linker']}]*"
-                f"[{charset['InCB=Linker']}]"
-                f"[{charset['InCB=Extend']}{charset['InCB=Linker']}]*"
-                f"[{charset['InCB=Consonant']}]"
-            f")+"
+        f"[{charset['InCB=Consonant']}]"
+        f"(?:"
+        f"[{charset['InCB=Extend']}{charset['InCB=Linker']}]*"
+        f"[{charset['InCB=Linker']}]"
+        f"[{charset['InCB=Extend']}{charset['InCB=Linker']}]*"
+        f"[{charset['InCB=Consonant']}]"
+        f")+"
         f")"
     )
     pat_core = (
         f"(?:"
-            f"{pat_hangul_syllable}"
-            f"|"
-            f"{pat_ri_sequence}"
-            f"|"
-            f"{pat_xpicto_sequence}"
-            f"|"
-            f"{pat_conjunct_cluster}"
-            f"|"
-            f"[^{charset[CONTROL]}{charset[CR]}{charset[LF]}]"
+        f"{pat_hangul_syllable}"
+        f"|"
+        f"{pat_ri_sequence}"
+        f"|"
+        f"{pat_xpicto_sequence}"
+        f"|"
+        f"{pat_conjunct_cluster}"
+        f"|"
+        f"[^{charset[CONTROL]}{charset[CR]}{charset[LF]}]"
         f")"
     )
     pat_extended_grapheme_cluster = (
         f"(?:"
-            f"{pat_crlf}"
-            f"|"
-            f"{pat_control}"
-            f"|"
-            f"{pat_precore}*{pat_core}{pat_postcore}*"
+        f"{pat_crlf}"
+        f"|"
+        f"{pat_control}"
+        f"|"
+        f"{pat_precore}*{pat_core}{pat_postcore}*"
         f")"
     )
     return pat_extended_grapheme_cluster
@@ -103,7 +102,6 @@ def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
 def optimize_code_point_ranges(cpranges: list[CodePointRange]
                                ) -> list[CodePointRange]:
     """Return re-ordered / optimized `CodePointRange` object list."""
-
     code_points = list(chain.from_iterable(cpranges))
     code_points.sort()
 
@@ -140,7 +138,6 @@ def pretty_string(s: str, width: int) -> str:
 
 def main() -> None:
     """"Main entry point."""
-
     parser = ArgumentParser()
     parser.add_argument('-o', '--output', default='-',
                         type=FileType('w', encoding='utf-8'))
