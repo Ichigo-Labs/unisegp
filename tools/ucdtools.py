@@ -1,12 +1,13 @@
 import re
-from typing import Any, Iterable, Iterator, Optional, TextIO, Union, overload
+from typing import Iterable, Iterator, Optional, TextIO, Union, overload
 
 RX_CODE_POINT_RANGE_LITERAL = re.compile(
-    r'(?P<cp1>[0-9A-Fa-f]{4,5})(?:\.\.(?P<cp2>[0-9A-Fa-f]{4,5}))?')
+    r'(?P<cp1>[0-9A-Fa-f]{4,5})(?:\.\.(?P<cp2>[0-9A-Fa-f]{4,5}))?'
+)
 
 
 class CodePointRange(object):
-    """a class which represents a certain range of code points """
+    """a class which represents a certain range of code points."""
 
     __slots__ = ['_start', '_end']
 
@@ -34,27 +35,22 @@ class CodePointRange(object):
 
     @property
     def start(self) -> int:
-
         return self._start
 
     @property
     def end(self) -> Optional[int]:
-
         return self._end
 
     def __iter__(self) -> Iterator[int]:
-
         if self.end is None:
             yield self.start
         else:
-            yield from range(self.start, self.end+1)
+            yield from range(self.start, self.end + 1)
 
     def __len__(self) -> int:
-
         return 1 if self.end is None else self.end - self.start + 1
 
     def __repr__(self) -> str:
-
         if self.end is None:
             s = f'{self.start:04X}'
         else:
@@ -62,7 +58,6 @@ class CodePointRange(object):
         return f'<{__class__.__name__} [{s}]>'
 
     def re_chars(self) -> str:
-
         esc_start = code_point_literal(self.start)
         if self.end is None:
             return f'{esc_start}'
@@ -75,14 +70,13 @@ class CodePointRange(object):
 
 
 def code_point_literal(code_point: int) -> str:
-    r"""return str literal expression for the code point
+    r"""return str literal expression for the code point.
 
     >>> code_point_literal(0x0030)
     '\\u0030'
     >>> code_point_literal(0x10030)
     '\\U00010030'
     """
-
     if code_point < 0x10000:
         return f'\\u{code_point:04x}'
     else:
@@ -90,8 +84,7 @@ def code_point_literal(code_point: int) -> str:
 
 
 def iter_records(f: TextIO) -> Iterable[tuple[str, ...]]:
-    """iterate tuples of tokens on the text data (comments are removed) """
-
+    """iterate tuples of tokens on the text data (comments are removed)."""
     for raw_line in f:
         # strip comment
         line = raw_line[:i if (i := raw_line.find('#')) >= 0 else None].strip()
@@ -101,7 +94,7 @@ def iter_records(f: TextIO) -> Iterable[tuple[str, ...]]:
 
 
 def group_continuous(iterable: Iterable[int]) -> Iterator[Iterable[int]]:
-    """iterate continuous `int` sequences in `iterable`
+    """iterate continuous `int` sequences in `iterable`.
 
     >>> L = [1, 2, 3, 10, 11, 21, 22, 23]
     >>> [list(x) for x in group_continuous(L)]
