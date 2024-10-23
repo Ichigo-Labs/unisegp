@@ -47,6 +47,9 @@ class WordBreak(Enum):
 # type alias for `WordBreak`
 WB = WordBreak
 
+AHLetterGroup = (WB.ALETTER, WB.HEBREW_LETTER)
+MidNumLetQGroup = (WB.MIDNUMLET, WB.SINGLE_QUOTE)
+
 
 def word_break(c: str, index: int = 0, /) -> WordBreak:
     r"""Return the Word_Break property of `c`
@@ -72,7 +75,6 @@ def word_break(c: str, index: int = 0, /) -> WordBreak:
 
 
 def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, WordBreak]]:
-
     r"""(internal) Preprocess WB4; X (Extend | Format | ZWJ)* -> X
 
     >>> list(_preprocess_boundaries('\r\n'))
@@ -103,7 +105,6 @@ def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, WordBreak]]:
 
 
 def word_breakables(s: str, /) -> Breakables:
-
     r"""Iterate word breaking opportunities for every position of `s`
 
     1 for "break" and 0 for "do not break".  The length of iteration
@@ -125,10 +126,10 @@ def word_breakables(s: str, /) -> Breakables:
     prev_wb = None
     for i, (pos, wb) in enumerate(primitive_boundaries):
         next_pos, next_wb = (primitive_boundaries[i+1]
-                             if i<len(primitive_boundaries)-1 else (len(s), None))
-        #print pos, prev_wb, wb
+                             if i < len(primitive_boundaries)-1 else (len(s), None))
+        # print pos, prev_wb, wb
         if (prev_wb in (WB.NEWLINE, WB.CR, WB.LF)
-            or wb in (WB.NEWLINE, WB.CR, WB.LF)):
+                or wb in (WB.NEWLINE, WB.CR, WB.LF)):
             do_break = not (prev_wb == WB.CR and wb == WB.LF)
         # WB5.
         elif prev_wb == wb == WB.ALETTER:
@@ -146,7 +147,11 @@ def word_breakables(s: str, /) -> Breakables:
         elif prev_wb == WB.ALETTER and wb == WB.NUMERIC:
             do_break = False
         # WB10.
-        elif prev_wb == WB.NUMERIC and wb == WB.ALETTER:
+        elif (
+            (prev_wb == wb == WB.NUMERIC)
+            or (prev_wb in AHLetterGroup and wb == WB.NUMERIC)
+            or (prev_wb == WB.NUMERIC and wb in AHLetterGroup)
+        ):
             do_break = False
         # WB11.
         elif prev_prev_wb == wb == WB.NUMERIC and prev_wb in (WB.MIDNUM, WB.MIDNUMLET):
@@ -168,13 +173,12 @@ def word_breakables(s: str, /) -> Breakables:
         else:
             do_break = True
         for j in range(next_pos-pos):
-            yield 1 if (j==0 and do_break) else 0
+            yield 1 if (j == 0 and do_break) else 0
         prev_prev_wb = prev_wb
         prev_wb = wb
 
 
 def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
-
     """Iterate indices of the word boundaries of `s`
 
     This function yields indices from the first boundary position (> 0)
@@ -188,7 +192,6 @@ def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[
 
 
 def words(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
-
     """Iterate *user-perceived* words of `s`
 
     These examples bellow is from
