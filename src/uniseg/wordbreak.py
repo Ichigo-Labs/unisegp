@@ -135,10 +135,35 @@ def word_breakables(s: str, /) -> Breakables:
         elif prev_wb in AHLetterGroup and wb in AHLetterGroup:
             do_break = False
         # WB6
-        elif prev_wb == next_wb == WB.ALETTER and wb in (WB.MIDLETTER, WB.MIDNUMLET):
+        elif (
+            prev_wb in AHLetterGroup
+            and wb in (WB.MIDLETTER,) + MidNumLetQGroup
+            and next_wb in AHLetterGroup
+        ):
             do_break = False
         # WB7
-        elif (prev_prev_wb == wb == WB.ALETTER and prev_wb in (WB.MIDLETTER, WB.MIDNUMLET)):
+        elif (
+            prev_prev_wb in AHLetterGroup
+            and prev_wb in (WB.MIDLETTER,) + MidNumLetQGroup
+            and wb in AHLetterGroup
+        ):
+            do_break = False
+        # WB7a
+        elif prev_wb == WB.HEBREW_LETTER and wb == WB.SINGLE_QUOTE:
+            do_break = False
+        # WB7b
+        elif (
+            prev_prev_wb == WB.HEBREW_LETTER
+            and prev_wb == WB.DOUBLE_QUOTE
+            and wb == WB.HEBREW_LETTER
+        ):
+            do_break = False
+        # WB7c
+        elif (
+            prev_wb == WB.HEBREW_LETTER
+            and wb == WB.DOUBLE_QUOTE
+            and next_wb == WB.HEBREW_LETTER
+        ):
             do_break = False
         # WB8
         elif prev_wb == wb == WB.NUMERIC:
@@ -164,7 +189,8 @@ def word_breakables(s: str, /) -> Breakables:
             do_break = False
         # WB13a
         elif (
-            prev_wb in AHLetterGroup + (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
+            prev_wb in AHLetterGroup +
+                (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
             and wb == WB.EXTENDNUMLET
         ):
             do_break = False
