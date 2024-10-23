@@ -160,12 +160,19 @@ def word_breakables(s: str, /) -> Breakables:
         elif prev_wb == next_wb == WB.NUMERIC and wb in (WB.MIDNUM, WB.MIDNUMLET):
             do_break = False
         # WB13
-        # WB13a WB13b
-        elif (prev_wb == wb == WB.KATAKANA
-              or (prev_wb in (WB.ALETTER, WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
-                  and wb == WB.EXTENDNUMLET)
-              or (prev_wb == WB.EXTENDNUMLET
-                  and wb in (WB.ALETTER, WB.NUMERIC, WB.KATAKANA))):
+        elif prev_wb == wb == WB.KATAKANA:
+            do_break = False
+        # WB13a
+        elif (
+            prev_wb in AHLetterGroup + (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
+            and wb == WB.EXTENDNUMLET
+        ):
+            do_break = False
+        # WB13b
+        elif (
+            prev_wb == WB.EXTENDNUMLET
+            and wb in AHLetterGroup + (WB.NUMERIC, WB.KATAKANA)
+        ):
             do_break = False
         # WB13c
         elif prev_wb == wb == WB.REGIONAL_INDICATOR:
