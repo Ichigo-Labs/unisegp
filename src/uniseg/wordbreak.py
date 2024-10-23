@@ -132,7 +132,7 @@ def word_breakables(s: str, /) -> Breakables:
                 or wb in (WB.NEWLINE, WB.CR, WB.LF)):
             do_break = not (prev_wb == WB.CR and wb == WB.LF)
         # WB5.
-        elif prev_wb == wb == WB.ALETTER:
+        elif prev_wb in AHLetterGroup and wb in AHLetterGroup:
             do_break = False
         # WB6.
         elif prev_wb == next_wb == WB.ALETTER and wb in (WB.MIDLETTER, WB.MIDNUMLET):
