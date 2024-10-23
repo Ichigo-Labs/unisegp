@@ -131,45 +131,46 @@ def word_breakables(s: str, /) -> Breakables:
         if (prev_wb in (WB.NEWLINE, WB.CR, WB.LF)
                 or wb in (WB.NEWLINE, WB.CR, WB.LF)):
             do_break = not (prev_wb == WB.CR and wb == WB.LF)
-        # WB5.
+        # WB5
         elif prev_wb in AHLetterGroup and wb in AHLetterGroup:
             do_break = False
-        # WB6.
+        # WB6
         elif prev_wb == next_wb == WB.ALETTER and wb in (WB.MIDLETTER, WB.MIDNUMLET):
             do_break = False
-        # WB7.
+        # WB7
         elif (prev_prev_wb == wb == WB.ALETTER and prev_wb in (WB.MIDLETTER, WB.MIDNUMLET)):
             do_break = False
-        # WB8.
+        # WB8
         elif prev_wb == wb == WB.NUMERIC:
             do_break = False
-        # WB9.
+        # WB9
         elif prev_wb == WB.ALETTER and wb == WB.NUMERIC:
             do_break = False
-        # WB10.
+        # WB10
         elif (
             (prev_wb == wb == WB.NUMERIC)
             or (prev_wb in AHLetterGroup and wb == WB.NUMERIC)
             or (prev_wb == WB.NUMERIC and wb in AHLetterGroup)
         ):
             do_break = False
-        # WB11.
+        # WB11
         elif prev_prev_wb == wb == WB.NUMERIC and prev_wb in (WB.MIDNUM, WB.MIDNUMLET):
             do_break = False
-        # WB12.
+        # WB12
         elif prev_wb == next_wb == WB.NUMERIC and wb in (WB.MIDNUM, WB.MIDNUMLET):
             do_break = False
-        # WB13. WB13a. WB13b.
+        # WB13
+        # WB13a WB13b
         elif (prev_wb == wb == WB.KATAKANA
               or (prev_wb in (WB.ALETTER, WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
                   and wb == WB.EXTENDNUMLET)
               or (prev_wb == WB.EXTENDNUMLET
                   and wb in (WB.ALETTER, WB.NUMERIC, WB.KATAKANA))):
             do_break = False
-        # WB13c.
+        # WB13c
         elif prev_wb == wb == WB.REGIONAL_INDICATOR:
             do_break = False
-        # WB14.
+        # WB14
         else:
             do_break = True
         for j in range(next_pos-pos):
