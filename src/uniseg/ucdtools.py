@@ -59,7 +59,11 @@ class CodePointSpan:
         self.end = arg2 or arg1
 
     def __iter__(self) -> Iterator[int]:
-        """Iterate every single code point of the range."""
+        """Iterate every single code point of the range.
+
+        >>> list(CodePointSpan(0x0600, 0x0605))
+        [1536, 1537, 1538, 1539, 1540, 1541]
+        """
         if self.end is None:
             yield self.start
         else:
