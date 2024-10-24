@@ -4,6 +4,7 @@ The UCD files are published under <https://www.unicode.org/Public/>.
 """
 
 import re
+from dataclasses import dataclass
 from typing import Iterable, Iterator, Optional, TextIO, Union, overload
 
 RX_CODE_POINT_RANGE_LITERAL = re.compile(
@@ -11,18 +12,21 @@ RX_CODE_POINT_RANGE_LITERAL = re.compile(
 )
 
 
-class CodePointSpan(object):
-    """a class which represents a certain range of code points."""
-
-    __slots__ = ['_start', '_end']
+@dataclass(init=False, repr=False, order=True)
+class CodePointSpan:
+    """A data class which represents a certain range of code points."""
+    start: int
+    end: int
 
     @overload
     def __init__(self, arg1: str, /) -> None:
         """`arg1` is a literal string with two hexadeciam code points.
         e.g. '0600..0605'
 
-        >>> r = CodePointSpan('0600..0605')
-        >>> r = CodePointSpan('06DD')
+        >>> CodePointSpan('0600..0605')
+        <CodePointSpan [0600..0605]>
+        >>> CodePointSpan('06DD')
+        <CodePointSpan [06DD]>
         """
         ...
 
@@ -32,9 +36,12 @@ class CodePointSpan(object):
         the last code point interger of that.  Specify `None` if the intance
         represents only one single codepoint.]
 
-        >>> span = CodePointSpan(0x0600, 0x0605)
-        >>> span = CodePointSpan(0x06dd)
-        >>> span = CodePointSpan(0x06dd, None)
+        >>> CodePointSpan(0x0600, 0x0605)
+        <CodePointSpan [0600..0605]>
+        >>> CodePointSpan(0x06dd)
+        <CodePointSpan [06DD]>
+        >>> CodePointSpan(0x06dd, None)
+        <CodePointSpan [06DD]>
         """
         ...
 
@@ -47,37 +54,8 @@ class CodePointSpan(object):
             arg2 = int(_, 16) if (_ := m.group('cp2')) else None
         if arg2 is not None and arg2 <= arg1:
             raise ValueError('end is greater than start')
-        self._start = arg1
-        self._end = arg2 or arg1
-
-    @property
-    def start(self) -> int:
-        """The first code point interger of the range.
-
-        >>> span = CodePointSpan('0600..0605')
-        >>> span.start
-        1536
-        >>> span = CodePointSpan(0x06dd)
-        >>> span.start
-        1757
-        """
-        return self._start
-
-    @property
-    def end(self) -> int:
-        """The last code point interger of the range.
-
-        If the instance represents a sigle code point, it returns the save
-        integer value as the `start` property.
-
-        >>> span = CodePointSpan('0600..0605')
-        >>> span.end
-        1541
-        >>> span = CodePointSpan(0x06dd)
-        >>> span.end
-        1757
-        """
-        return self._end
+        self.start = arg1
+        self.end = arg2 or arg1
 
     def __iter__(self) -> Iterator[int]:
         """Iterate every single code point of the range."""
@@ -89,11 +67,9 @@ class CodePointSpan(object):
     def __len__(self) -> int:
         """Return the number of the code points which the instance represents.
 
-        >>> span = CodePointSpan('0600..0605')
-        >>> len(span)
+        >>> len(CodePointSpan('0600..0605'))
         6
-        >>> span = CodePointSpan(0x06dd)
-        >>> len(span)
+        >>> len(CodePointSpan(0x06dd))
         1
         """
         return 1 if self.end is None else self.end - self.start + 1
@@ -116,11 +92,9 @@ class CodePointSpan(object):
         R"""Return regeular expression string which represents the code point
         span.
 
-        >>> span = CodePointSpan('0600..0605')
-        >>> span.re()
+        >>> CodePointSpan('0600..0605').re()
         '\\u0600-\\u0605'
-        >>> span = CodePointSpan(0x06dd)
-        >>> span.re()
+        >>> CodePointSpan(0x06dd).re()
         '\\u06dd'
         """
         esc_start = code_point_literal(self.start)
@@ -134,18 +108,25 @@ class CodePointSpan(object):
                 return f'{esc_start}-{esc_end}'
 
 
-def code_point_literal(code_point: int) -> str:
-    r"""return str literal expression for the code point.
+@dataclass
+class UCDRecord:
+    """A data class which stores the fields and comment of the UCD."""
+    fields: tuple[str, ...]
+    comment: str
+
+
+def code_point_literal(cp: int) -> str:
+    R"""return str literal expression for the code point.
 
     >>> code_point_literal(0x0030)
     '\\u0030'
     >>> code_point_literal(0x10030)
     '\\U00010030'
     """
-    if code_point < 0x10000:
-        return f'\\u{code_point:04x}'
+    if cp < 0x10000:
+        return f'\\u{cp:04x}'
     else:
-        return f'\\U{code_point:08x}'
+        return f'\\U{cp:08x}'
 
 
 def split_comment(line: str) -> tuple[str, str]:
