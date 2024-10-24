@@ -5,7 +5,8 @@ The UCD files are published under <https://www.unicode.org/Public/>.
 
 import re
 from dataclasses import dataclass
-from typing import Iterable, Iterator, Optional, TextIO, Union, overload
+from typing import (Iterable, Iterator, NamedTuple,
+                    Optional, TextIO, Union, overload)
 
 RX_CODE_POINT_RANGE_LITERAL = re.compile(
     r'(?P<cp1>[0-9A-Fa-f]{4,5})(?:\.\.(?P<cp2>[0-9A-Fa-f]{4,5}))?'
@@ -108,9 +109,9 @@ class CodePointSpan:
                 return f'{esc_start}-{esc_end}'
 
 
-@dataclass
-class UCDRecord:
-    """A data class which stores the fields and comment of the UCD."""
+class UcdRecord(NamedTuple):
+    """A data class which represents fields and a comment of the UCD record.
+    """
     fields: tuple[str, ...]
     comment: str
 
@@ -145,14 +146,14 @@ def split_comment(line: str) -> tuple[str, str]:
     return data.strip(), comment.strip()
 
 
-def iter_records(stream: TextIO) -> Iterable[tuple[str, ...]]:
+def iter_records(stream: TextIO) -> Iterable[UcdRecord]:
     """iterate tuples of tokens on the text data (comments are removed)."""
-    for raw_line in stream:
+    for line in stream:
         # strip comment
-        line = raw_line[:i if (i := raw_line.find('#')) >= 0 else None].strip()
-        if line:
-            fields = tuple(x.strip() for x in line.split(';'))
-            yield fields
+        field_part, comment_part = split_comment(line)
+        if field_part:
+            fields = tuple(x.strip() for x in field_part.split(';'))
+            yield UcdRecord(fields, comment_part)
 
 
 def group_continuous(iterable: Iterable[int]) -> Iterator[Iterable[int]]:
