@@ -4,12 +4,14 @@ UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
 https://www.unicode.org/reports/tr29/tr29-45.html
 """
 
+from collections.abc import Sequence
 from enum import Enum
-from typing import Iterator, Optional, Tuple
+from typing import Iterator, Literal, Optional
 
 from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
-from uniseg.codepoint import code_point, code_points
-from uniseg.db import word_break as _word_break, indic_conjunct_break, extended_pictographic
+from uniseg.codepoint import code_point
+from uniseg.db import extended_pictographic
+from uniseg.db import word_break as _word_break
 
 __all__ = [
     'WordBreak',
@@ -70,38 +72,83 @@ def word_break(c: str, index: int = 0, /) -> WordBreak:
     >>> word_break('A\u30a2', 1)
     <WordBreak.KATAKANA: 'Katakana'>
     """
-
     return WordBreak[_word_break(code_point(c, index)).upper()]
 
 
-def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, WordBreak]]:
-    r"""(internal) Preprocess WB4; X (Extend | Format | ZWJ)* -> X
+class Runner(object):
 
-    >>> list(_preprocess_boundaries('\r\n'))
-    [(0, <WordBreak.CR: 'CR'>), (1, <WordBreak.LF: 'LF'>)]
-    >>> list(_preprocess_boundaries('A\u0308A'))
-    [(0, <WordBreak.ALETTER: 'ALetter'>), (2, <WordBreak.ALETTER: 'ALetter'>)]
-    >>> list(_preprocess_boundaries('\n\u2060'))
-    [(0, <WordBreak.LF: 'LF'>), (1, <WordBreak.FORMAT: 'Format'>)]
-    >>> list(_preprocess_boundaries('\x01\u0308\x01'))
-    [(0, <WordBreak.OTHER: 'Other'>), (2, <WordBreak.OTHER: 'Other'>)]
-    """
+    def __init__(self, s: str):
+        self._text = s
+        self._values = [word_break(c) for c in s]
+        self._skip = tuple[str, ...]()
+        self._breakables: list[Literal[0, 1]] = [1 for __ in s]
+        self._i = 0
 
-    prev_prop = None
-    i = 0
-    for c in code_points(s):
-        prop = word_break(c)
-        if prop in (WB.NEWLINE, WB.CR, WB.LF):
-            yield (i, prop)
-            prev_prop = None
-        elif prop in (WB.EXTEND, WB.FORMAT, WB.ZWJ):
-            if prev_prop is None:
-                yield (i, prop)
-                prev_prop = prop
-        else:
-            yield (i, prop)
-            prev_prop = prop
-        i += len(c)
+    @property
+    def text(self) -> str:
+        return self._text
+
+    @property
+    def values(self) -> list[WordBreak]:
+        return self._values
+
+    @property
+    def breakables(self) -> list[Literal[0, 1]]:
+        return self._breakables
+
+    @property
+    def position(self) -> int:
+        return self._i
+
+    @property
+    def curr(self) -> Optional[WordBreak]:
+        return self.value()
+
+    @property
+    def prev(self) -> Optional[WordBreak]:
+        return self.value(-1)
+
+    @property
+    def next(self) -> Optional[WordBreak]:
+        return self.value(1)
+
+    @property
+    def chr(self) -> str:
+        return self._text[self._i]
+
+    def value(self, offset: int = 0) -> Optional[WordBreak]:
+        if offset == 0:
+            return self._values[self._i]
+        i = self._i
+        vec = offset // abs(offset)
+        for __ in range(abs(offset)):
+            i += vec
+            while 0 <= i < len(self._text) and self._values[i] in self._skip:
+                i += vec
+        if 0 <= i < len(self._text):
+            return self._values[i]
+        return None
+
+    def walk(self) -> bool:
+        self._i += 1
+        while self._i < len(self._text) and self._values[self._i] in self._skip:
+            self._i += 1
+        return self._i < len(self._text)
+
+    def head(self) -> None:
+        self._i = 0
+
+    def skip(self, values: Sequence[WordBreak]) -> None:
+        self._skip = tuple(values)
+
+    def break_here(self) -> None:
+        self._breakables[self._i] = 1
+
+    def do_not_break_here(self) -> None:
+        self._breakables[self._i] = 0
+
+    def does_break_here(self) -> bool:
+        return bool(self._breakables[self._i])
 
 
 def word_breakables(s: str, /) -> Breakables:
@@ -117,110 +164,118 @@ def word_breakables(s: str, /) -> Breakables:
     >>> list(word_breakables('\x01\u0308\x01'))
     [1, 0, 1]
     """
-
     if not s:
-        return
+        return iter([])
 
-    primitive_boundaries = list(_preprocess_boundaries(s))
-    prev_prev_wb = None
-    prev_wb = None
-    for i, (pos, wb) in enumerate(primitive_boundaries):
-        next_pos, next_wb = (primitive_boundaries[i+1]
-                             if i < len(primitive_boundaries)-1 else (len(s), None))
+    run = Runner(s)
+    while run.walk():
         # WB3
-        if prev_wb == WB.CR and wb == WB.LF:
-            do_break = False
-        # WB3a, WB3b
-        elif prev_wb in (WB.NEWLINE, WB.CR, WB.LF) or wb in (WB.NEWLINE, WB.CR, WB.LF):
-            do_break = True
+        if run.prev == WB.CR and run.curr == WB.LF:
+            run.do_not_break_here()
+        # WB3a
+        elif run.prev in (WB.NEWLINE, WB.CR, WB.LF):
+            run.break_here()
+        # WB3b
+        elif run.curr in (WB.NEWLINE, WB.CR, WB.LF):
+            run.break_here()
         # WB3c
-        elif prev_wb == WB.ZWJ and extended_pictographic(s[pos]):
-            do_break = False
+        elif run.prev == WB.ZWJ and extended_pictographic(run.chr):
+            run.do_not_break_here()
         # WB3d
-        elif prev_wb == wb == WB.WSEGSPACE:
-            do_break = False
+        elif run.prev == run.curr == WB.WSEGSPACE:
+            run.do_not_break_here()
+        # WB4
+        elif run.curr in (WB.FORMAT, WB.EXTEND, WB.ZWJ):
+            run.do_not_break_here()
+    # WB4
+    run.head()
+    run.skip((WB.EXTEND, WB.FORMAT, WB.ZWJ))
+    while run.walk():
         # WB5
-        elif prev_wb in AHLetterTuple and wb in AHLetterTuple:
-            do_break = False
+        if run.prev in AHLetterTuple and run.curr in AHLetterTuple:
+            run.do_not_break_here()
         # WB6
         elif (
-            prev_wb in AHLetterTuple
-            and wb in (WB.MIDLETTER,) + MidNumLetQTuple
-            and next_wb in AHLetterTuple
+            run.prev in AHLetterTuple
+            and run.curr in (WB.MIDLETTER,) + MidNumLetQTuple
+            and run.next in AHLetterTuple
         ):
-            do_break = False
+            run.do_not_break_here()
         # WB7
         elif (
-            prev_prev_wb in AHLetterTuple
-            and prev_wb in (WB.MIDLETTER,) + MidNumLetQTuple
-            and wb in AHLetterTuple
+            run.value(-2) in AHLetterTuple
+            and run.prev in (WB.MIDLETTER,) + MidNumLetQTuple
+            and run.curr in AHLetterTuple
         ):
-            do_break = False
+            run.do_not_break_here()
         # WB7a
-        elif prev_wb == WB.HEBREW_LETTER and wb == WB.SINGLE_QUOTE:
-            do_break = False
+        elif (
+            run.prev == WB.HEBREW_LETTER
+            and run.curr == WB.SINGLE_QUOTE
+        ):
+            run.do_not_break_here()
         # WB7b
         elif (
-            prev_prev_wb == WB.HEBREW_LETTER
-            and prev_wb == WB.DOUBLE_QUOTE
-            and wb == WB.HEBREW_LETTER
+            run.prev == WB.HEBREW_LETTER
+            and run.curr == WB.DOUBLE_QUOTE
+            and run.next == WB.HEBREW_LETTER
         ):
-            do_break = False
+            run.do_not_break_here()
         # WB7c
         elif (
-            prev_wb == WB.HEBREW_LETTER
-            and wb == WB.DOUBLE_QUOTE
-            and next_wb == WB.HEBREW_LETTER
+            run.value(-2) == WB.HEBREW_LETTER
+            and run.prev == WB.DOUBLE_QUOTE
+            and run.curr == WB.HEBREW_LETTER
         ):
-            do_break = False
+            run.do_not_break_here()
         # WB8
-        elif prev_wb == wb == WB.NUMERIC:
-            do_break = False
+        elif run.prev == run.curr == WB.NUMERIC:
+            run.do_not_break_here()
         # WB9
-        elif prev_wb in AHLetterTuple and wb == WB.NUMERIC:
-            do_break = False
+        elif run.prev in AHLetterTuple and run.curr == WB.NUMERIC:
+            run.do_not_break_here()
         # WB10
-        elif prev_wb == WB.NUMERIC and wb in AHLetterTuple:
-            do_break = False
+        elif run.prev == WB.NUMERIC and run.curr in AHLetterTuple:
+            run.do_not_break_here()
         # WB11
         elif (
-            prev_prev_wb == WB.NUMERIC
-            and prev_wb in (WB.MIDNUM,) + MidNumLetQTuple
-            and wb == WB.NUMERIC
+            run.value(-2) == WB.NUMERIC
+            and run.prev in (WB.MIDNUM,) + MidNumLetQTuple
+            and run.curr == WB.NUMERIC
         ):
-            do_break = False
+            run.do_not_break_here()
         # WB12
         elif (
-            prev_prev_wb == WB.NUMERIC
-            and wb in (WB.MIDNUM,) + MidNumLetQTuple
-            and next_wb == WB.NUMERIC
+            run.prev == WB.NUMERIC
+            and run.curr in (WB.MIDNUM,) + MidNumLetQTuple
+            and run.next == WB.NUMERIC
         ):
-            do_break = False
+            run.do_not_break_here()
         # WB13
-        elif prev_wb == wb == WB.KATAKANA:
-            do_break = False
+        elif run.prev == run.curr == WB.KATAKANA:
+            run.do_not_break_here()
         # WB13a
         elif (
-            prev_wb in AHLetterTuple + (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
-            and wb == WB.EXTENDNUMLET
+            run.prev in AHLetterTuple +
+                (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
+            and run.curr == WB.EXTENDNUMLET
         ):
-            do_break = False
+            run.do_not_break_here()
         # WB13b
         elif (
-            prev_wb == WB.EXTENDNUMLET
-            and wb in AHLetterTuple + (WB.NUMERIC, WB.KATAKANA)
+            run.prev == WB.EXTENDNUMLET
+            and run.curr in AHLetterTuple + (WB.NUMERIC, WB.KATAKANA)
         ):
-            do_break = False
-        # WB13c
-        elif prev_wb == wb == WB.REGIONAL_INDICATOR:
-            do_break = False
-        # WB14
-        else:
-            do_break = True
-        for j in range(next_pos-pos):
-            yield 1 if (j == 0 and do_break) else 0
-        prev_prev_wb = prev_wb
-        prev_wb = wb
+            run.do_not_break_here()
+    run.head()
+    # WB15
+    while run.does_break_here():
+        while run.curr == run.next == WB.REGIONAL_INDICATOR:
+            run.walk()
+            run.do_not_break_here()
+        if not run.walk():
+            break
+    return iter(run.breakables)
 
 
 def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
