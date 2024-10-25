@@ -2,10 +2,13 @@
 
 from sys import maxunicode
 
-from uniseg.codepoint import ord
-from uniseg.db_lookups import (grapheme_cluster_break_list, index1, index2,
-                               line_break_list, sentence_break_list, shift,
-                               word_break_list)
+from uniseg.db_lookups import columns, index1, index2, shift, values
+
+INDEX_GRAPHEME_CLUSTER_BREAK = columns.index('GraphemeClusterBreak')
+INDEX_WORD_BREAK = columns.index('WordBreak')
+INDEX_SENTENCE_BREAK = columns.index('SentenceBreak')
+INDEX_LINE_BREAK = columns.index('LineBreak')
+INDEX_EXTENDED_PICTOGRAPHIC = columns.index('Extended_Pictographic')
 
 
 def _find_break(ch: str, /) -> int:
@@ -19,16 +22,20 @@ def _find_break(ch: str, /) -> int:
 
 
 def grapheme_cluster_break(ch: str, /) -> str:
-    return grapheme_cluster_break_list[_find_break(ch)]
+    return values[_find_break(ch)][INDEX_GRAPHEME_CLUSTER_BREAK] or 'Other'
 
 
 def word_break(ch: str, /) -> str:
-    return word_break_list[_find_break(ch)]
+    return values[_find_break(ch)][INDEX_WORD_BREAK] or 'Other'
 
 
 def sentence_break(ch: str, /) -> str:
-    return sentence_break_list[_find_break(ch)]
+    return values[_find_break(ch)][INDEX_SENTENCE_BREAK] or 'Other'
 
 
 def line_break(ch: str, /) -> str:
-    return line_break_list[_find_break(ch)]
+    return values[_find_break(ch)][INDEX_LINE_BREAK] or 'Other'
+
+
+def extended_pictographic(ch: str, /) -> bool:
+    return bool(values[_find_break(ch)][INDEX_EXTENDED_PICTOGRAPHIC])

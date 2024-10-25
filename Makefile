@@ -133,19 +133,20 @@ cleandocs:
 
 # generate source files
 
-$(DIR_SRC)/uniseg/db_lookups.py: $(CSV_PROP_FILES)
-	$(PYTHON) $(DIR_TOOLS)/build_db_lookups.py $@
+$(DIR_SRC)/uniseg/db_lookups.py: $(UCD_PROP_FILES)
+	$(PYTHON) $(DIR_TOOLS)/build_db_lookups.py -o $@ \
+		GraphemeClusterBreak=data/16.0.0/ucd/auxiliary/GraphemeBreakProperty.txt \
+		WordBreak=data/16.0.0/ucd/auxiliary/WordBreakProperty.txt \
+		SentenceBreak=data/16.0.0/ucd/auxiliary/SentenceBreakProperty.txt \
+		LineBreak=data/16.0.0/ucd/LineBreak.txt \
+		data/16.0.0/ucd/DerivedCoreProperties.txt \
+		data/16.0.0/ucd/emoji/emoji-data.txt
 
-$(DIR_SRC)/uniseg/grapheme_re.py: \
-		$(DIR_TOOLS)/build_grapheme_re.py \
-		$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
-		$(DIR_UCD)/emoji/emoji-data.txt \
-		$(DIR_UCD)/DerivedCoreProperties.txt
+$(DIR_SRC)/uniseg/grapheme_re.py: $(UCD_PROP_FILES)
 	$(PYTHON) $(DIR_TOOLS)/build_grapheme_re.py -o $@ \
 		$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
 		$(DIR_UCD)/emoji/emoji-data.txt \
 		$(DIR_UCD)/DerivedCoreProperties.txt
-
 
 
 # generate test files

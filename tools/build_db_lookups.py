@@ -1,36 +1,17 @@
 import array
-import csv
 import sys
-from collections.abc import Sequence
+from argparse import ArgumentParser, FileType
+from dataclasses import dataclass
+from enum import Enum
+from itertools import groupby
 from pprint import pformat
+from typing import Iterable, Optional, TextIO
 
-base_dir = 'data/16.0.0/csv'
-
-reader = csv.reader(open(f'{base_dir}/auxiliary/WordBreakProperty.csv', 'r'))
-WordBreak = {int(k): v for k, v in reader}
-reader = csv.reader(open(f'{base_dir}/LineBreak.csv', 'r'))
-LineBreak = {int(k): v for k, v in reader}
-reader = csv.reader(
-    open(f'{base_dir}/auxiliary/SentenceBreakProperty.csv', 'r'))
-SentenceBreak = {int(k): v for k, v in reader}
-reader = csv.reader(
-    open(f'{base_dir}/auxiliary/GraphemeBreakProperty.csv', 'r'))
-GraphemeClusterBreak = {int(k): v for k, v in reader}
-
-mapping = [
-    (
-        WordBreak.get(x, 'Other'),
-        LineBreak.get(x, 'Other'),
-        SentenceBreak.get(x, 'Other'),
-        GraphemeClusterBreak.get(x, 'Other'),
-    )
-    for x in range(sys.maxunicode + 1)
-]
+from uniseg.ucdtools import iter_code_point_properties
 
 
-def getsize(data: Sequence) -> int:
+def getsize(data: list) -> int:
     """return smallest possible integer size for the given array. """
-
     maxdata = max(data)
     if maxdata < 0x100:
         return 1
@@ -39,7 +20,7 @@ def getsize(data: Sequence) -> int:
     return 4
 
 
-def splitbins(t: Sequence[int]) -> tuple[list[int], list[int], int]:
+def splitbins(t: tuple[int, ...]) -> tuple[list[int], list[int], int]:
     """t, trace=0 -> (t1, t2, shift).  Split a table to save space.
     t is a sequence of ints.  This function can be useful to save space if
     many of the ints are the same.  t1 and t2 are lists of ints, and shift
@@ -57,7 +38,6 @@ def splitbins(t: Sequence[int]) -> tuple[list[int], list[int], int]:
     del n
 
     bytes = sys.maxsize  # smallest total size so far
-    t = tuple(t)        # so slices can be dict keys
     for shift in range(maxshift + 1):
         t1 = []
         t2 = []
@@ -80,45 +60,76 @@ def splitbins(t: Sequence[int]) -> tuple[list[int], list[int], int]:
     return best
 
 
-unique = [x for x in sorted(set(mapping))]
+@dataclass(init=False)
+class PropArg:
+    """A data class which represents a property argument."""
+    name: str
+    stream: TextIO
 
-index = [unique.index(x) for x in mapping]
-index1, index2, shift = splitbins(index)
-
-
-index1_arr = array.array('B')
-index1_arr.extend(index1)
-index1_bytes = index1_arr.tobytes()
-
-index2_arr = array.array('B')
-index2_arr.extend(index2)
-index2_bytes = index2_arr.tobytes()
-
-form = f"""# DO NOT EDIT.  This file is generated automatically.
-shift = {shift}
-word_break_list = \\
-{pformat([x[0] for x in unique], compact=True)}
-line_break_list = \\
-{pformat([x[1] for x in unique], compact=True)}
-sentence_break_list = \\
-{pformat([x[2] for x in unique], compact=True)}
-grapheme_cluster_break_list = \\
-{pformat([x[3] for x in unique], compact=True)}
-index1 = \\
-{pformat(index1_bytes, compact=True)}
-index2 = \\
-{pformat(index2_bytes, compact=True)}
-"""
+    def __init__(self, arg: str):
+        if '=' in arg:
+            name_part, path_part = arg.split('=', 1)
+            name_part = name_part.strip()
+            path_part = path_part.strip()
+        else:
+            name_part = ''
+            path_part = arg.strip()
+        self.name = name_part.strip()
+        if path_part == '-':
+            self.stream = sys.stdin
+        else:
+            self.stream = open(path_part, 'r', encoding='utf-8')
 
 
 def main() -> None:
-    from argparse import ArgumentParser, FileType
 
     parser = ArgumentParser()
-    parser.add_argument('infile', type=FileType('w', encoding='utf-8'))
-
+    parser.add_argument('-o', '--output', default='-',
+                        type=FileType('w', encoding='utf-8'))
+    parser.add_argument('files', nargs='+',
+                        type=PropArg,
+                        help='UCD property files')
     args = parser.parse_args()
-    args.infile.write(form)
+    output: TextIO = args.output
+    prop_args: Iterable[PropArg] = args.files
+
+    names = list[str]()
+    db = [list[Optional[str]]() for cp in range(sys.maxunicode + 1)]
+    for prop_arg in prop_args:
+        name = prop_arg.name
+        stream = prop_arg.stream
+        items = iter_code_point_properties(stream)
+        if name:
+            # named property
+            print(name, file=sys.stderr)
+            names.append(name)
+            item_dict = dict(items)
+            for cp in range(sys.maxunicode + 1):
+                db[cp].append(item_dict.get(cp, ''))
+        else:
+            # boolean property
+            for name, grouped in groupby(items, lambda x: x[1]):
+                print(name, file=sys.stderr)
+                names.append(name)
+                item_dict = dict(grouped)
+                for cp in range(sys.maxunicode + 1):
+                    db[cp].append(item_dict.get(cp, ''))
+
+    sparse_records = tuple(tuple(items) for items in db)
+    unique_records = tuple(sorted(set(sparse_records)))
+    indices = tuple(unique_records.index(x) for x in sparse_records)
+    index1, index2, shift = splitbins(indices)
+    bytes1 = array.array('B', index1).tobytes()
+    bytes2 = array.array('B', index2).tobytes()
+
+    code = (
+        f'columns = \\\n{pformat(tuple(names), compact=True)}\n'
+        f'values = \\\n{pformat(unique_records, compact=True)}\n'
+        f'shift = {shift}\n'
+        f'index1 = \\\n{pformat(bytes1, compact=True)}\n'
+        f'index2 = \\\n{pformat(bytes2, compact=True)}\n'
+    )
+    output.write(code)
 
 
 if __name__ == '__main__':
