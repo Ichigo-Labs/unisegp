@@ -54,7 +54,7 @@ MidNumLetQTuple = (WB.MIDNUMLET, WB.SINGLE_QUOTE)
 
 
 def word_break(c: str, index: int = 0, /) -> WordBreak:
-    r"""Return the Word_Break property of `c`
+    R"""Return the Word_Break property of `c`
 
     `c` must be a single Unicode code point string.
 
@@ -152,7 +152,7 @@ class Runner(object):
 
 
 def word_breakables(s: str, /) -> Breakables:
-    r"""Iterate word breaking opportunities for every position of `s`
+    R"""Iterate word breaking opportunities for every position of `s`
 
     1 for "break" and 0 for "do not break".  The length of iteration
     will be the same as ``len(s)``.
@@ -188,8 +188,8 @@ def word_breakables(s: str, /) -> Breakables:
         elif run.curr in (WB.FORMAT, WB.EXTEND, WB.ZWJ):
             run.do_not_break_here()
     # WB4
-    run.head()
     run.skip((WB.EXTEND, WB.FORMAT, WB.ZWJ))
+    run.head()
     while run.walk():
         # WB5
         if run.prev in AHLetterTuple and run.curr in AHLetterTuple:
@@ -209,10 +209,7 @@ def word_breakables(s: str, /) -> Breakables:
         ):
             run.do_not_break_here()
         # WB7a
-        elif (
-            run.prev == WB.HEBREW_LETTER
-            and run.curr == WB.SINGLE_QUOTE
-        ):
+        elif run.prev == WB.HEBREW_LETTER and run.curr == WB.SINGLE_QUOTE:
             run.do_not_break_here()
         # WB7b
         elif (
@@ -256,8 +253,7 @@ def word_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # WB13a
         elif (
-            run.prev in AHLetterTuple +
-                (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
+            run.prev in AHLetterTuple + (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
             and run.curr == WB.EXTENDNUMLET
         ):
             run.do_not_break_here()
@@ -281,7 +277,6 @@ def word_breakables(s: str, /) -> Breakables:
                 break
             if not run.walk():
                 break
-
     return iter(run.breakables)
 
 
