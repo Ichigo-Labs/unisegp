@@ -120,7 +120,7 @@ class UcdRecord(NamedTuple):
     comment: str
 
 
-def code_point_literal(cp: int) -> str:
+def code_point_literal(cp: int, /) -> str:
     R"""return str literal expression for the code point.
 
     >>> code_point_literal(0x0030)
@@ -134,7 +134,7 @@ def code_point_literal(cp: int) -> str:
         return f'\\U{cp:08x}'
 
 
-def split_comment(line: str) -> tuple[str, str]:
+def split_comment(line: str, /) -> tuple[str, str]:
     """Split a string into two, a data part and a comment.
 
     >>> split_comment('data # comment')
@@ -150,8 +150,8 @@ def split_comment(line: str) -> tuple[str, str]:
     return data.strip(), comment.strip()
 
 
-def iter_records(stream: TextIO) -> Iterable[UcdRecord]:
-    """iterate tuples of tokens on the text data (comments are removed)."""
+def iter_records(stream: TextIO, /) -> Iterable[UcdRecord]:
+    """Iterate tuples of tokens on the text data (comments are removed)."""
     for line in stream:
         # strip comment
         field_part, comment_part = split_comment(line)
@@ -160,7 +160,29 @@ def iter_records(stream: TextIO) -> Iterable[UcdRecord]:
             yield UcdRecord(fields, comment_part)
 
 
-def group_continuous(iterable: Iterable[int]) -> Iterator[Iterable[int]]:
+def iter_code_point_properties(stream: TextIO, /) -> Iterable[tuple[int, str]]:
+    R"""Iterate tuples of code point interger and property string for every
+    code point described in the UCD property text.
+
+    >>> from io import StringIO
+    >>> text = (
+    ...     '002B          ; Math # Sm       PLUS SIGN\n'
+    ...     '003C..003E    ; Math # Sm   [3] LESS-THAN SIGN..GREATER-THAN SIGN\n'
+    ... )
+    >>> stream = StringIO(text)
+    >>> list(iter_code_point_properties(stream))
+    [(43, 'Math'), (60, 'Math'), (61, 'Math'), (62, 'Math')]
+    """
+    for record in iter_records(stream):
+        fields, __ = record
+        if len(fields) > 1:
+            span = CodePointSpan(fields[0])
+            prop = fields[1]
+            for cp in span:
+                yield cp, prop
+
+
+def group_continuous(iterable: Iterable[int], /) -> Iterator[Iterable[int]]:
     """iterate continuous `int` sequences in `iterable`.
 
     >>> L = [1, 2, 3, 10, 11, 21, 22, 23]
