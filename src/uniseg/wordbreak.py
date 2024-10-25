@@ -9,7 +9,7 @@ from typing import Iterator, Optional, Tuple
 
 from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
 from uniseg.codepoint import code_point, code_points
-from uniseg.db import word_break as _word_break
+from uniseg.db import word_break as _word_break, indic_conjunct_break, extended_pictographic
 
 __all__ = [
     'WordBreak',
@@ -127,10 +127,18 @@ def word_breakables(s: str, /) -> Breakables:
     for i, (pos, wb) in enumerate(primitive_boundaries):
         next_pos, next_wb = (primitive_boundaries[i+1]
                              if i < len(primitive_boundaries)-1 else (len(s), None))
-        # print pos, prev_wb, wb
-        if (prev_wb in (WB.NEWLINE, WB.CR, WB.LF)
-                or wb in (WB.NEWLINE, WB.CR, WB.LF)):
-            do_break = not (prev_wb == WB.CR and wb == WB.LF)
+        # WB3
+        if prev_wb == WB.CR and wb == WB.LF:
+            do_break = False
+        # WB3a, WB3b
+        elif prev_wb in (WB.NEWLINE, WB.CR, WB.LF) or wb in (WB.NEWLINE, WB.CR, WB.LF):
+            do_break = True
+        # WB3c
+        elif prev_wb == WB.ZWJ and extended_pictographic(s[pos]):
+            do_break = False
+        # WB3d
+        elif prev_wb == wb == WB.WSEGSPACE:
+            do_break = False
         # WB5
         elif prev_wb in AHLetterGroup and wb in AHLetterGroup:
             do_break = False
