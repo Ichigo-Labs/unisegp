@@ -2,7 +2,6 @@ import array
 import sys
 from argparse import ArgumentParser, FileType
 from dataclasses import dataclass
-from enum import Enum
 from itertools import groupby
 from pprint import pformat
 from typing import Iterable, Optional, TextIO
