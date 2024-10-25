@@ -5,8 +5,8 @@ The UCD files are published under <https://www.unicode.org/Public/>.
 
 import re
 from dataclasses import dataclass
-from typing import (Iterable, Iterator, NamedTuple,
-                    Optional, TextIO, Union, overload)
+from typing import (Iterable, Iterator, NamedTuple, Optional, TextIO, Union,
+                    overload)
 
 RX_CODE_POINT_RANGE_LITERAL = re.compile(
     r'(?P<cp1>[0-9A-Fa-f]{4,5})(?:\.\.(?P<cp2>[0-9A-Fa-f]{4,5}))?'
