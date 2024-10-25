@@ -47,8 +47,8 @@ class WordBreak(Enum):
 # type alias for `WordBreak`
 WB = WordBreak
 
-AHLetterGroup = (WB.ALETTER, WB.HEBREW_LETTER)
-MidNumLetQGroup = (WB.MIDNUMLET, WB.SINGLE_QUOTE)
+AHLetterTuple = (WB.ALETTER, WB.HEBREW_LETTER)
+MidNumLetQTuple = (WB.MIDNUMLET, WB.SINGLE_QUOTE)
 
 
 def word_break(c: str, index: int = 0, /) -> WordBreak:
@@ -140,20 +140,20 @@ def word_breakables(s: str, /) -> Breakables:
         elif prev_wb == wb == WB.WSEGSPACE:
             do_break = False
         # WB5
-        elif prev_wb in AHLetterGroup and wb in AHLetterGroup:
+        elif prev_wb in AHLetterTuple and wb in AHLetterTuple:
             do_break = False
         # WB6
         elif (
-            prev_wb in AHLetterGroup
-            and wb in (WB.MIDLETTER,) + MidNumLetQGroup
-            and next_wb in AHLetterGroup
+            prev_wb in AHLetterTuple
+            and wb in (WB.MIDLETTER,) + MidNumLetQTuple
+            and next_wb in AHLetterTuple
         ):
             do_break = False
         # WB7
         elif (
-            prev_prev_wb in AHLetterGroup
-            and prev_wb in (WB.MIDLETTER,) + MidNumLetQGroup
-            and wb in AHLetterGroup
+            prev_prev_wb in AHLetterTuple
+            and prev_wb in (WB.MIDLETTER,) + MidNumLetQTuple
+            and wb in AHLetterTuple
         ):
             do_break = False
         # WB7a
@@ -177,22 +177,22 @@ def word_breakables(s: str, /) -> Breakables:
         elif prev_wb == wb == WB.NUMERIC:
             do_break = False
         # WB9
-        elif prev_wb in AHLetterGroup and wb == WB.NUMERIC:
+        elif prev_wb in AHLetterTuple and wb == WB.NUMERIC:
             do_break = False
         # WB10
-        elif prev_wb == WB.NUMERIC and wb in AHLetterGroup:
+        elif prev_wb == WB.NUMERIC and wb in AHLetterTuple:
             do_break = False
         # WB11
         elif (
             prev_prev_wb == WB.NUMERIC
-            and prev_wb in (WB.MIDNUM,) + MidNumLetQGroup
+            and prev_wb in (WB.MIDNUM,) + MidNumLetQTuple
             and wb == WB.NUMERIC
         ):
             do_break = False
         # WB12
         elif (
             prev_prev_wb == WB.NUMERIC
-            and wb in (WB.MIDNUM,) + MidNumLetQGroup
+            and wb in (WB.MIDNUM,) + MidNumLetQTuple
             and next_wb == WB.NUMERIC
         ):
             do_break = False
@@ -201,14 +201,14 @@ def word_breakables(s: str, /) -> Breakables:
             do_break = False
         # WB13a
         elif (
-            prev_wb in AHLetterGroup + (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
+            prev_wb in AHLetterTuple + (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
             and wb == WB.EXTENDNUMLET
         ):
             do_break = False
         # WB13b
         elif (
             prev_wb == WB.EXTENDNUMLET
-            and wb in AHLetterGroup + (WB.NUMERIC, WB.KATAKANA)
+            and wb in AHLetterTuple + (WB.NUMERIC, WB.KATAKANA)
         ):
             do_break = False
         # WB13c
