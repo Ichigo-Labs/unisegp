@@ -9,6 +9,7 @@ INDEX_WORD_BREAK = columns.index('WordBreak')
 INDEX_SENTENCE_BREAK = columns.index('SentenceBreak')
 INDEX_LINE_BREAK = columns.index('LineBreak')
 INDEX_EXTENDED_PICTOGRAPHIC = columns.index('Extended_Pictographic')
+INDEX_INDIC_CONJUNCT_BREAK = columns.index('InCB')
 
 
 def _find_break(ch: str, /) -> int:
@@ -39,3 +40,7 @@ def line_break(ch: str, /) -> str:
 
 def extended_pictographic(ch: str, /) -> bool:
     return bool(values[_find_break(ch)][INDEX_EXTENDED_PICTOGRAPHIC])
+
+
+def indic_conjunct_break(ch: str, /) -> bool:
+    return bool(values[_find_break(ch)][INDEX_INDIC_CONJUNCT_BREAK])
