@@ -177,28 +177,31 @@ def word_breakables(s: str, /) -> Breakables:
         elif prev_wb == wb == WB.NUMERIC:
             do_break = False
         # WB9
-        elif prev_wb == WB.ALETTER and wb == WB.NUMERIC:
+        elif prev_wb in AHLetterGroup and wb == WB.NUMERIC:
             do_break = False
         # WB10
-        elif (
-            (prev_wb == wb == WB.NUMERIC)
-            or (prev_wb in AHLetterGroup and wb == WB.NUMERIC)
-            or (prev_wb == WB.NUMERIC and wb in AHLetterGroup)
-        ):
+        elif prev_wb == WB.NUMERIC and wb in AHLetterGroup:
             do_break = False
         # WB11
-        elif prev_prev_wb == wb == WB.NUMERIC and prev_wb in (WB.MIDNUM, WB.MIDNUMLET):
+        elif (
+            prev_prev_wb == WB.NUMERIC
+            and prev_wb in (WB.MIDNUM,) + MidNumLetQGroup
+            and wb == WB.NUMERIC
+        ):
             do_break = False
         # WB12
-        elif prev_wb == next_wb == WB.NUMERIC and wb in (WB.MIDNUM, WB.MIDNUMLET):
+        elif (
+            prev_prev_wb == WB.NUMERIC
+            and wb in (WB.MIDNUM,) + MidNumLetQGroup
+            and next_wb == WB.NUMERIC
+        ):
             do_break = False
         # WB13
         elif prev_wb == wb == WB.KATAKANA:
             do_break = False
         # WB13a
         elif (
-            prev_wb in AHLetterGroup +
-                (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
+            prev_wb in AHLetterGroup + (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
             and wb == WB.EXTENDNUMLET
         ):
             do_break = False
