@@ -122,6 +122,7 @@ def main() -> None:
     bytes2 = array.array('B', index2).tobytes()
 
     code = (
+        f'# DO NOT EDIT.  This file is generated automatically.\n'
         f'columns = \\\n{pformat(tuple(names), compact=True)}\n'
         f'values = \\\n{pformat(unique_records, compact=True)}\n'
         f'shift = {shift}\n'
