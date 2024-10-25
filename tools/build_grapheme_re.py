@@ -6,7 +6,7 @@ from argparse import ArgumentParser, FileType
 from itertools import chain
 from typing import TextIO
 
-from ucdtools import CodePointRange, group_continuous, iter_records
+from uniseg.ucdtools import CodePointSpan, group_continuous, iter_records
 
 OTHER = 'Other'
 CR = 'CR'
@@ -27,13 +27,13 @@ EXTENDED_PICTOGRAPHIC = 'Extended_Pictographic'
 INDIC_SYLLABIC_CATEGORY = 'InCB'
 
 
-def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
+def generate_pattern(cprange_dict: dict[str, list[CodePointSpan]]) -> str:
     """Generate regex pattern to determine grapheme cluster boundaries."""
     # charset[prop_value] -> re_charset_pattern
     charset: dict[str, str] = {}
 
     for prop_value, cpranges in cprange_dict.items():
-        re_character_set = f'{"".join(cpr.re_chars() for cpr in cpranges)}'
+        re_character_set = f'{"".join(cpr.re() for cpr in cpranges)}'
         charset[prop_value] = re_character_set
 
     # build patterns.
@@ -99,18 +99,18 @@ def generate_pattern(cprange_dict: dict[str, list[CodePointRange]]) -> str:
     return pat_extended_grapheme_cluster
 
 
-def optimize_code_point_ranges(cpranges: list[CodePointRange]
-                               ) -> list[CodePointRange]:
-    """Return re-ordered / optimized `CodePointRange` object list."""
+def optimize_code_point_ranges(cpranges: list[CodePointSpan]
+                               ) -> list[CodePointSpan]:
+    """Return re-ordered / optimized `CodePointSpan` object list."""
     code_points = list(chain.from_iterable(cpranges))
     code_points.sort()
 
-    new_cpranges: list[CodePointRange] = []
+    new_cpranges: list[CodePointSpan] = []
     for grouped_iter in group_continuous(code_points):
         grouped_cps = list(grouped_iter)
         cp1 = grouped_cps[0]
         cp2 = grouped_cps[-1] if len(grouped_cps) > 1 else None
-        cprange = CodePointRange(cp1, cp2)
+        cprange = CodePointSpan(cp1, cp2)
         new_cpranges.append(cprange)
     return new_cpranges
 
@@ -155,29 +155,29 @@ def main() -> None:
     derived_core_properties: TextIO = args.derived_core_properties
 
     # prop_to_cpranges[prop_value] -> list_of_code_point_ranges
-    prop_to_cpranges: dict[str, list[CodePointRange]] = {}
+    prop_to_cpranges: dict[str, list[CodePointSpan]] = {}
 
-    for fields in iter_records(grapheme_breake_property):
-        if len(fields) != 2:
+    for record in iter_records(grapheme_breake_property):
+        if len(record.fields) != 2:
             continue
-        f1, f2 = fields
-        cprange = CodePointRange(f1)
+        f1, f2 = record.fields
+        cprange = CodePointSpan(f1)
         prop_value = f2
         prop_to_cpranges.setdefault(prop_value, []).append(cprange)
 
-    for fields in iter_records(emoji_data):
-        if not (len(fields) == 2 and fields[1] == EXTENDED_PICTOGRAPHIC):
+    for record in iter_records(emoji_data):
+        if not (len(record.fields) == 2 and record.fields[1] == EXTENDED_PICTOGRAPHIC):
             continue
-        f1, f2 = fields
-        cprange = CodePointRange(f1)
+        f1, f2 = record.fields
+        cprange = CodePointSpan(f1)
         prop_value = f2
         prop_to_cpranges.setdefault(prop_value, []).append(cprange)
 
-    for fields in iter_records(derived_core_properties):
-        if not (len(fields) == 3 and fields[1] == INDIC_SYLLABIC_CATEGORY):
+    for record in iter_records(derived_core_properties):
+        if not (len(record.fields) == 3 and record.fields[1] == INDIC_SYLLABIC_CATEGORY):
             continue
-        f1, f2, f3 = fields
-        cprange = CodePointRange(f1)
+        f1, f2, f3 = record.fields
+        cprange = CodePointSpan(f1)
         prop_value = f'{f2}={f3}'
         prop_to_cpranges.setdefault(prop_value, []).append(cprange)
 
