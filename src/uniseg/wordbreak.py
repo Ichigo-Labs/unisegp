@@ -117,9 +117,9 @@ class Runner(object):
         return self._text[self._i]
 
     def value(self, offset: int = 0) -> Optional[WordBreak]:
-        if offset == 0:
-            return self._values[self._i]
         i = self._i
+        if offset == 0:
+            return self._values[i] if 0 <= i < len(self._text) else None
         vec = offset // abs(offset)
         for __ in range(abs(offset)):
             i += vec
@@ -269,12 +269,19 @@ def word_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
     run.head()
     # WB15
-    while run.does_break_here():
-        while run.curr == run.next == WB.REGIONAL_INDICATOR:
-            run.walk()
-            run.do_not_break_here()
+    while 1:
+        while run.curr != WB.REGIONAL_INDICATOR:
+            if not run.walk():
+                break
         if not run.walk():
             break
+        while run.prev == run.curr == WB.REGIONAL_INDICATOR:
+            run.do_not_break_here()
+            if not run.walk():
+                break
+            if not run.walk():
+                break
+
     return iter(run.breakables)
 
 
