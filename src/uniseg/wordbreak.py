@@ -189,7 +189,7 @@ def word_breakables(s: str, /) -> Breakables:
         ):
             run.do_not_break_here()
     run.head()
-    # WB15
+    # WB15, WB16
     while 1:
         while run.curr != WB.REGIONAL_INDICATOR:
             if not run.walk():
@@ -202,7 +202,9 @@ def word_breakables(s: str, /) -> Breakables:
                 break
             if not run.walk():
                 break
-    return (0 if x == Breakable.DoNotBreak else 1 for x in run.breakables)
+    # WB999
+    run.set_default(Breakable.Break)
+    return run.literal_breakables()
 
 
 def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:

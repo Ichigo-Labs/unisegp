@@ -153,7 +153,9 @@ def sentence_breakables(s: str, /) -> Breakables:
             run.break_here()
         else:
             run.do_not_break_here()
-    return (1 if x == Breakable.Break else 0 for x in run.breakables)
+    # SB998
+    run.set_default(Breakable.DoNotBreak)
+    return run.literal_breakables()
 
 
 def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
