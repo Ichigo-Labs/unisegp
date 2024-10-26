@@ -6,6 +6,8 @@ https://www.unicode.org/reports/tr29/tr29-45.html
 
 from collections.abc import Iterator
 from enum import Enum
+from sys import stderr
+import sys
 from typing import Optional
 
 from uniseg.breaking import (Breakable, Breakables, Runner, TailorFunc,
@@ -96,9 +98,6 @@ def sentence_breakables(s: str, /) -> Breakables:
         # SB4
         elif run.prev in ParaSepTuple:
             run.break_here()
-        # SB5
-        elif run.curr in (SB.FORMAT, SB.EXTEND):
-            run.do_not_break_here()
     # SB5
     run.head()
     run.skip((SB.EXTEND, SB.FORMAT))
@@ -115,17 +114,24 @@ def sentence_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # SB8
         elif (
-            (run.is_following((SB.SP,), variable=True)
-             .is_following((SB.CLOSE,), variable=True).prev == SB.ATERM)
-            and (run.is_leading((SB.EXTEND, SB.FORMAT, SB.SP, SB.NUMERIC,
-                                 SB.SCONTINUE, SB.CLOSE), variable=True)
-                 .next == SB.LOWER)
+            run.is_following((SB.SP,), variable=True)
+            .is_following((SB.CLOSE,), variable=True).prev == SB.ATERM
+            and (
+                (
+                    run.curr in (SB.EXTEND, SB.FORMAT, SB.SP,
+                                 SB.NUMERIC, SB.SCONTINUE, SB.CLOSE)
+                    and run.is_leading((SB.EXTEND, SB.FORMAT, SB.SP, SB.NUMERIC,
+                                        SB.SCONTINUE, SB.CLOSE), variable=True)
+                    .next == SB.LOWER
+                )
+                or run.curr == SB.LOWER
+            )
         ):
             run.do_not_break_here()
         # SB8a
         elif (
-            (run.is_following((SB.SP,), variable=True)
-             .is_following((SB.CLOSE,), variable=True).prev in SATermTuple)
+            run.is_following((SB.SP,), variable=True)
+            .is_following((SB.CLOSE,), variable=True).prev in SATermTuple
             and run.curr in (SB.SCONTINUE,) + SATermTuple
         ):
             run.do_not_break_here()
@@ -137,18 +143,18 @@ def sentence_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # SB10
         elif (
-            (run.is_following((SB.SP,), variable=True)
-             .is_following((SB.CLOSE,), variable=True).prev in SATermTuple)
+            run.is_following((SB.SP,), variable=True)
+            .is_following((SB.CLOSE,), variable=True).prev in SATermTuple
             and run.curr in (SB.SP,) + ParaSepTuple
         ):
             run.do_not_break_here()
         # SB11
         elif (
-            (run.is_following((SB.SP,), variable=True)
-             .is_following((SB.CLOSE,), variable=True).prev in SATermTuple)
-            or (run.is_following(ParaSepTuple)
-                .is_following((SB.SP,), variable=True)
-                .is_following((SB.CLOSE,), variable=True).prev in SATermTuple)
+            run.is_following((SB.SP,), variable=True)
+            .is_following((SB.CLOSE,), variable=True).prev in SATermTuple
+            or run.is_following(ParaSepTuple, noskip=True)
+            .is_following((SB.SP,), variable=True)
+            .is_following((SB.CLOSE,), variable=True).prev in SATermTuple
         ):
             run.break_here()
         else:

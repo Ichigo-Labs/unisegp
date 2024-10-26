@@ -76,25 +76,43 @@ class Runner(Generic[T]):
     def chr(self) -> str:
         return self._text[self._position]
 
-    def _calc_position(self, offset: int, /) -> int:
+    def _calc_position(self, offset: int, /, noskip: bool = False) -> int:
         i = self._position
         vec = offset // abs(offset) if offset else 0
         for __ in range(abs(offset)):
             i += vec
-            while 0 <= i < len(self._text) and self._values[i] in self._skip:
+            while 0 <= i < len(self._text) and (not noskip and self._values[i] in self._skip):
                 i += vec
         return i
 
-    def value(self, offset: int = 0, /) -> Optional[T]:
-        i = self._calc_position(offset)
+    def value(self, offset: int = 0, /, noskip: bool = False) -> Optional[T]:
+        """Return value at current position + offset.
+
+        >>> run = Runner('abc', lambda x: x.upper())
+        >>> run.value(1)
+        'B'
+        >>> run.value(2)
+        'C'
+        >>> run.walk()
+        True
+        >>> run.value(-1)
+        'A'
+        >>> run.head()
+        >>> run.skip('B')
+        >>> run.value(1)
+        'C'
+        >>> run.value(1, noskip=True)
+        'B'
+        """
+        i = self._calc_position(offset, noskip=noskip)
         if self._condition and 0 <= i < len(self._text):
             return self._values[i]
         else:
             return None
 
-    def walk(self, offset: int = 1, /) -> bool:
+    def walk(self, offset: int = 1, /, noskip: bool = False) -> bool:
         if self._condition:
-            pos = self._calc_position(offset)
+            pos = self._calc_position(offset, noskip=noskip)
             condition = False
             if pos < 0:
                 pos = 0
@@ -119,26 +137,69 @@ class Runner(Generic[T]):
         /,
         variable: bool = False,
         backward: bool = False,
+        noskip: bool = False,
     ) -> 'Runner[T]':
+        """Test if values appears before / after the current position.
+
+        Return shallow copy of the instance which position is at the end of
+        the tested continuing series.
+
+        >>> run = Runner('abc', lambda x: x.upper())
+        >>> run.is_continuing('B').curr
+        'B'
+        >>> run.is_continuing('B').next
+        'C'
+        >>> run.is_continuing('X', variable=True).curr
+        'A'
+        >>> run.is_continuing('X', variable=True).next
+        'B'
+        >>> bool(run.is_continuing('B').is_continuing('C'))
+        True
+        >>> run.walk()
+        True
+        >>> run.is_continuing('B').curr is None
+        True
+        >>> run.is_continuing('A', backward=True).curr
+        'A'
+
+        >>> run = Runner('abbbccd', lambda x: x.upper())
+        >>> run.is_continuing('B', variable=True).curr
+        'B'
+        >>> run.skip(('C',))
+        >>> run.is_continuing('B', variable=True).next
+        'D'
+        >>> run.is_continuing('B', variable=True).value(1, noskip=True)
+        'C'
+
+        >>> run = Runner('abbbccd', lambda x: x.upper())
+        >>> run.walk(4)
+        True
+        >>> run.curr
+        'C'
+        >>> run.is_continuing('B', variable=True, backward=True).prev
+        'A'
+        """
         run = copy(self)
         vec = -1 if backward else 1
         if variable:
-            while run.value(vec) in values:
-                if not run.walk(vec):
+            while run.value(vec, noskip=noskip) in values:
+                if not run.walk(vec, noskip=noskip):
                     break
+            condition = True
         else:
-            run._condition = run.value(vec) in values and run.walk(vec)
+            condition = run.walk(vec, noskip=noskip) and run.curr in values
+        run._condition = self._condition and condition
         return run
 
     def is_following(
-        self, values: Sequence[T], /, variable: bool = False
+        self, values: Sequence[T], /, variable: bool = False, noskip: bool = False
     ) -> 'Runner[T]':
-        return self.is_continuing(values, variable=variable, backward=True)
+        return self.is_continuing(values, variable=variable, backward=True, noskip=noskip)
 
     def is_leading(
-        self, values: Sequence[T], /, variable: bool = False
+        self, values: Sequence[T], /, variable: bool = False, noskip: bool = False
     ) -> 'Runner[T]':
-        return self.is_continuing(values, variable=variable)
+        return self.is_continuing(values, variable=variable, noskip=noskip)
 
     def break_here(self) -> None:
         if self._text and self._breakables[self._position] is None:
