@@ -202,7 +202,7 @@ def word_breakables(s: str, /) -> Breakables:
                 break
             if not run.walk():
                 break
-    return (1 if x == Breakable.Break else 0 for x in run.breakables)
+    return (0 if x == Breakable.DoNotBreak else 1 for x in run.breakables)
 
 
 def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:

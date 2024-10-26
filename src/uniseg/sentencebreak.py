@@ -4,13 +4,12 @@ UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
 https://www.unicode.org/reports/tr29/tr29-45.html
 """
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator
 from enum import Enum
 from typing import Optional
 
 from uniseg.breaking import (Breakable, Breakables, Runner, TailorFunc,
                              boundaries, break_units)
-from uniseg.codepoint import code_point, code_points
 from uniseg.db import sentence_break as _sentence_break
 
 __all__ = [
@@ -71,62 +70,7 @@ def sentence_break(c: str, index: int = 0, /) -> SentenceBreak:
     >>> sentence_break('/')
     <SentenceBreak.OTHER: 'Other'>
     """
-    return SentenceBreak[_sentence_break(code_point(c, index)).upper()]
-
-
-def _preprocess_boundaries(s: str, /) -> Iterator[tuple[int, SentenceBreak]]:
-
-    R"""(internal)
-
-    >>> from pprint import pprint
-    >>> pprint(list(_preprocess_boundaries('Aa')),
-    ...        width=76, compact=True)
-    [(0, <SentenceBreak.UPPER: 'Upper'>), (1, <SentenceBreak.LOWER: 'Lower'>)]
-    >>> pprint(list(_preprocess_boundaries('A a')),
-    ...        width=76, compact=True)
-    [(0, <SentenceBreak.UPPER: 'Upper'>), (1, <SentenceBreak.SP: 'Sp'>),
-     (2, <SentenceBreak.LOWER: 'Lower'>)]
-    >>> pprint(list(_preprocess_boundaries('A" a')),
-    ...        width=76, compact=True)
-    [(0, <SentenceBreak.UPPER: 'Upper'>), (1, <SentenceBreak.CLOSE: 'Close'>),
-     (2, <SentenceBreak.SP: 'Sp'>), (3, <SentenceBreak.LOWER: 'Lower'>)]
-    >>> pprint(list(_preprocess_boundaries('A\xad "')),
-    ...        width=76, compact=True)
-    [(0, <SentenceBreak.UPPER: 'Upper'>), (2, <SentenceBreak.SP: 'Sp'>),
-     (3, <SentenceBreak.CLOSE: 'Close'>)]
-    >>> pprint(list(_preprocess_boundaries('\r\rA')),
-    ...        width=76, compact=True)
-    [(0, <SentenceBreak.CR: 'CR'>), (1, <SentenceBreak.CR: 'CR'>),
-     (2, <SentenceBreak.UPPER: 'Upper'>)]
-    """
-    prev_prop = None
-    i = 0
-    for c in code_points(s):
-        prop = sentence_break(c)
-        if prop in (SB.SEP, SB.CR, SB.LF):
-            yield (i, prop)
-            prev_prop = None
-        elif prop in (SB.EXTEND, SB.FORMAT):
-            if prev_prop is None:
-                yield (i, prop)
-                prev_prop = prop
-        elif prev_prop != prop:
-            yield (i, prop)
-            prev_prop = prop
-        i += len(c)
-
-
-def _next_break(primitive_boundaries: Sequence[tuple[int, SentenceBreak]],
-                pos: int,
-                expects: Sequence[SentenceBreak],
-                /
-                ) -> Optional[SentenceBreak]:
-    """(internal)"""
-    for i in range(pos, len(primitive_boundaries)):
-        sb = primitive_boundaries[i][1]
-        if sb in expects:
-            return sb
-    return None
+    return SentenceBreak[_sentence_break(c[index]).upper()]
 
 
 def sentence_breakables(s: str, /) -> Breakables:
@@ -143,7 +87,9 @@ def sentence_breakables(s: str, /) -> Breakables:
      0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     """
     run = Runner(s, sentence_break)
+    run.break_here()
     while run.walk():
+        # SB1
         # SB3
         if run.prev == SB.CR and run.curr == SB.LF:
             run.do_not_break_here()
@@ -207,7 +153,7 @@ def sentence_breakables(s: str, /) -> Breakables:
             run.break_here()
         else:
             run.do_not_break_here()
-    return (0 if x == Breakable.DoNotBreak else 1 for x in run.breakables)
+    return (1 if x == Breakable.Break else 0 for x in run.breakables)
 
 
 def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
