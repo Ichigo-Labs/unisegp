@@ -4,11 +4,12 @@ UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
 https://www.unicode.org/reports/tr29/tr29-45.html
 """
 
+from collections.abc import Iterator, Sequence
 from enum import Enum
-from typing import Iterator, List, Optional, Sequence, Tuple
+from typing import Optional
 
-from uniseg.breaking import (Breakable, Breakables, Runner, TailorFunc, boundaries,
-                             break_units)
+from uniseg.breaking import (Breakable, Breakables, Runner, TailorFunc,
+                             boundaries, break_units)
 from uniseg.codepoint import code_point, code_points
 from uniseg.db import sentence_break as _sentence_break
 
@@ -73,7 +74,7 @@ def sentence_break(c: str, index: int = 0, /) -> SentenceBreak:
     return SentenceBreak[_sentence_break(code_point(c, index)).upper()]
 
 
-def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, SentenceBreak]]:
+def _preprocess_boundaries(s: str, /) -> Iterator[tuple[int, SentenceBreak]]:
 
     R"""(internal)
 
@@ -115,7 +116,7 @@ def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, SentenceBreak]]:
         i += len(c)
 
 
-def _next_break(primitive_boundaries: Sequence[Tuple[int, SentenceBreak]],
+def _next_break(primitive_boundaries: Sequence[tuple[int, SentenceBreak]],
                 pos: int,
                 expects: Sequence[SentenceBreak],
                 /
