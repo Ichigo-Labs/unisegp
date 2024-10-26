@@ -4,13 +4,13 @@ UAX #14: Unicode Line Breaking Algorithm (Unicode 16.0.0)
 https://www.unicode.org/reports/tr14/tr14-53.html
 """
 
-from typing import Iterator, Optional, Tuple, List
+from collections.abc import Iterator
+from typing import Optional
 from unicodedata import east_asian_width
 
-from uniseg.breaking import boundaries, break_units, Breakables, TailorFunc
-from uniseg.codepoint import ord, chr, code_point, code_points
+from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
+from uniseg.codepoint import code_point, code_points
 from uniseg.db import line_break as _line_break
-
 
 __all__ = [
     'line_break',
@@ -232,7 +232,7 @@ def line_break(c: str, index: int = 0, /) -> str:
     return _line_break(code_point(c, index))
 
 
-def _preprocess_boundaries(s: str, /) -> Iterator[Tuple[int, str]]:
+def _preprocess_boundaries(s: str, /) -> Iterator[tuple[int, str]]:
 
     r"""(internal) Preprocess LB9: X CM* -> X
 
@@ -292,7 +292,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
 
         if legacy:
             if lb == AL:
-                cp = chr(ord(s, pos))
+                cp = chr(ord(s[pos]))
                 lb = ID if east_asian_width(cp) == 'A' else AL
             elif lb == AI:
                 lb = ID
