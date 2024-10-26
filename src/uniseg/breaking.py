@@ -29,7 +29,11 @@ class Runner(Generic[T]):
         self._values = [func(c) for c in text]
         self._skip = tuple[str, ...]()
         self._breakables: list[Literal[0, 1]] = [1 for __ in text]
-        self._i = 0
+        self._position = 0
+        self._cond = True
+
+    def __bool__(self) -> bool:
+        return self._cond
 
     @property
     def text(self) -> str:
@@ -45,7 +49,7 @@ class Runner(Generic[T]):
 
     @property
     def position(self) -> int:
-        return self._i
+        return self._position
 
     @property
     def curr(self) -> Optional[T]:
@@ -61,41 +65,42 @@ class Runner(Generic[T]):
 
     @property
     def chr(self) -> str:
-        return self._text[self._i]
+        return self._text[self._position]
 
-    def value(self, offset: int = 0) -> Optional[T]:
-        i = self._i
-        if offset == 0:
-            return self._values[i] if 0 <= i < len(self._text) else None
-        vec = offset // abs(offset)
+    def _calc_position(self, offset: int) -> int:
+        i = self._position
+        vec = offset // abs(offset) if offset else 0
         for __ in range(abs(offset)):
             i += vec
             while 0 <= i < len(self._text) and self._values[i] in self._skip:
                 i += vec
-        if 0 <= i < len(self._text):
-            return self._values[i]
-        return None
+        self._cond = bool(0 <= i < len(self._text))
+        return i
+
+    def value(self, offset: int = 0) -> Optional[T]:
+        i = self._calc_position(offset)
+        return self._values[i] if 0 <= i < len(self._text) else None
 
     def walk(self) -> bool:
-        self._i += 1
-        while self._i < len(self._text) and self._values[self._i] in self._skip:
-            self._i += 1
-        return self._i < len(self._text)
+        self._position += 1
+        while self._position < len(self._text) and self._values[self._position] in self._skip:
+            self._position += 1
+        return self._position < len(self._text)
 
     def head(self) -> None:
-        self._i = 0
+        self._position = 0
 
     def skip(self, values: Sequence[T]) -> None:
         self._skip = tuple(values)
 
     def break_here(self) -> None:
-        self._breakables[self._i] = 1
+        self._breakables[self._position] = 1
 
     def do_not_break_here(self) -> None:
-        self._breakables[self._i] = 0
+        self._breakables[self._position] = 0
 
     def does_break_here(self) -> bool:
-        return bool(self._breakables[self._i])
+        return bool(self._breakables[self._position])
 
 
 def boundaries(breakables: Breakables, /) -> Iterator[int]:
