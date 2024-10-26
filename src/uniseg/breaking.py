@@ -1,7 +1,9 @@
 """Breakable table and string tokenization."""
 
 from collections.abc import Callable, Iterable, Iterator, Sequence
-from typing import Generic, Literal, Optional, TypeVar
+from copy import copy
+from enum import Enum
+from typing import Generic, Optional, TypeVar
 
 __all__ = [
     'Breakable',
@@ -13,8 +15,18 @@ __all__ = [
 ]
 
 
+class Breakable(Enum):
+    Unknown = -1
+    DoNotBreak = 0
+    Break = 1
+
+    def __bool__(self) -> bool:
+        if self.value == Breakable.Unknown:
+            raise ValueError(f'{self.value} is evaluated as bool')
+        return bool(self.value)
+
+
 # type aliases for annotation
-Breakable = Literal[0, 1]
 Breakables = Iterable[Breakable]
 TailorFunc = Callable[[str, Breakables], Breakables]
 
@@ -28,12 +40,12 @@ class Runner(Generic[T]):
         self._text = text
         self._values = [func(c) for c in text]
         self._skip = tuple[str, ...]()
-        self._breakables: list[Literal[0, 1]] = [1 for __ in text]
+        self._breakables = [Breakable.Unknown for __ in text]
         self._position = 0
-        self._cond = True
+        self._condition = True
 
     def __bool__(self) -> bool:
-        return self._cond
+        return self._condition
 
     @property
     def text(self) -> str:
@@ -44,7 +56,7 @@ class Runner(Generic[T]):
         return self._values
 
     @property
-    def breakables(self) -> list[Literal[0, 1]]:
+    def breakables(self) -> list[Breakable]:
         return self._breakables
 
     @property
@@ -67,37 +79,74 @@ class Runner(Generic[T]):
     def chr(self) -> str:
         return self._text[self._position]
 
-    def _calc_position(self, offset: int) -> int:
+    def _calc_position(self, offset: int, /) -> int:
         i = self._position
         vec = offset // abs(offset) if offset else 0
         for __ in range(abs(offset)):
             i += vec
             while 0 <= i < len(self._text) and self._values[i] in self._skip:
                 i += vec
-        self._cond = bool(0 <= i < len(self._text))
         return i
 
-    def value(self, offset: int = 0) -> Optional[T]:
+    def value(self, offset: int = 0, /) -> Optional[T]:
         i = self._calc_position(offset)
         return self._values[i] if 0 <= i < len(self._text) else None
 
-    def walk(self) -> bool:
-        self._position += 1
-        while self._position < len(self._text) and self._values[self._position] in self._skip:
-            self._position += 1
-        return self._position < len(self._text)
+    def walk(self, offset: int = 1, /) -> bool:
+        if self._condition:
+            pos = self._calc_position(offset)
+            condition = False
+            if pos < 0:
+                pos = 0
+            elif len(self._text) <= pos:
+                pos = len(self._text) - 1
+            else:
+                condition = True
+            self._position = pos
+            self._condition = condition
+        return self._condition
 
     def head(self) -> None:
         self._position = 0
+        self._condition = True
 
     def skip(self, values: Sequence[T]) -> None:
         self._skip = tuple(values)
 
+    def is_continuing(
+        self,
+        values: Sequence[T],
+        /,
+        variable: bool = False,
+        backward: bool = False,
+    ) -> 'Runner[T]':
+        run = copy(self)
+        vec = -1 if backward else 1
+        if variable:
+            while run.value(vec) in values:
+                if not run.walk(vec):
+                    break
+        else:
+            run._condition = run.value(vec) in values and run.walk(vec)
+        return run
+
+    def is_following(
+        self, values: Sequence[T], /, variable: bool = False
+    ) -> 'Runner[T]':
+        return self.is_continuing(values, variable=variable, backward=True)
+
+    def is_leading(
+        self, values: Sequence[T], /, variable: bool = False
+    ) -> 'Runner[T]':
+        return self.is_continuing(values, variable=variable)
+
     def break_here(self) -> None:
-        self._breakables[self._position] = 1
+        if self._breakables[self._position] == Breakable.Unknown:
+            self._breakables[self._position] = Breakable.Break
 
     def do_not_break_here(self) -> None:
-        self._breakables[self._position] = 0
+        if self._breakables[self._position] == Breakable.Unknown:
+            self._breakables[self._position] = Breakable.DoNotBreak
 
     def does_break_here(self) -> bool:
         return bool(self._breakables[self._position])
