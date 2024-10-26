@@ -4,9 +4,9 @@ UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
 https://www.unicode.org/reports/tr29/tr29-45.html
 """
 
-from collections.abc import Sequence
+from collections.abc import Callable, Iterable, Sequence
 from enum import Enum
-from typing import Iterator, Literal, Optional
+from typing import Any, Generic, Iterator, Literal, Optional, TypeVar
 
 from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
 from uniseg.codepoint import code_point
@@ -75,13 +75,16 @@ def word_break(c: str, index: int = 0, /) -> WordBreak:
     return WordBreak[_word_break(code_point(c, index)).upper()]
 
 
-class Runner(object):
+T = TypeVar('T')
 
-    def __init__(self, s: str):
-        self._text = s
-        self._values = [word_break(c) for c in s]
+
+class Runner(Generic[T]):
+
+    def __init__(self, text: str, func: Callable[[str], T]):
+        self._text = text
+        self._values = [func(c) for c in text]
         self._skip = tuple[str, ...]()
-        self._breakables: list[Literal[0, 1]] = [1 for __ in s]
+        self._breakables: list[Literal[0, 1]] = [1 for __ in text]
         self._i = 0
 
     @property
@@ -89,7 +92,7 @@ class Runner(object):
         return self._text
 
     @property
-    def values(self) -> list[WordBreak]:
+    def values(self) -> list[Any]:
         return self._values
 
     @property
@@ -101,22 +104,22 @@ class Runner(object):
         return self._i
 
     @property
-    def curr(self) -> Optional[WordBreak]:
+    def curr(self) -> Optional[T]:
         return self.value()
 
     @property
-    def prev(self) -> Optional[WordBreak]:
+    def prev(self) -> Optional[T]:
         return self.value(-1)
 
     @property
-    def next(self) -> Optional[WordBreak]:
+    def next(self) -> Optional[T]:
         return self.value(1)
 
     @property
     def chr(self) -> str:
         return self._text[self._i]
 
-    def value(self, offset: int = 0) -> Optional[WordBreak]:
+    def value(self, offset: int = 0) -> Optional[T]:
         i = self._i
         if offset == 0:
             return self._values[i] if 0 <= i < len(self._text) else None
@@ -138,7 +141,7 @@ class Runner(object):
     def head(self) -> None:
         self._i = 0
 
-    def skip(self, values: Sequence[WordBreak]) -> None:
+    def skip(self, values: Sequence[T]) -> None:
         self._skip = tuple(values)
 
     def break_here(self) -> None:
@@ -167,7 +170,7 @@ def word_breakables(s: str, /) -> Breakables:
     if not s:
         return iter([])
 
-    run = Runner(s)
+    run = Runner(s, word_break)
     while run.walk():
         # WB3
         if run.prev == WB.CR and run.curr == WB.LF:
@@ -253,7 +256,8 @@ def word_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # WB13a
         elif (
-            run.prev in AHLetterTuple + (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
+            run.prev in AHLetterTuple +
+                (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
             and run.curr == WB.EXTENDNUMLET
         ):
             run.do_not_break_here()
