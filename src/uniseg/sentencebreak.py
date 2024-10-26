@@ -7,7 +7,7 @@ https://www.unicode.org/reports/tr29/tr29-45.html
 from enum import Enum
 from typing import Iterator, List, Optional, Sequence, Tuple
 
-from uniseg.breaking import (Breakables, Runner, TailorFunc, boundaries,
+from uniseg.breaking import (Breakable, Breakables, Runner, TailorFunc, boundaries,
                              break_units)
 from uniseg.codepoint import code_point, code_points
 from uniseg.db import sentence_break as _sentence_break
@@ -137,8 +137,7 @@ def sentence_breakables(s: str, /) -> Breakables:
 
     >>> from pprint import pprint
     >>> s = 'He said, \u201cAre you going?\u201d John shook his head.'
-    >>> pprint(list(sentence_breakables(s)),
-    ...        width=76, compact=True)
+    >>> pprint(list(sentence_breakables(s)), width=76, compact=True)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     """
@@ -207,7 +206,7 @@ def sentence_breakables(s: str, /) -> Breakables:
             run.break_here()
         else:
             run.do_not_break_here()
-    return run.breakables
+    return (0 if x == Breakable.DoNotBreak else 1 for x in run.breakables)
 
 
 def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:

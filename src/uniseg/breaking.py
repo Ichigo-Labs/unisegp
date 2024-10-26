@@ -3,7 +3,7 @@
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from copy import copy
 from enum import Enum
-from typing import Generic, Optional, TypeVar
+from typing import Generic, Literal, Optional, TypeVar
 
 __all__ = [
     'Breakable',
@@ -27,7 +27,7 @@ class Breakable(Enum):
 
 
 # type aliases for annotation
-Breakables = Iterable[Breakable]
+Breakables = Iterable[Literal[0, 1]]
 TailorFunc = Callable[[str, Breakables], Breakables]
 
 

@@ -7,8 +7,8 @@ https://www.unicode.org/reports/tr29/tr29-45.html
 from enum import Enum
 from typing import Iterator, Optional
 
-from uniseg.breaking import (Breakables, Runner, TailorFunc, boundaries,
-                             break_units)
+from uniseg.breaking import (Breakable, Breakables, Runner, TailorFunc,
+                             boundaries, break_units)
 from uniseg.codepoint import code_point
 from uniseg.db import extended_pictographic
 from uniseg.db import word_break as _word_break
@@ -202,7 +202,7 @@ def word_breakables(s: str, /) -> Breakables:
                 break
             if not run.walk():
                 break
-    return iter(run.breakables)
+    return (1 if x == Breakable.Break else 0 for x in run.breakables)
 
 
 def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
