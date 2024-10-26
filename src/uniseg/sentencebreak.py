@@ -44,6 +44,9 @@ class SentenceBreak(Enum):
 # type alias for `SentenceBreak`
 SB = SentenceBreak
 
+ParaSepTuple = (SB.SEP, SB.CR, SB.LF)
+SATermTuple = (SB.STERM, SB.ATERM)
+
 
 def sentence_break(c: str, index: int = 0, /) -> SentenceBreak:
     R"""Return Sentence_Break property value of `c`.
@@ -139,95 +142,72 @@ def sentence_breakables(s: str, /) -> Breakables:
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     """
-    primitive_boundaries = list(_preprocess_boundaries(s))
-    prev_prev_prev_prev_sb = None
-    prev_prev_prev_sb = None
-    prev_prev_sb = None
-    prev_sb = None
-    pos = 0
-    for i, (pos, sb) in enumerate(primitive_boundaries):
-        next_pos, next_sb = (primitive_boundaries[i+1]
-                             if i < len(primitive_boundaries)-1 else (len(s), None))
-        if pos == 0:
-            do_break = True
+    run = Runner(s, sentence_break)
+    while run.walk():
         # SB3
-        elif prev_sb == SB.CR and sb == SB.LF:
-            do_break = False
+        if run.prev == SB.CR and run.curr == SB.LF:
+            run.do_not_break_here()
         # SB4
-        elif prev_sb in (SB.SEP, SB.CR, SB.LF):
-            do_break = True
+        elif run.prev in ParaSepTuple:
+            run.break_here()
+        # SB5
+        elif run.curr in (SB.FORMAT, SB.EXTEND):
+            run.do_not_break_here()
+    # SB5
+    run.head()
+    run.skip((SB.EXTEND, SB.FORMAT))
+    while run.walk():
         # SB6
-        elif prev_sb == SB.ATERM and sb == SB.NUMERIC:
-            do_break = False
+        if run.prev == SB.ATERM and run.curr == SB.NUMERIC:
+            run.do_not_break_here()
         # SB7
-        elif prev_prev_sb == SB.UPPER and prev_sb == SB.ATERM and sb == SB.UPPER:
-            do_break = False
+        elif (
+            run.value(-2) in (SB.UPPER, SB.LOWER)
+            and run.prev == SB.ATERM
+            and run.curr == SB.UPPER
+        ):
+            run.do_not_break_here()
         # SB8
-        elif (((prev_sb == SB.ATERM)
-               or (prev_prev_sb == SB.ATERM and prev_sb == SB.CLOSE)
-               or (prev_prev_sb == SB.ATERM and prev_sb == SB.SP)
-               or (prev_prev_prev_sb == SB.ATERM and prev_prev_sb == SB.CLOSE
-                   and prev_sb == SB.SP))
-              and _next_break(primitive_boundaries, i,
-                              [SB.OLETTER, SB.UPPER, SB.LOWER, SB.SEP, SB.CR,
-                               SB.LF, SB.STERM, SB.ATERM]) == SB.LOWER):
-            do_break = False
+        elif (
+            (run.is_following((SB.SP,), variable=True)
+             .is_following((SB.CLOSE,), variable=True).prev == SB.ATERM)
+            and (run.is_leading((SB.EXTEND, SB.FORMAT, SB.SP, SB.NUMERIC,
+                                 SB.SCONTINUE, SB.CLOSE), variable=True)
+                 .next == SB.LOWER)
+        ):
+            run.do_not_break_here()
         # SB8a
-        elif ((
-            (prev_sb in (SB.STERM, SB.ATERM))
-            or (prev_prev_sb in (SB.STERM, SB.ATERM) and prev_sb == SB.CLOSE)
-            or (prev_prev_sb in (SB.STERM, SB.ATERM) and prev_sb == SB.SP)
-            or (prev_prev_prev_sb in (SB.STERM, SB.ATERM)
-                and prev_prev_sb == SB.CLOSE and prev_sb == SB.SP)
-        ) and (
-            sb in (SB.SCONTINUE, SB.STERM, SB.ATERM)
-        )):
-            do_break = False
+        elif (
+            (run.is_following((SB.SP,), variable=True)
+             .is_following((SB.CLOSE,), variable=True).prev in SATermTuple)
+            and run.curr in (SB.SCONTINUE,) + SATermTuple
+        ):
+            run.do_not_break_here()
         # SB9
-        elif (((prev_sb in (SB.STERM, SB.ATERM))
-               or (prev_prev_sb in (SB.STERM, SB.ATERM) and prev_sb == SB.CLOSE))
-              and sb in (SB.CLOSE, SB.SP, SB.SEP, SB.CR, SB.LF)):
-            do_break = False
+        elif (
+            run.is_following((SB.CLOSE,), variable=True).prev in SATermTuple
+            and run.curr in (SB.CLOSE, SB.SP) + ParaSepTuple
+        ):
+            run.do_not_break_here()
         # SB10
-        elif (((prev_sb in (SB.STERM, SB.ATERM))
-               or (prev_prev_sb in (SB.STERM, SB.ATERM) and prev_sb == SB.CLOSE)
-               or (prev_prev_sb in (SB.STERM, SB.ATERM) and prev_sb == SB.SP)
-               or (prev_prev_prev_sb in (SB.STERM, SB.ATERM)
-                   and prev_prev_sb == SB.CLOSE
-                   and prev_sb == SB.SP))
-              and sb in (SB.SP, SB.SEP, SB.CR, SB.LF)):
-            do_break = False
+        elif (
+            (run.is_following((SB.SP,), variable=True)
+             .is_following((SB.CLOSE,), variable=True).prev in SATermTuple)
+            and run.curr in (SB.SP,) + ParaSepTuple
+        ):
+            run.do_not_break_here()
         # SB11
-        elif ((prev_sb in (SB.STERM, SB.ATERM))
-              or (prev_prev_sb in (SB.STERM, SB.ATERM)
-                  and prev_sb == SB.CLOSE)
-              or (prev_prev_sb in (SB.STERM, SB.ATERM)
-                  and prev_sb == SB.SP)
-              or (prev_prev_sb in (SB.STERM, SB.ATERM)
-                  and prev_sb in (SB.SEP, SB.CR, SB.LF))
-              or (prev_prev_prev_sb in (SB.STERM, SB.ATERM)
-                  and prev_prev_sb == SB.CLOSE
-                  and prev_sb == SB.SP)
-              or (prev_prev_prev_sb in (SB.STERM, SB.ATERM)
-                  and prev_prev_sb == SB.CLOSE
-                  and prev_sb in (SB.SEP, SB.CR, SB.LF))
-              or (prev_prev_prev_sb in (SB.STERM, SB.ATERM)
-                  and prev_prev_sb == SB.SP
-                  and prev_sb in (SB.SEP, SB.CR, SB.LF))
-              or (prev_prev_prev_prev_sb in (SB.STERM, SB.ATERM)
-                  and prev_prev_prev_sb == SB.CLOSE
-                  and prev_prev_sb == SB.SP
-                  and prev_sb in (SB.SEP, SB.CR, SB.LF))):
-            do_break = True
+        elif (
+            (run.is_following((SB.SP,), variable=True)
+             .is_following((SB.CLOSE,), variable=True).prev in SATermTuple)
+            or (run.is_following(ParaSepTuple)
+                .is_following((SB.SP,), variable=True)
+                .is_following((SB.CLOSE,), variable=True).prev in SATermTuple)
+        ):
+            run.break_here()
         else:
-            do_break = False
-        for j in range(next_pos-pos):
-            yield 1 if j == 0 and do_break else 0
-        prev_prev_prev_prev_sb = prev_prev_prev_sb
-        prev_prev_prev_sb = prev_prev_sb
-        prev_prev_sb = prev_sb
-        prev_sb = sb
-        pos = next_pos
+            run.do_not_break_here()
+    return run.breakables
 
 
 def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
