@@ -42,7 +42,7 @@ class Runner(Generic[T]):
         self._skip = tuple[str, ...]()
         self._breakables = [Breakable.Unknown for __ in text]
         self._position = 0
-        self._condition = True
+        self._condition = bool(text)
 
     def __bool__(self) -> bool:
         return self._condition
@@ -141,11 +141,11 @@ class Runner(Generic[T]):
         return self.is_continuing(values, variable=variable)
 
     def break_here(self) -> None:
-        if self._breakables[self._position] == Breakable.Unknown:
+        if self._text and self._breakables[self._position] == Breakable.Unknown:
             self._breakables[self._position] = Breakable.Break
 
     def do_not_break_here(self) -> None:
-        if self._breakables[self._position] == Breakable.Unknown:
+        if self._text and self._breakables[self._position] == Breakable.Unknown:
             self._breakables[self._position] = Breakable.DoNotBreak
 
     def does_break_here(self) -> bool:
