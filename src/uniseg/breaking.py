@@ -16,13 +16,10 @@ __all__ = [
 
 
 class Breakable(Enum):
-    Unknown = -1
     DoNotBreak = 0
     Break = 1
 
     def __bool__(self) -> bool:
-        if self.value == Breakable.Unknown:
-            raise ValueError(f'{self.value} is evaluated as bool')
         return bool(self.value)
 
 
@@ -40,7 +37,7 @@ class Runner(Generic[T]):
         self._text = text
         self._values = [func(c) for c in text]
         self._skip = tuple[str, ...]()
-        self._breakables = [Breakable.Unknown for __ in text]
+        self._breakables = list[Optional[Breakable]](None for __ in text)
         self._position = 0
         self._condition = bool(text)
 
@@ -56,7 +53,7 @@ class Runner(Generic[T]):
         return self._values
 
     @property
-    def breakables(self) -> list[Breakable]:
+    def breakables(self) -> list[Optional[Breakable]]:
         return self._breakables
 
     @property
@@ -90,7 +87,10 @@ class Runner(Generic[T]):
 
     def value(self, offset: int = 0, /) -> Optional[T]:
         i = self._calc_position(offset)
-        return self._values[i] if 0 <= i < len(self._text) else None
+        if self._condition and 0 <= i < len(self._text):
+            return self._values[i]
+        else:
+            return None
 
     def walk(self, offset: int = 1, /) -> bool:
         if self._condition:
@@ -141,15 +141,25 @@ class Runner(Generic[T]):
         return self.is_continuing(values, variable=variable)
 
     def break_here(self) -> None:
-        if self._text and self._breakables[self._position] == Breakable.Unknown:
+        if self._text and self._breakables[self._position] is None:
             self._breakables[self._position] = Breakable.Break
 
     def do_not_break_here(self) -> None:
-        if self._text and self._breakables[self._position] == Breakable.Unknown:
+        if self._text and self._breakables[self._position] is None:
             self._breakables[self._position] = Breakable.DoNotBreak
 
     def does_break_here(self) -> bool:
         return bool(self._breakables[self._position])
+
+    def set_default(self, breakable: Breakable) -> None:
+        self._breakables[:] = [
+            breakable if x is None else x for x in self._breakables
+        ]
+
+    def literal_breakables(
+            self, default: Breakable = Breakable.Break
+    ) -> Iterable[Literal[0, 1]]:
+        return (default.value if x is None else x.value for x in self._breakables)
 
 
 def boundaries(breakables: Breakables, /) -> Iterator[int]:
