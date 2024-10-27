@@ -33,7 +33,7 @@ T = TypeVar('T')
 class Run(Generic[T]):
     """A utitlity class which helps treating break determination for a string."""
 
-    def __init__(self, text: str, func: Callable[[str], T]):
+    def __init__(self, text: str, func: Callable[[str], T] = lambda x: x, /):
         """Utitlity class which helps treating break determination for a string.
 
         `text`
@@ -50,35 +50,51 @@ class Run(Generic[T]):
         self._condition = bool(text)
 
     def __bool__(self) -> bool:
+        """Evaluate the instance itself represents if its context is valid.
+
+        >>> bool(Run('a'))
+        True
+        >>> bool(Run(''))  # empty string is evaluated as False
+        False
+        >>> bool(Run('abc').is_leading('b'))
+        True
+        >>> bool(Run('abc').is_leading('x'))
+        False
+        """
         return self._condition
 
     @property
-    def text(self) -> str:
-        return self._text
-
-    @property
-    def values(self) -> list[T]:
-        return self._values
-
-    @property
-    def breakables(self) -> list[Optional[Breakable]]:
-        return self._breakables
-
-    @property
     def position(self) -> int:
+        """Current index position."""
         return self._position
 
     @property
+    def text(self) -> str:
+        """Initial string.
+
+        >>> Run('abc').text
+        'abc'
+        """
+        return self._text
+
+    @property
     def curr(self) -> Optional[T]:
+        """Property value for the current position, or None if it is invalid."""
         return self.value()
 
     @property
     def prev(self) -> Optional[T]:
+        """Property value for the previous position, or None if it is invalid."""
         return self.value(-1)
 
     @property
     def next(self) -> Optional[T]:
+        """Property value for the next position, or None if it is invalid."""
         return self.value(1)
+
+    @property
+    def breakables(self) -> list[Optional[Breakable]]:
+        return self._breakables
 
     @property
     def chr(self) -> str:
@@ -117,6 +133,10 @@ class Run(Generic[T]):
             return self._values[i]
         else:
             return None
+
+    def values(self) -> list[T]:
+        """Return a copy of the list of its properties."""
+        return self._values[:]
 
     def walk(self, offset: int = 1, /, noskip: bool = False) -> bool:
         if self._condition:
