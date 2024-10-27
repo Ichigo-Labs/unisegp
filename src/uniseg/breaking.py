@@ -145,10 +145,10 @@ class Run(Generic[T]):
         return self._text[self._position]
 
     def _calc_position(self, offset: int, /, noskip: bool = False) -> int:
-        """(internal) Return the index value for the walked `offset` steps
+        """(internal) Return the index for the result of walking `offset` steps
         from the current postion.
 
-        if `noskip` is specified as `True`, skipping values are ignored.
+        If `noskip` is `True`, skipping values are ignored.
 
         >>> run = Run('abc')
         >>> run._calc_position(1)
