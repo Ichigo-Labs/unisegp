@@ -260,8 +260,8 @@ class Run(Generic[T]):
     ) -> 'Run[T]':
         """Test if values appears before / after the current position.
 
-        Return shallow copy of the instance which position is at the end of
-        the tested continuing series.
+        Return shallow copy of the instance which position is at the result of
+        the rounting.
 
         >>> run = Run('abc', lambda x: x.upper())
         >>> run.is_continuing('B').curr
