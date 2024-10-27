@@ -30,6 +30,7 @@ TailorFunc = Callable[[str, Breakables], Breakables]
 
 T = TypeVar('T')
 
+
 class Run(Generic[T]):
     """A utitlity class which helps treating break determination for a string."""
 
@@ -54,11 +55,17 @@ class Run(Generic[T]):
 
         >>> bool(Run('a'))
         True
-        >>> bool(Run(''))  # empty string is evaluated as False
+        >>> bool(Run(''))
         False
         >>> bool(Run('abc').is_leading('b'))
         True
+        >>> bool(Run('abc').is_leading('b').is_leading('c'))
+        True
         >>> bool(Run('abc').is_leading('x'))
+        False
+        >>> bool(Run('abc').is_leading('b').is_leading('c'))
+        True
+        >>> bool(Run('abc').is_leading('x').is_leading('c'))
         False
         """
         return self._condition
