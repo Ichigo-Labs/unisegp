@@ -9,7 +9,7 @@ __all__ = [
     'Breakable',
     'Breakables',
     'TailorFunc',
-    'Runner',
+    'Run',
     'boundaries',
     'break_units',
 ]
@@ -30,10 +30,18 @@ TailorFunc = Callable[[str, Breakables], Breakables]
 
 T = TypeVar('T')
 
-
-class Runner(Generic[T]):
+class Run(Generic[T]):
+    """A utitlity class which helps treating break determination for a string."""
 
     def __init__(self, text: str, func: Callable[[str], T]):
+        """Utitlity class which helps treating break determination for a string.
+
+        `text`
+            string to determine breakable information.
+        `func`
+            property function to get a specific value for each character
+            (code page) of the string.
+        """
         self._text = text
         self._values = [func(c) for c in text]
         self._skip = tuple[str, ...]()
@@ -88,7 +96,7 @@ class Runner(Generic[T]):
     def value(self, offset: int = 0, /, noskip: bool = False) -> Optional[T]:
         """Return value at current position + offset.
 
-        >>> run = Runner('abc', lambda x: x.upper())
+        >>> run = Run('abc', lambda x: x.upper())
         >>> run.value(1)
         'B'
         >>> run.value(2)
@@ -138,13 +146,13 @@ class Runner(Generic[T]):
         variable: bool = False,
         backward: bool = False,
         noskip: bool = False,
-    ) -> 'Runner[T]':
+    ) -> 'Run[T]':
         """Test if values appears before / after the current position.
 
         Return shallow copy of the instance which position is at the end of
         the tested continuing series.
 
-        >>> run = Runner('abc', lambda x: x.upper())
+        >>> run = Run('abc', lambda x: x.upper())
         >>> run.is_continuing('B').curr
         'B'
         >>> run.is_continuing('B').next
@@ -162,7 +170,7 @@ class Runner(Generic[T]):
         >>> run.is_continuing('A', backward=True).curr
         'A'
 
-        >>> run = Runner('abbbccd', lambda x: x.upper())
+        >>> run = Run('abbbccd', lambda x: x.upper())
         >>> run.is_continuing('B', variable=True).curr
         'B'
         >>> run.skip(('C',))
@@ -171,7 +179,7 @@ class Runner(Generic[T]):
         >>> run.is_continuing('B', variable=True).value(1, noskip=True)
         'C'
 
-        >>> run = Runner('abbbccd', lambda x: x.upper())
+        >>> run = Run('abbbccd', lambda x: x.upper())
         >>> run.walk(4)
         True
         >>> run.curr
@@ -193,12 +201,12 @@ class Runner(Generic[T]):
 
     def is_following(
         self, values: Sequence[T], /, variable: bool = False, noskip: bool = False
-    ) -> 'Runner[T]':
+    ) -> 'Run[T]':
         return self.is_continuing(values, variable=variable, backward=True, noskip=noskip)
 
     def is_leading(
         self, values: Sequence[T], /, variable: bool = False, noskip: bool = False
-    ) -> 'Runner[T]':
+    ) -> 'Run[T]':
         return self.is_continuing(values, variable=variable, noskip=noskip)
 
     def break_here(self) -> None:

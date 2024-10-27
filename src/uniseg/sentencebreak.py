@@ -10,7 +10,7 @@ from sys import stderr
 import sys
 from typing import Optional
 
-from uniseg.breaking import (Breakable, Breakables, Runner, TailorFunc,
+from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import sentence_break as _sentence_break
 
@@ -88,7 +88,7 @@ def sentence_breakables(s: str, /) -> Breakables:
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     """
-    run = Runner(s, sentence_break)
+    run = Run(s, sentence_break)
     run.break_here()
     while run.walk():
         # SB1
