@@ -89,9 +89,9 @@ def sentence_breakables(s: str, /) -> Breakables:
      0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     """
     run = Run(s, sentence_break)
+    # SB1
     run.break_here()
     while run.walk():
-        # SB1
         # SB3
         if run.prev == SB.CR and run.curr == SB.LF:
             run.do_not_break_here()
