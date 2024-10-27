@@ -177,8 +177,7 @@ def word_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # WB13a
         elif (
-            run.prev in AHLetterTuple +
-                (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
+            run.prev in AHLetterTuple + (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
             and run.curr == WB.EXTENDNUMLET
         ):
             run.do_not_break_here()
