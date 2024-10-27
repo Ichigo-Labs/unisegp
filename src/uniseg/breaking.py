@@ -72,7 +72,14 @@ class Run(Generic[T]):
 
     @property
     def position(self) -> int:
-        """Current index position."""
+        """Current index position.
+
+        >>> run = Run('abc')
+        >>> run.position
+        0
+        >>> __ = run.walk() ; run.position
+        1
+        """
         return self._position
 
     @property
@@ -86,17 +93,37 @@ class Run(Generic[T]):
 
     @property
     def curr(self) -> Optional[T]:
-        """Property value for the current position, or None if it is invalid."""
+        """Property value for the current position, or None if it is invalid.
+
+        >>> run = Run('abc', lambda x: x.upper())
+        >>> run.curr
+        'A'
+        >>> __ = run.walk() ; run.curr
+        'B'
+        """
         return self.value()
 
     @property
     def prev(self) -> Optional[T]:
-        """Property value for the previous position, or None if it is invalid."""
+        """Property value for the previous position, or None if it is invalid.
+
+        >>> run = Run('abc', lambda x: x.upper())
+        >>> run.prev    # returns None
+        >>> __ = run.walk() ; run.prev
+        'A'
+        """
         return self.value(-1)
 
     @property
     def next(self) -> Optional[T]:
-        """Property value for the next position, or None if it is invalid."""
+        """Property value for the next position, or None if it is invalid.
+
+        >>> run = Run('abc', lambda x: x.upper())
+        >>> run.next
+        'B'
+        >>> __ = run.walk() ; run.next
+        'C'
+        """
         return self.value(1)
 
     @property
