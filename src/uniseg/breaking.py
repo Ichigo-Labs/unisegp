@@ -95,6 +95,8 @@ class Run(Generic[T]):
     def curr(self) -> Optional[T]:
         """Property value for the current position, or None if it is invalid.
 
+        `run.curr` is equivalent for `run.value()`.
+
         >>> run = Run('abc', lambda x: x.upper())
         >>> run.curr
         'A'
@@ -107,6 +109,8 @@ class Run(Generic[T]):
     def prev(self) -> Optional[T]:
         """Property value for the previous position, or None if it is invalid.
 
+        `run.prev` is equivalent for `run.value(-1)`.
+
         >>> run = Run('abc', lambda x: x.upper())
         >>> run.prev    # returns None
         >>> __ = run.walk() ; run.prev
@@ -116,7 +120,9 @@ class Run(Generic[T]):
 
     @property
     def next(self) -> Optional[T]:
-        """Property value for the next position, or None if it is invalid.
+        """Property value for the next position, or None if it is not valid.
+
+        `run.next` is equivalent for `run.value(1)`.
 
         >>> run = Run('abc', lambda x: x.upper())
         >>> run.next
@@ -127,19 +133,43 @@ class Run(Generic[T]):
         return self.value(1)
 
     @property
-    def breakables(self) -> list[Optional[Breakable]]:
-        return self._breakables
-
-    @property
     def chr(self) -> str:
+        """Current code point (a single Unicode str object) at the position.
+
+        >>> run = Run('abc', lambda x: x.upper())
+        >>> run.chr
+        'a'
+        >>> __ = run.walk() ; run.chr
+        'b'
+        """
         return self._text[self._position]
 
     def _calc_position(self, offset: int, /, noskip: bool = False) -> int:
+        """(internal) Return the index value for the walked `offset` steps
+        from the current postion.
+
+        if `noskip` is specified as `True`, skipping values are ignored.
+
+        >>> run = Run('abc')
+        >>> run._calc_position(1)
+        1
+        >>> run.skip('b')
+        >>> run._calc_position(1)
+        2
+        >>> run._calc_position(1, noskip=True)
+        1
+        >>> run._calc_position(3)
+        4
+        """
         i = self._position
         vec = offset // abs(offset) if offset else 0
         for __ in range(abs(offset)):
             i += vec
-            while 0 <= i < len(self._text) and (not noskip and self._values[i] in self._skip):
+            while (
+                0 <= i < len(self._text)
+                and not noskip
+                and self._values[i] in self._skip
+            ):
                 i += vec
         return i
 
@@ -169,10 +199,37 @@ class Run(Generic[T]):
             return None
 
     def values(self) -> list[T]:
-        """Return a copy of the list of its properties."""
+        """Return a copy of the list of its properties.
+
+        >>> run = Run('abc', lambda x: x.upper())
+        >>> run.values()
+        ['A', 'B', 'C']
+        """
         return self._values[:]
 
+    def breakables(self) -> list[Optional[Breakable]]:
+        """Return a copy of the list of the breakable oppotunity values."""
+        return self._breakables[:]
+
     def walk(self, offset: int = 1, /, noskip: bool = False) -> bool:
+        """Move current position for `offset` steps.
+
+        Certain values specified as "skip" is ignored unless `noskip` flag is
+        set as `True`.  Return if it successfully moved.
+
+        >>> run = Run('abcde')
+        >>> run.walk()
+        True
+        >>> run.curr
+        'b'
+        >>> run.skip(('c', 'd'))
+        >>> run.walk()
+        True
+        >>> run.curr
+        'e'
+        >>> run.walk()
+        False
+        """
         if self._condition:
             pos = self._calc_position(offset, noskip=noskip)
             condition = False
@@ -197,7 +254,7 @@ class Run(Generic[T]):
         self,
         values: Sequence[T],
         /,
-        variable: bool = False,
+        greedy: bool = False,
         backward: bool = False,
         noskip: bool = False,
     ) -> 'Run[T]':
@@ -211,9 +268,9 @@ class Run(Generic[T]):
         'B'
         >>> run.is_continuing('B').next
         'C'
-        >>> run.is_continuing('X', variable=True).curr
+        >>> run.is_continuing('X', greedy=True).curr
         'A'
-        >>> run.is_continuing('X', variable=True).next
+        >>> run.is_continuing('X', greedy=True).next
         'B'
         >>> bool(run.is_continuing('B').is_continuing('C'))
         True
@@ -225,12 +282,12 @@ class Run(Generic[T]):
         'A'
 
         >>> run = Run('abbbccd', lambda x: x.upper())
-        >>> run.is_continuing('B', variable=True).curr
+        >>> run.is_continuing('B', greedy=True).curr
         'B'
         >>> run.skip(('C',))
-        >>> run.is_continuing('B', variable=True).next
+        >>> run.is_continuing('B', greedy=True).next
         'D'
-        >>> run.is_continuing('B', variable=True).value(1, noskip=True)
+        >>> run.is_continuing('B', greedy=True).value(1, noskip=True)
         'C'
 
         >>> run = Run('abbbccd', lambda x: x.upper())
@@ -238,12 +295,12 @@ class Run(Generic[T]):
         True
         >>> run.curr
         'C'
-        >>> run.is_continuing('B', variable=True, backward=True).prev
+        >>> run.is_continuing('B', greedy=True, backward=True).prev
         'A'
         """
         run = copy(self)
         vec = -1 if backward else 1
-        if variable:
+        if greedy:
             while run.value(vec, noskip=noskip) in values:
                 if not run.walk(vec, noskip=noskip):
                     break
@@ -254,14 +311,14 @@ class Run(Generic[T]):
         return run
 
     def is_following(
-        self, values: Sequence[T], /, variable: bool = False, noskip: bool = False
+        self, values: Sequence[T], /, greedy: bool = False, noskip: bool = False
     ) -> 'Run[T]':
-        return self.is_continuing(values, variable=variable, backward=True, noskip=noskip)
+        return self.is_continuing(values, greedy=greedy, backward=True, noskip=noskip)
 
     def is_leading(
-        self, values: Sequence[T], /, variable: bool = False, noskip: bool = False
+        self, values: Sequence[T], /, greedy: bool = False, noskip: bool = False
     ) -> 'Run[T]':
-        return self.is_continuing(values, variable=variable, noskip=noskip)
+        return self.is_continuing(values, greedy=greedy, noskip=noskip)
 
     def break_here(self) -> None:
         if self._text and self._breakables[self._position] is None:
