@@ -10,7 +10,7 @@ from typing import Optional
 from unicodedata import east_asian_width
 
 from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
-from uniseg.codepoint import code_point, code_points
+from uniseg.codepoint import code_points
 from uniseg.db import line_break as _line_break
 
 __all__ = [
@@ -78,58 +78,26 @@ LB = LineBreak
 
 
 def line_break(c: str, index: int = 0, /) -> str:
-    r"""Return the Line_Break property of `c`
+    R"""Return the Line_Break property for `c`.
 
     `c` must be a single Unicode code point string.
 
     >>> print(line_break('\x0d'))
-    CR
+    <LineBreak.CR: 'CR'>
     >>> print(line_break(' '))
-    SP
+    <LineBreak.SP: 'SP'>
     >>> print(line_break('1'))
-    NU
+    <LineBreak.NU: 'NU'>
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Line_Break property of the code point at
     c[index].
 
     >>> print(line_break(u'a\x0d', 1))
-    CR
+    <LineBreak.CR: 'CR'>
     """
 
-    return _line_break(code_point(c, index))
-
-
-def _preprocess_boundaries(s: str, /) -> Iterator[tuple[int, str]]:
-    r"""(internal) Preprocess LB9: X CM* -> X
-
-    Where X is not in (BK, CR, LF, NL, SP, ZW)
-
-    >>> list(_preprocess_boundaries(u'\r\n')) == [(0, 'CR'), (1, 'LF')]
-    True
-    >>> list(_preprocess_boundaries(u'A\x01A')) == [(0, 'AL'), (2, 'AL')]
-    True
-    >>> list(_preprocess_boundaries(u'\n\x01')) == [(0, 'LF'), (1, 'CM')]
-    True
-    >>> list(_preprocess_boundaries(u'\n  A')) == [(0, 'LF'), (1, 'SP'), (2, 'SP'), (3, 'AL')]
-    True
-    """
-
-    prev_prop = None
-    i = 0
-    for c in code_points(s):
-        prop = line_break(c)
-        if prop in (BK, CR, LF, SP, NL, ZW):
-            yield (i, prop)
-            prev_prop = None
-        elif prop == CM:
-            if prev_prop is None:
-                yield (i, prop)
-                prev_prop = prop
-        else:
-            yield (i, prop)
-            prev_prop = prop
-        i += len(c)
+    return _line_break(c[index])
 
 
 def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
