@@ -4,13 +4,13 @@ UAX #14: Unicode Line Breaking Algorithm (Unicode 16.0.0)
 https://www.unicode.org/reports/tr14/tr14-53.html
 """
 
-from enum import Enum
 from collections.abc import Iterator
+from enum import Enum
 from typing import Optional
 from unicodedata import east_asian_width
 
-from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
-from uniseg.codepoint import code_points
+from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
+                             boundaries, break_units)
 from uniseg.db import line_break as _line_break
 
 __all__ = [
@@ -77,27 +77,27 @@ class LineBreak(Enum):
 LB = LineBreak
 
 
-def line_break(c: str, index: int = 0, /) -> str:
+def line_break(c: str, index: int = 0, /) -> LineBreak:
     R"""Return the Line_Break property for `c`.
 
     `c` must be a single Unicode code point string.
 
-    >>> print(line_break('\x0d'))
+    >>> line_break('\x0d')
     <LineBreak.CR: 'CR'>
-    >>> print(line_break(' '))
+    >>> line_break(' ')
     <LineBreak.SP: 'SP'>
-    >>> print(line_break('1'))
+    >>> line_break('1')
     <LineBreak.NU: 'NU'>
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Line_Break property of the code point at
     c[index].
 
-    >>> print(line_break(u'a\x0d', 1))
+    >>> line_break(u'a\x0d', 1)
     <LineBreak.CR: 'CR'>
     """
 
-    return _line_break(c[index])
+    return LineBreak[_line_break(c[index])]
 
 
 def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
@@ -113,145 +113,210 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     >>> list(line_break_breakables(u''))
     []
     """
-
     if not s:
-        return
+        return iter([])
 
-    primitive_boundaries = list(_preprocess_boundaries(s))
-    prev_prev_lb = None
-    prev_lb = None
-    for i, (pos, lb) in enumerate(primitive_boundaries):
-        next_pos, __ = (primitive_boundaries[i+1]
-                        if i < len(primitive_boundaries)-1 else (len(s), None))
-
-        if legacy:
-            if lb == AL:
-                cp = chr(ord(s[pos]))
-                lb = ID if east_asian_width(cp) == 'A' else AL
-            elif lb == AI:
-                lb = ID
-        else:
-            if lb == AI:
-                lb = AL
-
-        if lb == CJ:
-            lb = NS
-
-        if lb in (CM, XX, SA):
-            lb = AL
+    run = Run(s, line_break)
+    # LB1
+    # TODO:
+    # LB2
+    run.do_not_break_here()
+    while run.walk():
         # LB4
-        if pos == 0:
-            do_break = False
-        elif prev_lb == BK:
-            do_break = True
+        if run.prev == LB.BK:
+            run.break_here()
         # LB5
-        elif prev_lb in (CR, LF, NL):
-            do_break = not (prev_lb == CR and lb == LF)
+        elif run.prev == LB.CR and run.curr == LB.LF:
+            run.do_not_break_here()
+        elif run.prev in (LB.CR, LB.LF, LB.NL):
+            run.break_here()
         # LB6
-        elif lb in (BK, CR, LF, NL):
-            do_break = False
+        elif run.curr in (LB.BK, LB.CR, LB.LF, LB.NL):
+            run.do_not_break_here()
         # LB7
-        elif lb in (SP, ZW):
-            do_break = False
+        elif run.curr in (LB.SP, LB.ZW):
+            run.do_not_break_here()
         # LB8
-        elif ((prev_prev_lb == ZW and prev_lb == SP) or (prev_lb == ZW)):
-            do_break = True
+        elif run.is_following((LB.SP,), greedy=True).prev == LB.ZW:
+            run.break_here()
+        # LB8a
+        elif run.prev == LB.ZWJ:
+            run.do_not_break_here()
+    run.head()
+    run.skip((LB.CM, LB.ZWJ))
+    # LB10
+    # TODO:
+    while run.walk():
         # LB11
-        elif lb == WJ or prev_lb == WJ:
-            do_break = False
+        if run.curr == LB.WJ or run.prev == LB.WJ:
+            run.do_not_break_here()
         # LB12
-        elif prev_lb == GL:
-            do_break = False
+        elif run.prev == LB.GL:
+            run.do_not_break_here()
         # LB12a
-        elif prev_lb not in (SP, BA, HY) and lb == GL:
-            do_break = False
+        elif run.prev not in (LB.SP, LB.BA, LB.HY) and run.curr == LB.GL:
+            run.do_not_break_here()
         # LB13
-        elif lb in (CL, CP, EX, IS, SY):
-            do_break = False
+        elif run.curr in (LB.CL, LB.CP, LB.EX, LB.SY):
+            run.do_not_break_here()
         # LB14
-        elif (prev_prev_lb == OP and prev_lb == SP) or prev_lb == OP:
-            do_break = False
-        # LB15
-        elif ((prev_prev_lb == QU and prev_lb == SP and lb == OP)
-              or (prev_lb == QU and lb == OP)):
-            do_break = False
+        elif run.is_following((LB.SP,), greedy=True).prev == LB.OP:
+            run.do_not_break_here()
+        # LB15a
+        elif (
+            run.is_following((LB.SP,), greedy=True).is_following((LB.QU,))
+            .prev in (LB.BK, LB.CR, LB.LF, LB.NL, LB.OP, LB.QU, LB.GL, LB.SP, LB.ZW)
+        ):
+            run.do_not_break_here()
+        # LB15b
+        elif (
+            run.is_leading((LB.SP, LB.GL, LB.WJ, LB.CL, LB.QU, LB.CP, LB.EX, LB.IS,
+                            LB.SY, LB.BK, LB.CR, LB.LF, LB.NL, LB.ZW))
+        ):
+            run.do_not_break_here()
+        # LB15c
+        elif run.prev == LB.SP and run.curr == LB.IS and run.next == LB.NU:
+            run.break_here()
+        # LB15d
+        elif run.curr == LB.IS:
+            run.do_not_break_here()
         # LB16
-        elif ((prev_prev_lb in (CL, CP) and prev_lb == SP and lb == NS)
-              or (prev_lb in (CL, CP) and lb == NS)):
-            do_break = False
+        elif (
+            run.is_leading((LB.SP,), greedy=True).prev in (LB.CL, LB.CP)
+            and run.curr == LB.NS
+        ):
+            run.do_not_break_here()
         # LB17
-        elif ((prev_prev_lb == B2 and prev_lb == SP and lb == B2)
-              or (prev_lb == B2 and lb == B2)):
-            do_break = False
+        elif (
+            run.is_leading((LB.SP,), greedy=True).prev == LB.B2
+            and run.curr == LB.B2
+        ):
+            run.do_not_break_here()
         # LB18
-        elif prev_lb == SP:
-            do_break = True
+        elif run.prev == LB.SP:
+            run.break_here()
         # LB19
-        elif lb == QU or prev_lb == QU:
-            do_break = False
+        elif (
+            run.curr == LB.QU
+            or run.prev == LB.QU
+        ):
+            run.do_not_break_here()
         # LB20
-        elif lb == CB or prev_lb == CB:
-            do_break = True
+        elif run.curr == LB.CB or run.prev == LB.CB:
+            run.break_here()
+        # LB20a
+        elif (
+            run.is_leading((LB.HY,)).prev in (LB.BK, LB.CR, LB.LF, LB.NL, LB.SP,
+                                              LB.ZW, LB.CB, LB.GL)
+            and run.curr == LB.AL
+        ):
+            run.do_not_break_here()
         # LB21
-        elif lb in (BA, HY, NS) or prev_lb == BB:
-            do_break = False
+        elif run.curr in (LB.BA, LB.HY, LB.NS) or run.prev == LB.BB:
+            run.do_not_break_here()
+        # LB21a
+        elif run.is_following((LB.HY, LB.BA)).prev == LB.HL and run.curr != LB.HL:
+            run.do_not_break_here()
+        # LB21b
+        elif run.prev == LB.SY and run.curr == LB.HL:
+            run.do_not_break_here()
         # LB22
-        elif prev_lb in (AL, HL, ID, IN, NU) and lb == IN:
-            do_break = False
+        elif run.curr == LB.IN:
+            run.do_not_break_here()
         # LB23
-        elif ((prev_lb == ID and lb == PO)
-              or (prev_lb in (AL, HL) and lb == NU)
-              or (prev_lb == NU and lb in (AL, HL))):
-            do_break = False
+        elif (
+            (run.prev in (LB.AL, LB.HL) and run.curr == LB.NU)
+            or (run.prev == LB.NU and run.curr in (LB.AL, LB.HL))
+        ):
+            run.do_not_break_here()
+        # LB23a
+        elif (
+            (run.prev == LB.PR and run.curr in (LB.ID, LB.EB, LB.EM))
+            or (run.prev in (LB.ID, LB.EB, LB.EM) and run.cur == LB.PO)
+        ):
+            run.do_not_break_here()
         # LB24
-        elif ((prev_lb == PR and lb == ID)
-              or (prev_lb == PR and lb in (AL, HL))
-              or (prev_lb == PO and lb in (AL, HL))):
-            do_break = False
+        elif (
+            (run.prev in (LB.PR, LB.PO) and run.curr in (LB.AL, LB.HL))
+            or (run.prev in (LB.AL, LB.HL) and run.curr in (LB.PR, LB.PO))
+        ):
+            run.do_not_break_here()
         # LB25
-        elif ((prev_lb == CL and lb == PO)
-              or (prev_lb == CP and lb == PO)
-              or (prev_lb == CL and lb == PR)
-              or (prev_lb == CP and lb == PR)
-              or (prev_lb == NU and lb == PO)
-              or (prev_lb == NU and lb == PR)
-              or (prev_lb == PO and lb == OP)
-              or (prev_lb == PO and lb == NU)
-              or (prev_lb == PR and lb == OP)
-              or (prev_lb == PR and lb == NU)
-              or (prev_lb == HY and lb == NU)
-              or (prev_lb == IS and lb == NU)
-              or (prev_lb == NU and lb == NU)
-              or (prev_lb == SY and lb == NU)):
-            do_break = False
+        elif (
+            (run.is_following((LB.CL, LB.CP)).is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
+             and run.curr in (LB.PO, LB.PR))
+            or (run.is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
+                and run.curr in (LB.PO, LB.PR))
+            or (run.prev in (LB.PO, LB.PR) and run.curr == LB.OP and run.next == LB.NU)
+            or (run.prev in (LB.PO, LB.PR) and run.curr == LB.OP and run.next == LB.IS
+                and run.value(2) == LB.NU)
+            or (run.prev in (LB.PO, LB.PR) and run.curr == LB.NU)
+            or (run.prev in (LB.HY, LB.IS) and run.curr == LB.NU)
+            or (run.is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
+                and run.curr == LB.NU)
+        ):
+            run.do_not_break_here()
         # LB26
-        elif ((prev_lb == JL and lb in (JL, JV, H2, H3))
-              or (prev_lb in (JV, H2) and lb in (JV, JT))
-              or (prev_lb in (JT, H3) and lb == JT)):
-            do_break = False
+        elif (
+            (run.prev == LB.JL and run.curr in (LB.JL, LB.JV, LB.H2, LB.H3))
+            or (run.prev in (LB.JV, LB.H2) and run.curr in (LB.JV, LB.JT))
+            or (run.prev in (LB.JT, LB.H3) and run.curr == LB.JT)
+        ):
+            run.do_not_break_here()
         # LB27
-        elif ((prev_lb in (JL, JV, JT, H2, H3) and lb in (IN, PO))
-              or (prev_lb == PR and lb in (JL, JV, JT, H2, H3))):
-            do_break = False
+        elif (
+            (run.prev in (LB.JL, LB.JV, LB.JT, LB.H2, LB.H3) and run.curr == LB.PO)
+            or (run.prev == LB.PR and run.curr in (LB.JL, LB.JV, LB.JT, LB.H2, LB.H3))
+        ):
+            run.do_not_break_here()
         # LB28
-        elif prev_lb in (AL, HL) and lb in (AL, HL):
-            do_break = False
+        elif run.prev in (LB.AL, LB.HL) and run.curr in (LB.AL, LB.HL):
+            run.do_not_break_here()
+        # LB28a
+        elif (
+            (run.prev == LB.AP and (run.curr in (LB.AK, LB.AS) or run.cc == '\u25cc'))
+            or ((run.prev in (LB.AK, LB.AS) or run.pc == '\u25cc') and run.curr in (LB.VF, LB.VI))
+            or (run.is_following((LB.VI,)).prev in (LB.AK, LB.AS)
+                and (run.curr == LB.AK or run.cc == '\u25cc'))
+            or ((run.prev in (LB.AK, LB.AS) or run.pc == '\u25cc')
+                and (run.curr in (LB.AK, LB.AS) or run.cc == '\u25cc')
+                and run.next == LB.VF)
+        ):
+            run.do_not_break_here()
         # LB29
-        elif prev_lb == IS and lb in (AL, HL):
-            do_break = False
+        elif run.prev == LB.IS and run.curr in (LB.AL, LB.HL):
+            run.do_not_break_here()
         # LB30
-        elif ((prev_lb in (AL, HL, NU) and lb == OP)
-              or (prev_lb == CP and lb in (AL, HL, NU))):
-            do_break = False
-        # LB30a
-        elif prev_lb == lb == RI:
-            do_break = False
-        else:
-            do_break = True
-        for j in range(next_pos-pos):
-            yield 1 if j == 0 and do_break else 0
-        prev_prev_lb = prev_lb
-        prev_lb = lb
+        elif (
+            (run.prev in (LB.AL, LB.HL, LB.NU) and run.curr == LB.OP)
+            or (run.prev == LB.CP and run.curr in (LB.AL, LB.HL, LB.NU))
+        ):
+            run.do_not_break_here()
+    # LB30a
+    run.head()
+    while 1:
+        while run.curr != LB.RI:
+            if not run.walk():
+                break
+        if not run.walk():
+            break
+        while run.prev == run.curr == LB.RI:
+            run.do_not_break_here()
+            if not run.walk():
+                break
+            if not run.walk():
+                break
+    # LB30b
+    run.head()
+    while run.walk():
+        if (
+            run.prev == LB.EB and run.curr == LB.EM
+            or (run.curr == LB.EM)
+        ):
+            run.do_not_break_here()
+    # LB31
+    run.set_default(Breakable.Break)
+    return run.literal_breakables()
 
 
 def line_break_boundaries(s: str,

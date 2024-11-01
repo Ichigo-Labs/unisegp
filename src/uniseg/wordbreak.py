@@ -103,7 +103,7 @@ def word_breakables(s: str, /) -> Breakables:
         elif run.curr in (WB.NEWLINE, WB.CR, WB.LF):
             run.break_here()
         # WB3c
-        elif run.prev == WB.ZWJ and extended_pictographic(run.chr):
+        elif run.prev == WB.ZWJ and run.cc and extended_pictographic(run.cc):
             run.do_not_break_here()
         # WB3d
         elif run.prev == run.curr == WB.WSEGSPACE:

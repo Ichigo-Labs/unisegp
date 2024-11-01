@@ -133,16 +133,31 @@ class Run(Generic[T]):
         return self.value(1)
 
     @property
-    def chr(self) -> str:
+    def cc(self) -> Optional[str]:
         """Current code point (a single Unicode str object) at the position.
 
         >>> run = Run('abc', lambda x: x.upper())
-        >>> run.chr
+        >>> run.cc
         'a'
-        >>> __ = run.walk() ; run.chr
+        >>> __ = run.walk() ; run.cc
         'b'
         """
-        return self._text[self._position]
+        i = self._position
+        cond = (0 <= i < len(self._text)) and self._condition
+        return self._text[i] if cond else None
+
+    @property
+    def pc(self) -> Optional[str]:
+        """Previous code point (a single Unicode str object) at the position.
+
+        >>> run = Run('abc', lambda x: x.upper())
+        >>> run.pc
+        >>> __ = run.walk() ; run.pc
+        'a'
+        """
+        i = self._position - 1
+        cond = (0 <= i < len(self._text)) and self._condition
+        return self._text[i] if cond else None
 
     def _calc_position(self, offset: int, /, noskip: bool = False) -> int:
         """(internal) Return the index for the result of walking `offset` steps
