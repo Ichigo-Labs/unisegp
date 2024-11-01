@@ -20,6 +20,7 @@ __all__ = [
     'line_break_units',
 ]
 
+
 class LineBreak(Enum):
     """Line_Break property values."""
     BK = 'BK'   # Mandatory Break
@@ -32,7 +33,7 @@ class LineBreak(Enum):
     ZW = 'ZW'   # Zero Width Space
     GL = 'GL'   # Non-breaking ("Glue")
     SP = 'SP'   # Space
-    ZWJ = 'ZWJ' # Zero Width Joiner
+    ZWJ = 'ZWJ'  # Zero Width Joiner
     B2 = 'B2'   # Break Opportunity Before and After
     BA = 'BA'   # Break After
     BB = 'BB'   # Break Before
@@ -71,155 +72,12 @@ class LineBreak(Enum):
     VI = 'VF'   # Virama
     XX = 'XX'   # Unknown
 
-# Pair table based on UAX #14.
-# cf. http://www.unicode.org/reports/tr14/#ExampleTable
-# The table is extended to handle CBs.
-pair_table = {
-OP: {OP: '^', CL: '^', CP: '^', QU: '^', GL: '^', NS: '^',
-     EX: '^', SY: '^', IS: '^', PR: '^', PO: '^', NU: '^',
-     AL: '^', ID: '^', IN: '^', HY: '^', BA: '^', BB: '^',
-     B2: '^', ZW: '^', CM: '@', WJ: '^', H2: '^', H3: '^',
-     JL: '^', JV: '^', JT: '^', CB: '^'},
-CL: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '^',
-     EX: '^', SY: '^', IS: '^', PR: '%', PO: '%', NU: '_',
-     AL: '_', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-CP: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '^',
-     EX: '^', SY: '^', IS: '^', PR: '%', PO: '%', NU: '%',
-     AL: '%', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-QU: {OP: '^', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '%', PO: '%', NU: '%',
-     AL: '%', ID: '%', IN: '%', HY: '%', BA: '%', BB: '%',
-     B2: '%', ZW: '^', CM: '#', WJ: '^', H2: '%', H3: '%',
-     JL: '%', JV: '%', JT: '%', CB: '%'},
-GL: {OP: '%', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '%', PO: '%', NU: '%',
-     AL: '%', ID: '%', IN: '%', HY: '%', BA: '%', BB: '%',
-     B2: '%', ZW: '^', CM: '#', WJ: '^', H2: '%', H3: '%',
-     JL: '%', JV: '%', JT: '%', CB: '%'},
-NS: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '_',
-     AL: '_', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-EX: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '_',
-     AL: '_', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-SY: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '%',
-     AL: '_', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-IS: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '%',
-     AL: '%', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-PR: {OP: '%', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '%',
-     AL: '%', ID: '%', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '%', H3: '%',
-     JL: '%', JV: '%', JT: '%', CB: '_'},
-PO: {OP: '%', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '%',
-     AL: '%', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-NU: {OP: '%', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '%', PO: '%', NU: '%',
-     AL: '%', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-AL: {OP: '%', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '%',
-     AL: '%', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-ID: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '%', NU: '_',
-     AL: '_', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-IN: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '_',
-     AL: '_', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-HY: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '_', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '%',
-     AL: '_', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-BA: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '_', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '_',
-     AL: '_', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-BB: {OP: '%', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '%', PO: '%', NU: '%',
-     AL: '%', ID: '%', IN: '%', HY: '%', BA: '%', BB: '%',
-     B2: '%', ZW: '^', CM: '#', WJ: '^', H2: '%', H3: '%',
-     JL: '%', JV: '%', JT: '%', CB: '_'},
-B2: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '_',
-     AL: '_', ID: '_', IN: '_', HY: '%', BA: '%', BB: '_',
-     B2: '^', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-ZW: {OP: '_', CL: '_', CP: '_', QU: '_', GL: '_', NS: '_',
-     EX: '_', SY: '_', IS: '_', PR: '_', PO: '_', NU: '_',
-     AL: '_', ID: '_', IN: '_', HY: '_', BA: '_', BB: '_',
-     B2: '_', ZW: '^', CM: '_', WJ: '_', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-CM: {OP: '%', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '%',
-     AL: '%', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-WJ: {OP: '%', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '%', PO: '%', NU: '%',
-     AL: '%', ID: '%', IN: '%', HY: '%', BA: '%', BB: '%',
-     B2: '%', ZW: '^', CM: '#', WJ: '^', H2: '%', H3: '%',
-     JL: '%', JV: '%', JT: '%', CB: '%'},
-H2: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '%', NU: '_',
-     AL: '_', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '%', JT: '%', CB: '_'},
-H3: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '%', NU: '_',
-     AL: '_', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '%', CB: '_'},
-JL: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '%', NU: '_',
-     AL: '_', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '%', H3: '%',
-     JL: '%', JV: '%', JT: '_', CB: '_'},
-JV: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '%', NU: '_',
-     AL: '_', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '%', JT: '%', CB: '_'},
-JT: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '%',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '%', NU: '_',
-     AL: '_', ID: '_', IN: '%', HY: '%', BA: '%', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '%', CB: '_'},
-CB: {OP: '_', CL: '^', CP: '^', QU: '%', GL: '%', NS: '_',
-     EX: '^', SY: '^', IS: '^', PR: '_', PO: '_', NU: '_',
-     AL: '_', ID: '_', IN: '_', HY: '_', BA: '_', BB: '_',
-     B2: '_', ZW: '^', CM: '#', WJ: '^', H2: '_', H3: '_',
-     JL: '_', JV: '_', JT: '_', CB: '_'},
-}
+
+# type alias for `LineBreak`
+LB = LineBreak
 
 
 def line_break(c: str, index: int = 0, /) -> str:
-
     r"""Return the Line_Break property of `c`
 
     `c` must be a single Unicode code point string.
@@ -243,7 +101,6 @@ def line_break(c: str, index: int = 0, /) -> str:
 
 
 def _preprocess_boundaries(s: str, /) -> Iterator[tuple[int, str]]:
-
     r"""(internal) Preprocess LB9: X CM* -> X
 
     Where X is not in (BK, CR, LF, NL, SP, ZW)
@@ -276,7 +133,6 @@ def _preprocess_boundaries(s: str, /) -> Iterator[tuple[int, str]]:
 
 
 def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
-
     """Iterate line breaking opportunities for every position of `s`
 
     1 means "break" and 0 means "do not break" BEFORE the postion.
@@ -298,7 +154,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     prev_lb = None
     for i, (pos, lb) in enumerate(primitive_boundaries):
         next_pos, __ = (primitive_boundaries[i+1]
-                        if i<len(primitive_boundaries)-1 else (len(s), None))
+                        if i < len(primitive_boundaries)-1 else (len(s), None))
 
         if legacy:
             if lb == AL:
@@ -425,15 +281,14 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         else:
             do_break = True
         for j in range(next_pos-pos):
-            yield 1 if j==0 and do_break else 0
+            yield 1 if j == 0 and do_break else 0
         prev_prev_lb = prev_lb
         prev_lb = lb
 
 
 def line_break_boundaries(s: str,
                           legacy: bool = False,
-                          tailor:Optional[TailorFunc] = None) -> Iterator[int]:
-
+                          tailor: Optional[TailorFunc] = None) -> Iterator[int]:
     """Iterate indices of the line breaking boundaries of `s`
 
     This function yields from 0 to the end of the string (== len(s)).
@@ -447,8 +302,7 @@ def line_break_boundaries(s: str,
 
 def line_break_units(s: str,
                      legacy: bool = False,
-                     tailor:Optional[TailorFunc] = None, /) -> Iterator[str]:
-
+                     tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
     r"""Iterate every line breaking token of `s`
 
     >>> s = 'The quick (\u201cbrown\u201d) fox can\u2019t jump 32.3 feet, right?'
