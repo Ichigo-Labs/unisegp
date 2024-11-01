@@ -4,6 +4,7 @@ UAX #14: Unicode Line Breaking Algorithm (Unicode 16.0.0)
 https://www.unicode.org/reports/tr14/tr14-53.html
 """
 
+from enum import Enum
 from collections.abc import Iterator
 from typing import Optional
 from unicodedata import east_asian_width
@@ -19,47 +20,56 @@ __all__ = [
     'line_break_units',
 ]
 
-
-BK = 'BK'   # Mandatory Break
-CR = 'CR'   # Carriage Return
-LF = 'LF'   # Line Feed
-CM = 'CM'   # Combining Mark
-NL = 'NL'   # Next Line
-SG = 'SG'   # Surrogate
-WJ = 'WJ'   # Word Joiner
-ZW = 'ZW'   # Zero Width Space
-GL = 'GL'   # Non-breaking ("Glue")
-SP = 'SP'   # Space
-B2 = 'B2'   # Break Opportunity Before and After
-BA = 'BA'   # Break After
-BB = 'BB'   # Break Before
-HY = 'HY'   # Hyphen
-CB = 'CB'   # Contingent Break Opportunity
-CL = 'CL'   # Close Punctuation
-CP = 'CP'   # Close Parenthesis
-EX = 'EX'   # Exclamation/Interrogation
-IN = 'IN'   # Inseparable
-NS = 'NS'   # Nonstarter
-OP = 'OP'   # Open Punctuation
-QU = 'QU'   # Quotation
-IS = 'IS'   # Infix Numeric Separator
-NU = 'NU'   # Numeric
-PO = 'PO'   # Postfix Numeric
-PR = 'PR'   # Prefix Numeric
-SY = 'SY'   # Symbols Allowing Break After
-AI = 'AI'   # Ambiguous (Alphabetic or Ideographic)
-AL = 'AL'   # Alphabetic
-CJ = 'CJ'   # Conditional Japanese Starter
-H2 = 'H2'   # Hangul LV Syllable
-H3 = 'H3'   # Hangul LVT Syllable
-HL = 'HL'   # Hebrew Letter
-ID = 'ID'   # Ideographic
-JL = 'JL'   # Hangul L Jamo
-JV = 'JV'   # Hangul V Jamo
-JT = 'JT'   # Hangul T Jamo
-RI = 'RI'   # Regional Indicator
-SA = 'SA'   # Complex Context Dependent (South East Asian)
-XX = 'XX'   # Unknown
+class LineBreak(Enum):
+    """Line_Break property values."""
+    BK = 'BK'   # Mandatory Break
+    CR = 'CR'   # Carriage Return
+    LF = 'LF'   # Line Feed
+    CM = 'CM'   # Combining Mark
+    NL = 'NL'   # Next Line
+    SG = 'SG'   # Surrogate
+    WJ = 'WJ'   # Word Joiner
+    ZW = 'ZW'   # Zero Width Space
+    GL = 'GL'   # Non-breaking ("Glue")
+    SP = 'SP'   # Space
+    ZWJ = 'ZWJ' # Zero Width Joiner
+    B2 = 'B2'   # Break Opportunity Before and After
+    BA = 'BA'   # Break After
+    BB = 'BB'   # Break Before
+    HY = 'HY'   # Hyphen
+    CB = 'CB'   # Contingent Break Opportunity
+    CL = 'CL'   # Close Punctuation
+    CP = 'CP'   # Close Parenthesis
+    EX = 'EX'   # Exclamation/Interrogation
+    IN = 'IN'   # Inseparable
+    NS = 'NS'   # Nonstarter
+    OP = 'OP'   # Open Punctuation
+    QU = 'QU'   # Quotation
+    IS = 'IS'   # Infix Numeric Separator
+    NU = 'NU'   # Numeric
+    PO = 'PO'   # Postfix Numeric
+    PR = 'PR'   # Prefix Numeric
+    SY = 'SY'   # Symbols Allowing Break After
+    AI = 'AI'   # Ambiguous (Alphabetic or Ideographic)
+    AK = 'AK'   # Aksara
+    AL = 'AL'   # Alphabetic
+    AP = 'AP'   # Aksara Pre-Base
+    AS = 'AS'   # Aksara Start
+    CJ = 'CJ'   # Conditional Japanese Starter
+    EB = 'EB'   # Emoji Base
+    EM = 'EM'   # Emoji Modifier
+    H2 = 'H2'   # Hangul LV Syllable
+    H3 = 'H3'   # Hangul LVT Syllable
+    HL = 'HL'   # Hebrew Letter
+    ID = 'ID'   # Ideographic
+    JL = 'JL'   # Hangul L Jamo
+    JV = 'JV'   # Hangul V Jamo
+    JT = 'JT'   # Hangul T Jamo
+    RI = 'RI'   # Regional Indicator
+    SA = 'SA'   # Complex Context Dependent (South East Asian)
+    VF = 'VF'   # Virama Final
+    VI = 'VF'   # Virama
+    XX = 'XX'   # Unknown
 
 # Pair table based on UAX #14.
 # cf. http://www.unicode.org/reports/tr14/#ExampleTable
