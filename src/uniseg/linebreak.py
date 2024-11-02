@@ -142,6 +142,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         # LB8a
         elif run.prev == LB.ZWJ:
             run.do_not_break_here()
+    # LB9
     run.head()
     run.skip((LB.CM, LB.ZWJ))
     # LB10
