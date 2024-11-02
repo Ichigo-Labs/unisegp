@@ -233,7 +233,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         # LB23a
         elif (
             (run.prev == LB.PR and run.curr in (LB.ID, LB.EB, LB.EM))
-            or (run.prev in (LB.ID, LB.EB, LB.EM) and run.cur == LB.PO)
+            or (run.prev in (LB.ID, LB.EB, LB.EM) and run.curr == LB.PO)
         ):
             run.do_not_break_here()
         # LB24
