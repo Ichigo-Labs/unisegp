@@ -93,7 +93,7 @@ def line_break(c: str, index: int = 0, /) -> LineBreak:
     string and return Line_Break property of the code point at
     c[index].
 
-    >>> line_break(u'a\x0d', 1)
+    >>> line_break('a\x0d', 1)
     <LineBreak.CR: 'CR'>
     """
 
@@ -110,7 +110,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     [0, 0, 0]
     >>> list(line_break_breakables('Hello, world.'))
     [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
-    >>> list(line_break_breakables(u''))
+    >>> list(line_break_breakables(''))
     []
     """
     if not s:
@@ -342,12 +342,12 @@ def line_break_units(s: str,
     >>> s = 'The quick (\u201cbrown\u201d) fox can\u2019t jump 32.3 feet, right?'
     >>> '|'.join(line_break_units(s)) == 'The |quick |(\u201cbrown\u201d) |fox |can\u2019t |jump |32.3 |feet, |right?'
     True
-    >>> list(line_break_units(u''))
+    >>> list(line_break_units(''))
     []
 
-    >>> list(line_break_units('\u03b1\u03b1')) == [u'\u03b1\u03b1']
+    >>> list(line_break_units('\u03b1\u03b1')) == ['\u03b1\u03b1']
     True
-    >>> list(line_break_units(u'\u03b1\u03b1', True)) == [u'\u03b1', u'\u03b1']
+    >>> list(line_break_units('\u03b1\u03b1', True)) == ['\u03b1', '\u03b1']
     True
     """
 
