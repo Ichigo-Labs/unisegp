@@ -146,9 +146,7 @@ class Run(Generic[T]):
         >>> __ = run.walk() ; run.cc
         'b'
         """
-        i = self._position
-        cond = (0 <= i < len(self._text)) and self._condition
-        return self._text[i] if cond else None
+        return self.char()
 
     @property
     def pc(self) -> Optional[str]:
@@ -159,9 +157,27 @@ class Run(Generic[T]):
         >>> __ = run.walk() ; run.pc
         'a'
         """
-        i = self._position - 1
-        cond = (0 <= i < len(self._text)) and self._condition
-        return self._text[i] if cond else None
+        return self.char(-1)
+
+    @property
+    def nc(self) -> Optional[str]:
+        """Next code point (a single Unicode str object) at the position.
+
+        >>> run = Run('abc', lambda x: x.upper())
+        >>> run.nc
+        'b'
+        >>> __ = run.walk() ; run.nc
+        'c'
+        """
+        return self.char(1)
+
+    def char(self, offset: int = 0, /, noskip: bool = False) -> Optional[str]:
+        i = self._calc_position(offset, noskip=noskip)
+        if self._condition and 0 <= i < len(self._text):
+            return self._text[i]
+        else:
+            return None
+
 
     def is_eot(self) -> bool:
         return self._position == len(self._text) - 1

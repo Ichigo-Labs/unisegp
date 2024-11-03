@@ -71,7 +71,7 @@ class LineBreak(Enum):
     RI = 'RI'   # Regional Indicator
     SA = 'SA'   # Complex Context Dependent (South East Asian)
     VF = 'VF'   # Virama Final
-    VI = 'VF'   # Virama
+    VI = 'VI'   # Virama
     XX = 'XX'   # Unknown
 
 
@@ -117,6 +117,8 @@ def line_break(c: str, index: int = 0, /) -> LineBreak:
     <LineBreak.SP: 'SP'>
     >>> line_break('1')
     <LineBreak.NU: 'NU'>
+    >>> line_break('\u1b44)
+    <LineBreak.VI: 'VI'>
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Line_Break property of the code point at
@@ -315,13 +317,24 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB28a
         elif (
-            (run.prev == LB.AP and (run.curr in (LB.AK, LB.AS) or run.cc == '\u25cc'))
-            or ((run.prev in (LB.AK, LB.AS) or run.pc == '\u25cc') and run.curr in (LB.VF, LB.VI))
-            or (run.is_following((LB.VI,)).prev in (LB.AK, LB.AS)
-                and (run.curr == LB.AK or run.cc == '\u25cc'))
-            or ((run.prev in (LB.AK, LB.AS) or run.pc == '\u25cc')
+            (
+                run.prev == LB.AP
                 and (run.curr in (LB.AK, LB.AS) or run.cc == '\u25cc')
-                and run.next == LB.VF)
+            )
+            or (
+                (run.prev in (LB.AK, LB.AS) or run.pc == '\u25cc')
+                and run.curr in (LB.VF, LB.VI)
+            )
+            or (
+                (run.attr(-2) in (LB.AK, LB.AS) or run.char(-2) == '\u25cc')
+                and run.prev == LB.VI
+                and (run.curr == LB.AK or run.cc == '\u25cc')
+            )
+            or (
+                (run.prev in (LB.AK, LB.AS) or run.pc == '\u25cc')
+                and (run.curr in (LB.AK, LB.AS) or run.cc == '\u25cc')
+                and run.next == LB.VF
+            )
         ):
             run.do_not_break_here()
         # LB29
