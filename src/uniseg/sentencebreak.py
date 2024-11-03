@@ -107,7 +107,7 @@ def sentence_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # SB7
         elif (
-            run.value(-2) in (SB.UPPER, SB.LOWER)
+            run.attr(-2) in (SB.UPPER, SB.LOWER)
             and run.prev == SB.ATERM
             and run.curr == SB.UPPER
         ):

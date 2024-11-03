@@ -26,6 +26,7 @@ class Breakable(Enum):
 # type aliases for annotation
 Breakables = Iterable[Literal[0, 1]]
 TailorFunc = Callable[[str, Breakables], Breakables]
+SkipTable = Sequence[Literal[0, 1]]
 
 
 T = TypeVar('T')
@@ -33,6 +34,9 @@ T = TypeVar('T')
 
 class Run(Generic[T]):
     """A utitlity class which helps treating break determination for a string."""
+    __slots__ = [
+        '_text', '_attributes', '_skip_table', '_breakables', '_position', '_condition'
+    ]
 
     def __init__(self, text: str, func: Callable[[str], T] = lambda x: x, /):
         """Utitlity class which helps treating break determination for a string.
@@ -44,8 +48,8 @@ class Run(Generic[T]):
             (code page) of the string.
         """
         self._text = text
-        self._values = [func(c) for c in text]
-        self._skip = tuple[str, ...]()
+        self._attributes = [func(c) for c in text]
+        self._skip_table = list[Literal[0, 1]](1 for __ in text)
         self._breakables = list[Optional[Breakable]](None for __ in text)
         self._position = 0
         self._condition = bool(text)
@@ -93,7 +97,7 @@ class Run(Generic[T]):
 
     @property
     def curr(self) -> Optional[T]:
-        """Property value for the current position, or None if it is invalid.
+        """Attribute value for the current position, or None if it is invalid.
 
         `run.curr` is equivalent for `run.value()`.
 
@@ -103,11 +107,11 @@ class Run(Generic[T]):
         >>> __ = run.walk() ; run.curr
         'B'
         """
-        return self.value()
+        return self.attr()
 
     @property
     def prev(self) -> Optional[T]:
-        """Property value for the previous position, or None if it is invalid.
+        """Attribute value for the previous position, or None if it is invalid.
 
         `run.prev` is equivalent for `run.value(-1)`.
 
@@ -116,11 +120,11 @@ class Run(Generic[T]):
         >>> __ = run.walk() ; run.prev
         'A'
         """
-        return self.value(-1)
+        return self.attr(-1)
 
     @property
     def next(self) -> Optional[T]:
-        """Property value for the next position, or None if it is not valid.
+        """Attribute value for the next position, or None if it is not valid.
 
         `run.next` is equivalent for `run.value(1)`.
 
@@ -130,7 +134,7 @@ class Run(Generic[T]):
         >>> __ = run.walk() ; run.next
         'C'
         """
-        return self.value(1)
+        return self.attr(1)
 
     @property
     def cc(self) -> Optional[str]:
@@ -183,44 +187,44 @@ class Run(Generic[T]):
             while (
                 0 <= i < len(self._text)
                 and not noskip
-                and self._values[i] in self._skip
+                and self._skip_table[i]
             ):
                 i += vec
         return i
 
-    def value(self, offset: int = 0, /, noskip: bool = False) -> Optional[T]:
-        """Return value at current position + offset.
+    def attr(self, offset: int = 0, /, noskip: bool = False) -> Optional[T]:
+        """Return attrubute value at current position + offset.
 
         >>> run = Run('abc', lambda x: x.upper())
-        >>> run.value(1)
+        >>> run.attr(1)
         'B'
-        >>> run.value(2)
+        >>> run.attr(2)
         'C'
         >>> run.walk()
         True
-        >>> run.value(-1)
+        >>> run.attr(-1)
         'A'
         >>> run.head()
         >>> run.skip('B')
-        >>> run.value(1)
+        >>> run.attr(1)
         'C'
-        >>> run.value(1, noskip=True)
+        >>> run.attr(1, noskip=True)
         'B'
         """
         i = self._calc_position(offset, noskip=noskip)
         if self._condition and 0 <= i < len(self._text):
-            return self._values[i]
+            return self._attributes[i]
         else:
             return None
 
-    def values(self) -> list[T]:
+    def attributes(self) -> list[T]:
         """Return a copy of the list of its properties.
 
         >>> run = Run('abc', lambda x: x.upper())
         >>> run.values()
         ['A', 'B', 'C']
         """
-        return self._values[:]
+        return self._attributes[:]
 
     def breakables(self) -> list[Optional[Breakable]]:
         """Return a copy of the list of the breakable oppotunity values."""
@@ -262,8 +266,15 @@ class Run(Generic[T]):
         self._position = 0
         self._condition = True
 
-    def skip(self, values: Sequence[T]) -> None:
-        self._skip = tuple(values)
+    def set_skip_table(self, skip_table: Sequence[Literal[0, 1]]) -> None:
+        """Set the skip table for the run.
+
+        Skip table must be the sequence of 0 / 1, which lenght is the same as
+        the run text.
+        """
+        if (len(skip_table) != len(self.text)):
+            raise ValueError('Skip table must be the same length as the text')
+        self._skip_table[:] = skip_table
 
     def is_continuing(
         self,
@@ -316,7 +327,7 @@ class Run(Generic[T]):
         run = copy(self)
         vec = -1 if backward else 1
         if greedy:
-            while run.value(vec, noskip=noskip) in values:
+            while run.attr(vec, noskip=noskip) in values:
                 if not run.walk(vec, noskip=noskip):
                     break
             condition = True

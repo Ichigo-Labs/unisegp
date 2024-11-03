@@ -127,7 +127,7 @@ def word_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # WB7
         elif (
-            run.value(-2) in AHLetterTuple
+            run.attr(-2) in AHLetterTuple
             and run.prev in (WB.MIDLETTER,) + MidNumLetQTuple
             and run.curr in AHLetterTuple
         ):
@@ -144,7 +144,7 @@ def word_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # WB7c
         elif (
-            run.value(-2) == WB.HEBREW_LETTER
+            run.attr(-2) == WB.HEBREW_LETTER
             and run.prev == WB.DOUBLE_QUOTE
             and run.curr == WB.HEBREW_LETTER
         ):
@@ -160,7 +160,7 @@ def word_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # WB11
         elif (
-            run.value(-2) == WB.NUMERIC
+            run.attr(-2) == WB.NUMERIC
             and run.prev in (WB.MIDNUM,) + MidNumLetQTuple
             and run.curr == WB.NUMERIC
         ):

@@ -250,7 +250,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
                 and run.curr in (LB.PO, LB.PR))
             or (run.prev in (LB.PO, LB.PR) and run.curr == LB.OP and run.next == LB.NU)
             or (run.prev in (LB.PO, LB.PR) and run.curr == LB.OP and run.next == LB.IS
-                and run.value(2) == LB.NU)
+                and run.attr(2) == LB.NU)
             or (run.prev in (LB.PO, LB.PR) and run.curr == LB.NU)
             or (run.prev in (LB.HY, LB.IS) and run.curr == LB.NU)
             or (run.is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
