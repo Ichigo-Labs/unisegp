@@ -99,15 +99,16 @@ def sentence_breakables(s: str, /) -> Breakables:
         elif run.prev in ParaSepTuple:
             run.break_here()
     # SB5
+    run.set_skip_table(x not in (SB.EXTEND, SB.FORMAT)
+                       for x in run.attributes())
     run.head()
-    run.skip((SB.EXTEND, SB.FORMAT))
     while run.walk():
         # SB6
         if run.prev == SB.ATERM and run.curr == SB.NUMERIC:
             run.do_not_break_here()
         # SB7
         elif (
-            run.value(-2) in (SB.UPPER, SB.LOWER)
+            run.attr(-2) in (SB.UPPER, SB.LOWER)
             and run.prev == SB.ATERM
             and run.curr == SB.UPPER
         ):
