@@ -360,14 +360,10 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         if (
             (run.prev == LB.EB and run.curr == LB.EM)
             or (
-                run.pc
-                and category(run.pc) != 'Cn'
+                run.pc and category(run.pc) == 'Cn'
                 and extended_pictographic(run.pc) and run.curr == LB.EM
             )
         ):
-            print('LB30b', run.prev, file=stderr)
-            if run.pc:
-                print(extended_pictographic(run.pc), file=stderr)
             run.do_not_break_here()
     # LB31
     run.set_default(Breakable.Break)
