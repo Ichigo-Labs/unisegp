@@ -3,7 +3,7 @@
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from copy import copy
 from enum import Enum
-from typing import Generic, Literal, Optional, TypeVar
+from typing import Any, Generic, Literal, Optional, TypeVar
 
 __all__ = [
     'Breakable',
@@ -49,7 +49,7 @@ class Run(Generic[T]):
         """
         self._text = text
         self._attributes = [func(c) for c in text]
-        self._skip_table = list[Literal[0, 1]](1 for __ in text)
+        self._skip_table = [1 for __ in text]
         self._breakables = list[Optional[Breakable]](None for __ in text)
         self._position = 0
         self._condition = bool(text)
@@ -172,7 +172,7 @@ class Run(Generic[T]):
         >>> run = Run('abc')
         >>> run._calc_position(1)
         1
-        >>> run.skip('b')
+        >>> run.set_skip_table([1, 0, 1])
         >>> run._calc_position(1)
         2
         >>> run._calc_position(1, noskip=True)
@@ -187,7 +187,7 @@ class Run(Generic[T]):
             while (
                 0 <= i < len(self._text)
                 and not noskip
-                and self._skip_table[i]
+                and self._skip_table[i] == 0
             ):
                 i += vec
         return i
@@ -205,7 +205,7 @@ class Run(Generic[T]):
         >>> run.attr(-1)
         'A'
         >>> run.head()
-        >>> run.skip('B')
+        >>> run.set_skip_table([1, 0, 1])
         >>> run.attr(1)
         'C'
         >>> run.attr(1, noskip=True)
@@ -221,7 +221,7 @@ class Run(Generic[T]):
         """Return a copy of the list of its properties.
 
         >>> run = Run('abc', lambda x: x.upper())
-        >>> run.values()
+        >>> run.attributes()
         ['A', 'B', 'C']
         """
         return self._attributes[:]
@@ -241,7 +241,7 @@ class Run(Generic[T]):
         True
         >>> run.curr
         'b'
-        >>> run.skip(('c', 'd'))
+        >>> run.set_skip_table([1, 1, 0, 0, 1])
         >>> run.walk()
         True
         >>> run.curr
@@ -266,19 +266,19 @@ class Run(Generic[T]):
         self._position = 0
         self._condition = True
 
-    def set_skip_table(self, skip_table: Sequence[Literal[0, 1]]) -> None:
+    def set_skip_table(self, skip_table: Sequence[Any]) -> None:
         """Set the skip table for the run.
 
         Skip table must be the sequence of 0 / 1, which lenght is the same as
-        the run text.
+        the run text. 1 for count, 0 for skip.
         """
         if (len(skip_table) != len(self.text)):
             raise ValueError('Skip table must be the same length as the text')
-        self._skip_table[:] = skip_table
+        self._skip_table[:] = [int(bool(x)) for x in skip_table]
 
     def is_continuing(
         self,
-        values: Sequence[T],
+        attrs: Sequence[T],
         /,
         greedy: bool = False,
         backward: bool = False,
@@ -310,10 +310,10 @@ class Run(Generic[T]):
         >>> run = Run('abbbccd', lambda x: x.upper())
         >>> run.is_continuing('B', greedy=True).curr
         'B'
-        >>> run.skip(('C',))
+        >>> run.set_skip_table([1, 1, 1, 1, 0, 0, 1])
         >>> run.is_continuing('B', greedy=True).next
         'D'
-        >>> run.is_continuing('B', greedy=True).value(1, noskip=True)
+        >>> run.is_continuing('B', greedy=True).attr(1, noskip=True)
         'C'
 
         >>> run = Run('abbbccd', lambda x: x.upper())
@@ -327,24 +327,24 @@ class Run(Generic[T]):
         run = copy(self)
         vec = -1 if backward else 1
         if greedy:
-            while run.attr(vec, noskip=noskip) in values:
+            while run.attr(vec, noskip=noskip) in attrs:
                 if not run.walk(vec, noskip=noskip):
                     break
             condition = True
         else:
-            condition = run.walk(vec, noskip=noskip) and run.curr in values
+            condition = run.walk(vec, noskip=noskip) and run.curr in attrs
         run._condition = self._condition and condition
         return run
 
     def is_following(
-        self, values: Sequence[T], /, greedy: bool = False, noskip: bool = False
+        self, attrs: Sequence[T], /, greedy: bool = False, noskip: bool = False
     ) -> 'Run[T]':
-        return self.is_continuing(values, greedy=greedy, backward=True, noskip=noskip)
+        return self.is_continuing(attrs, greedy=greedy, backward=True, noskip=noskip)
 
     def is_leading(
-        self, values: Sequence[T], /, greedy: bool = False, noskip: bool = False
+        self, attrs: Sequence[T], /, greedy: bool = False, noskip: bool = False
     ) -> 'Run[T]':
-        return self.is_continuing(values, greedy=greedy, noskip=noskip)
+        return self.is_continuing(attrs, greedy=greedy, noskip=noskip)
 
     def break_here(self) -> None:
         if self._text and self._breakables[self._position] is None:
