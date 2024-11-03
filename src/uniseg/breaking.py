@@ -163,6 +163,9 @@ class Run(Generic[T]):
         cond = (0 <= i < len(self._text)) and self._condition
         return self._text[i] if cond else None
 
+    def is_eot(self) -> bool:
+        return self._position == len(self._text) - 1
+
     def _calc_position(self, offset: int, /, noskip: bool = False) -> int:
         """(internal) Return the index for the result of walking `offset` steps
         from the current postion.

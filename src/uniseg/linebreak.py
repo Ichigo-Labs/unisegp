@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from enum import Enum
 from sys import stderr
 from typing import Iterable, Optional
-from unicodedata import east_asian_width, name
+from unicodedata import east_asian_width, category
 
 from uniseg.db import extended_pictographic
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
@@ -77,10 +77,6 @@ class LineBreak(Enum):
 
 # type alias for `LineBreak`
 LB = LineBreak
-
-
-def assigned(chr: str, /) -> bool:
-    return name(chr, None) is not None
 
 
 def _iter_lb9_skip_table(attributes: Iterable[LineBreak]) -> Iterator[int]:
@@ -201,14 +197,22 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB15a
         elif (
-            run.is_following((LB.SP,), greedy=True).is_following((LB.QU,))
-            .prev in (LB.BK, LB.CR, LB.LF, LB.NL, LB.OP, LB.QU, LB.GL, LB.SP, LB.ZW)
+            (run0 := run.is_following((LB.SP,), greedy=True))
+            and (run0.pc and category(run0.pc) == 'Pi')
+            and (
+                run0.is_following((LB.QU,))
+                .prev in (LB.BK, LB.CR, LB.LF, LB.NL, LB.OP, LB.QU, LB.GL, LB.SP, LB.ZW)
+            )
         ):
             run.do_not_break_here()
         # LB15b
         elif (
-            run.is_leading((LB.SP, LB.GL, LB.WJ, LB.CL, LB.QU, LB.CP, LB.EX, LB.IS,
-                            LB.SY, LB.BK, LB.CR, LB.LF, LB.NL, LB.ZW))
+            run.cc and category(run.cc) == 'Pf' and run.curr == LB.QU
+            and (
+                run.is_leading((LB.SP, LB.GL, LB.WJ, LB.CL, LB.QU, LB.CP,
+                                LB.EX, LB.IS, LB.SY, LB.BK, LB.CR, LB.LF, LB.NL, LB.ZW))
+                or run.is_eot()
+            )
         ):
             run.do_not_break_here()
         # LB15c
@@ -357,7 +361,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             (run.prev == LB.EB and run.curr == LB.EM)
             or (
                 run.pc
-                and not assigned(run.pc)
+                and category(run.pc) != 'Cn'
                 and extended_pictographic(run.pc) and run.curr == LB.EM
             )
         ):
