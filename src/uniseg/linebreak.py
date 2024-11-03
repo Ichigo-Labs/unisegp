@@ -6,7 +6,7 @@ https://www.unicode.org/reports/tr14/tr14-53.html
 
 from collections.abc import Iterator
 from enum import Enum
-from typing import Optional
+from typing import Iterable, Optional
 from unicodedata import east_asian_width
 
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
@@ -77,6 +77,33 @@ class LineBreak(Enum):
 LB = LineBreak
 
 
+def _iter_lb9_skip_table(attributes: Iterable[LineBreak]) -> Iterator[int]:
+    """(Internal) Implement LB9 ignoring algorithm.
+
+    >>> list(_iter_lb9_skip_table([LB.AL, LB.AL]))
+    [1, 1]
+    >>> list(_iter_lb9_skip_table([LB.AL, LB.CM]))
+    [1, 0]
+    >>> list(_iter_lb9_skip_table([LB.BK, LB.CM]))
+    [1, 1]
+    """
+    iter_attrs = iter(attributes)
+    try:
+        while 1:
+            attr = next(iter_attrs)
+            yield 1
+            if attr not in (LB.BK, LB.CR, LB.LF, LB.NL, LB.SP, LB.ZW):
+                while 1:
+                    attr = next(iter_attrs)
+                    if attr in (LB.CM, LB.ZWJ):
+                        yield 0
+                    else:
+                        yield 1
+                        break
+    except StopIteration as e:
+        pass
+
+
 def line_break(c: str, index: int = 0, /) -> LineBreak:
     R"""Return the Line_Break property for `c`.
 
@@ -142,9 +169,12 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         # LB8a
         elif run.prev == LB.ZWJ:
             run.do_not_break_here()
+        elif run.curr == LB.CM:
+            run.do_not_break_here()
     # LB9
+    run.set_skip_table(_iter_lb9_skip_table(run.attributes()))
+
     run.head()
-    run.skip((LB.CM, LB.ZWJ))
     # LB10
     # TODO:
     while run.walk():
