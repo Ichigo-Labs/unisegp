@@ -6,9 +6,11 @@ https://www.unicode.org/reports/tr14/tr14-53.html
 
 from collections.abc import Iterator
 from enum import Enum
+from sys import stderr
 from typing import Iterable, Optional
-from unicodedata import east_asian_width
+from unicodedata import east_asian_width, name
 
+from uniseg.db import extended_pictographic
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import line_break as _line_break
@@ -75,6 +77,10 @@ class LineBreak(Enum):
 
 # type alias for `LineBreak`
 LB = LineBreak
+
+
+def assigned(chr: str, /) -> bool:
+    return name(chr, None) is not None
 
 
 def _iter_lb9_skip_table(attributes: Iterable[LineBreak]) -> Iterator[int]:
@@ -319,8 +325,15 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB30
         elif (
-            (run.prev in (LB.AL, LB.HL, LB.NU) and run.curr == LB.OP)
-            or (run.prev == LB.CP and run.curr in (LB.AL, LB.HL, LB.NU))
+            (
+                run.prev in (LB.AL, LB.HL, LB.NU) and run.curr == LB.OP
+                and run.cc and east_asian_width(run.cc) not in ('F', 'W', 'H')
+            )
+            or (
+                run.prev == LB.CP
+                and run.pc and east_asian_width(run.pc) not in ('F', 'W', 'H')
+                and run.curr in (LB.AL, LB.HL, LB.NU)
+            )
         ):
             run.do_not_break_here()
     # LB30a
@@ -341,9 +354,16 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     run.head()
     while run.walk():
         if (
-            run.prev == LB.EB and run.curr == LB.EM
-            or (run.curr == LB.EM)
+            (run.prev == LB.EB and run.curr == LB.EM)
+            or (
+                run.pc
+                and not assigned(run.pc)
+                and extended_pictographic(run.pc) and run.curr == LB.EM
+            )
         ):
+            print('LB30b', run.prev, file=stderr)
+            if run.pc:
+                print(extended_pictographic(run.pc), file=stderr)
             run.do_not_break_here()
     # LB31
     run.set_default(Breakable.Break)
