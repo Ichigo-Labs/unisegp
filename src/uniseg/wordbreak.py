@@ -112,7 +112,6 @@ def word_breakables(s: str, /) -> Breakables:
         elif run.curr in (WB.FORMAT, WB.EXTEND, WB.ZWJ):
             run.do_not_break_here()
     # WB4
-    # run.skip((WB.EXTEND, WB.FORMAT, WB.ZWJ))
     run.set_skip_table(x not in (WB.EXTEND, WB.FORMAT, WB.ZWJ)
                        for x in run.attributes())
     run.head()
