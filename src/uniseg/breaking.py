@@ -266,15 +266,16 @@ class Run(Generic[T]):
         self._position = 0
         self._condition = True
 
-    def set_skip_table(self, skip_table: Sequence[Any]) -> None:
+    def set_skip_table(self, iter_skip: Iterable[Any], /) -> None:
         """Set the skip table for the run.
 
         Skip table must be the sequence of 0 / 1, which lenght is the same as
         the run text. 1 for count, 0 for skip.
         """
+        skip_table = [int(bool(x)) for x in iter_skip]
         if (len(skip_table) != len(self.text)):
             raise ValueError('Skip table must be the same length as the text')
-        self._skip_table[:] = [int(bool(x)) for x in skip_table]
+        self._skip_table[:] = skip_table
 
     def is_continuing(
         self,
