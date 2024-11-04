@@ -79,6 +79,9 @@ class LineBreak(Enum):
 LB = LineBreak
 
 
+EastAsianTuple = ('F', 'W', 'H')
+
+
 def line_break(c: str, index: int = 0, /) -> LineBreak:
     R"""Return the Line_Break property for `c`.
 
@@ -246,8 +249,34 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.break_here()
         # LB19
         elif (
-            run.curr == LB.QU
-            or run.prev == LB.QU
+            (run.curr == LB.QU and run.cc and category(run.cc) != 'Pi')
+            or (run.prev == LB.QU and run.pc and category(run.pc) != 'Pi')
+        ):
+            run.do_not_break_here()
+        # LB19a
+        elif (
+            (
+                (run.pc and east_asian_width(run.pc) not in EastAsianTuple)
+                and run.curr == LB.QU
+            )
+            or (
+                run.curr == LB.QU
+                and (
+                    (run.nc and east_asian_width(run.nc) not in EastAsianTuple)
+                    or run.is_eot()
+                )
+            )
+            or (
+                run.prev == LB.QU
+                and (run.cc and east_asian_width(run.cc) not in EastAsianTuple)
+            )
+            or (
+                run0 := run.is_following((LB.QU,))
+                and (
+                    (run0.pc and east_asian_width(run0.pc) not in EastAsianTuple)
+                    or run0.is_sot
+                )
+            )
         ):
             run.do_not_break_here()
         # LB20
@@ -355,11 +384,11 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         elif (
             (
                 run.prev in (LB.AL, LB.HL, LB.NU) and run.curr == LB.OP
-                and run.cc and east_asian_width(run.cc) not in ('F', 'W', 'H')
+                and run.cc and east_asian_width(run.cc) not in EastAsianTuple
             )
             or (
                 run.prev == LB.CP
-                and run.pc and east_asian_width(run.pc) not in ('F', 'W', 'H')
+                and run.pc and east_asian_width(run.pc) not in EastAsianTuple
                 and run.curr in (LB.AL, LB.HL, LB.NU)
             )
         ):
