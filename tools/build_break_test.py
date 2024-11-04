@@ -2,6 +2,7 @@
 """Generate uniseg break test code."""
 
 import csv
+import re
 from argparse import ArgumentParser, FileType
 from textwrap import wrap
 from typing import NamedTuple, TextIO
@@ -40,13 +41,23 @@ def generate_break_test_code(test: TestEntry, break_func_name: str) -> str:
     string, expect = parse_breaking_test_pattern(test.pattern)
     string_literal = string.encode('unicode_escape').decode(
         'ascii').replace("'", "\\'")
-    doc_string = '\n    '.join(wrap(test.comment, 76))
+    doc_string = '\n'.join(wrap(
+        test.pattern,
+        76,
+        initial_indent='       ',
+        subsequent_indent='    '
+    )).strip()
+    doc_detail = '\n    '.join([
+        f'{i}. {x}' for i, x in enumerate(
+            re.findall(r'[\u00f7\u00d7][^\u00f7\u00d7]+', test.comment)
+        )
+    ])
 
     return (
         f'def test_{test.name.lower()}() -> None:\n'
-        f'    """{test.pattern}\n'
+        f'    """{doc_string}\n'
         f'\n'
-        f'    {doc_string}\n'
+        f'    {doc_detail}\n'
         f'    """\n'
         f'    actual = list({break_func_name}(\'{string_literal}\'))\n'
         f'    expect = {repr(expect)}\n'
