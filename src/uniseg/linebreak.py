@@ -104,6 +104,21 @@ def line_break(c: str, index: int = 0, /) -> LineBreak:
     return LineBreak[_line_break(c[index])]
 
 
+def resolve_lb1_linebreak(ch: str, /) -> LineBreak:
+    lb = line_break(ch)
+    cat = category(ch)
+    if lb in (LB.AI, LB.SG, LB.XX):
+        lb = LB.AL
+    elif lb == LB.SA:
+        if cat in ('Mn', 'Mc'):
+            lb = LB.CM
+        else:
+            lb = LB.AL
+    elif lb == LB.CJ:
+        lb = LB.NS
+    return lb
+
+
 def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     """Iterate line breaking opportunities for every position of `s`
 
@@ -120,9 +135,8 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     if not s:
         return iter([])
 
-    run = Run(s, line_break)
     # LB1
-    # TODO:
+    run = Run(s, resolve_lb1_linebreak)
     # LB2
     run.do_not_break_here()
     while run.walk():
@@ -364,6 +378,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
     # LB31
     run.set_default(Breakable.Break)
+    print(run.attributes(), file=stderr)
     return run.literal_breakables()
 
 

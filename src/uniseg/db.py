@@ -35,7 +35,7 @@ def sentence_break(ch: str, /) -> str:
 
 
 def line_break(ch: str, /) -> str:
-    return values[_find_break(ch)][INDEX_LINE_BREAK] or 'Other'
+    return values[_find_break(ch)][INDEX_LINE_BREAK] or 'XX'
 
 
 def extended_pictographic(ch: str, /) -> bool:
