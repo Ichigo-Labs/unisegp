@@ -279,11 +279,10 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
                 and _eaw(run.cc) not in EastAsianTuple
             )
             or (
-                run0 := run.is_following((LB.QU,))
-                and (_eaw(run0.pc) not in EastAsianTuple or run0.is_sot)
+                (run0 := run.is_following((LB.QU,)))
+                and (_eaw(run0.pc) not in EastAsianTuple or run0.is_sot())
             )
         ):
-            print(f'LB19a {run.position=} {_eaw(run.nc)=}', file=stderr)
             run.do_not_break_here()
         # LB20
         elif run.curr == LB.CB or run.prev == LB.CB:
@@ -423,9 +422,6 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         ):
             run.do_not_break_here()
     # LB31
-    # print(run.attributes(), file=stderr)
-    # print(run.breakables(), file=stderr)
-    # print(run._skip_table, file=stderr)
     run.set_default(Breakable.Break)
     return run.literal_breakables()
 
