@@ -184,6 +184,9 @@ class Run(Generic[T]):
         else:
             return None
 
+    def is_sot(self) -> bool:
+        return self._position == 0
+
     def is_eot(self) -> bool:
         return self._position == len(self._text) - 1
 

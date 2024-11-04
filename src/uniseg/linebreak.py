@@ -251,8 +251,11 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.break_here()
         # LB20a
         elif (
-            run.is_leading((LB.HY,)).prev in (LB.BK, LB.CR, LB.LF, LB.NL, LB.SP,
-                                              LB.ZW, LB.CB, LB.GL)
+            (run.prev == LB.HY or run.pc == '\u2010')
+            and (
+                run.position == 1
+                or run.attr(-2) in (LB.BK, LB.CR, LB.LF, LB.NL, LB.SP, LB.ZW, LB.CB, LB.GL)
+            )
             and run.curr == LB.AL
         ):
             run.do_not_break_here()
