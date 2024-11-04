@@ -79,33 +79,6 @@ class LineBreak(Enum):
 LB = LineBreak
 
 
-def _iter_lb9_skip_table(attributes: Iterable[LineBreak]) -> Iterator[int]:
-    """(Internal) Implement LB9 ignoring algorithm.
-
-    >>> list(_iter_lb9_skip_table([LB.AL, LB.AL]))
-    [1, 1]
-    >>> list(_iter_lb9_skip_table([LB.AL, LB.CM]))
-    [1, 0]
-    >>> list(_iter_lb9_skip_table([LB.BK, LB.CM]))
-    [1, 1]
-    """
-    iter_attrs = iter(attributes)
-    try:
-        while 1:
-            attr = next(iter_attrs)
-            yield 1
-            if attr not in (LB.BK, LB.CR, LB.LF, LB.NL, LB.SP, LB.ZW):
-                while 1:
-                    attr = next(iter_attrs)
-                    if attr in (LB.CM, LB.ZWJ):
-                        yield 0
-                    else:
-                        yield 1
-                        break
-    except StopIteration as e:
-        pass
-
-
 def line_break(c: str, index: int = 0, /) -> LineBreak:
     R"""Return the Line_Break property for `c`.
 
@@ -173,13 +146,23 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         # LB8a
         elif run.prev == LB.ZWJ:
             run.do_not_break_here()
-        elif run.curr == LB.CM:
-            run.do_not_break_here()
     # LB9
-    run.set_skip_table(_iter_lb9_skip_table(run.attributes()))
-
     run.head()
+    skip_table = [1]
+    while run.walk():
+        if (
+            run.is_following((LB.CM, LB.ZWJ), greedy=True)
+            .prev not in (LB.BK, LB.CR, LB.LF, LB.NL, LB.SP, LB.ZW)
+            and run.curr in (LB.CM, LB.ZWJ)
+
+        ):
+            skip_table.append(0)
+            run.do_not_break_here()
+        else:
+            skip_table.append(1)
+    run.set_skip_table(skip_table)
     # LB10
+    run.head()
     # TODO:
     while run.walk():
         # LB11
@@ -237,6 +220,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB18
         elif run.prev == LB.SP:
+            print('LB18', run.breakables(), file=stderr)
             run.break_here()
         # LB19
         elif (
