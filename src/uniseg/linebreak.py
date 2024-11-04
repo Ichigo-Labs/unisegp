@@ -177,7 +177,13 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     run.set_skip_table(skip_table)
     # LB10
     run.head()
-    # TODO:
+    breakables = run.breakables()
+    while run.walk():
+        if run.curr in (LB.CM, LB.ZWJ) and breakables[run.position] is None:
+            run.set_char('A')
+            run.set_attr(LB.AL)
+
+    run.head()
     while run.walk():
         # LB11
         if run.curr == LB.WJ or run.prev == LB.WJ:
@@ -378,7 +384,6 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
     # LB31
     run.set_default(Breakable.Break)
-    print(run.attributes(), file=stderr)
     return run.literal_breakables()
 
 

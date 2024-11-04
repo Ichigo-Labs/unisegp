@@ -35,7 +35,8 @@ T = TypeVar('T')
 class Run(Generic[T]):
     """A utitlity class which helps treating break determination for a string."""
     __slots__ = [
-        '_text', '_attributes', '_skip_table', '_breakables', '_position', '_condition'
+        '_text', '_chars', '_attributes', '_skip_table', '_breakables',
+        '_position', '_condition'
     ]
 
     def __init__(self, text: str, func: Callable[[str], T] = lambda x: x, /):
@@ -48,6 +49,7 @@ class Run(Generic[T]):
             (code page) of the string.
         """
         self._text = text
+        self._chars = list(text)
         self._attributes = [func(c) for c in text]
         self._skip_table = [1 for __ in text]
         self._breakables = list[Optional[Breakable]](None for __ in text)
@@ -94,6 +96,10 @@ class Run(Generic[T]):
         'abc'
         """
         return self._text
+
+    @property
+    def chars(self) -> list[str]:
+        return self._chars
 
     @property
     def curr(self) -> Optional[T]:
@@ -173,14 +179,19 @@ class Run(Generic[T]):
 
     def char(self, offset: int = 0, /, noskip: bool = False) -> Optional[str]:
         i = self._calc_position(offset, noskip=noskip)
-        if self._condition and 0 <= i < len(self._text):
-            return self._text[i]
+        if self._condition and 0 <= i < len(self._chars):
+            return self._chars[i]
         else:
             return None
 
-
     def is_eot(self) -> bool:
         return self._position == len(self._text) - 1
+
+    def set_char(self, ch: str, /) -> None:
+        self._chars[self._position] = ch
+
+    def set_attr(self, attr: T, /) -> None:
+        self._attributes[self._position] = attr
 
     def _calc_position(self, offset: int, /, noskip: bool = False) -> int:
         """(internal) Return the index for the result of walking `offset` steps
