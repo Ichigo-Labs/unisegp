@@ -222,9 +222,10 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB16
         elif (
-            run.is_leading((LB.SP,), greedy=True).prev in (LB.CL, LB.CP)
+            run.is_following((LB.SP,), greedy=True).prev in (LB.CL, LB.CP)
             and run.curr == LB.NS
         ):
+            print('LB16', file=stderr)
             run.do_not_break_here()
         # LB17
         elif (
@@ -234,7 +235,6 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB18
         elif run.prev == LB.SP:
-            print('LB18', run.breakables(), file=stderr)
             run.break_here()
         # LB19
         elif (
