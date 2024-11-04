@@ -165,8 +165,8 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     skip_table = [1]
     while run.walk():
         if (
-            run.is_following((LB.CM, LB.ZWJ), greedy=True)
-            .prev not in (LB.BK, LB.CR, LB.LF, LB.NL, LB.SP, LB.ZW)
+            run.is_following((LB.CM, LB.ZWJ), greedy=True).prev not in (
+                LB.BK, LB.CR, LB.LF, LB.NL, LB.SP, LB.ZW)
             and run.curr in (LB.CM, LB.ZWJ)
 
         ):
@@ -179,7 +179,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     run.head()
     breakables = run.breakables()
     while run.walk():
-        if run.curr in (LB.CM, LB.ZWJ) and breakables[run.position] is None:
+        if run.curr in (LB.CM, LB.ZWJ):
             run.set_char('A')
             run.set_attr(LB.AL)
 
