@@ -253,13 +253,14 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         elif (
             (run0 := run.is_following((LB.HY, LB.BA)))
             and (
-                run0.prev in (LB.BK, LB.CR, LB.LF, LB.NL, LB.SP, LB.ZW, LB.CB, LB.GL)
+                run0.prev in (LB.BK, LB.CR, LB.LF, LB.NL,
+                              LB.SP, LB.ZW, LB.CB, LB.GL)
                 or run0.is_sot()
             )
             and run.curr == LB.AL
             and (run.prev == LB.HY or run.pc == '\u2010')
         ):
-                run.do_not_break_here()
+            run.do_not_break_here()
         # LB21
         elif run.curr in (LB.BA, LB.HY, LB.NS) or run.prev == LB.BB:
             run.do_not_break_here()
