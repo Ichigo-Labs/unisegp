@@ -200,11 +200,14 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB15a
         elif (
-            (run0 := run.is_following((LB.SP,), greedy=True))
-            and (run0.pc and category(run0.pc) == 'Pi')
+            (
+                (run0 := run.is_following((LB.SP,), greedy=True))
+                and (run0.pc and category(run0.pc) == 'Pi')
+            )
             and (
-                run0.is_following((LB.QU,))
-                .prev in (LB.BK, LB.CR, LB.LF, LB.NL, LB.OP, LB.QU, LB.GL, LB.SP, LB.ZW)
+                (run1 := run0.is_following((LB.QU,))).prev in (
+                    LB.BK, LB.CR, LB.LF, LB.NL, LB.OP, LB.QU, LB.GL, LB.SP, LB.ZW)
+                or run1.is_sot()
             )
         ):
             run.do_not_break_here()
