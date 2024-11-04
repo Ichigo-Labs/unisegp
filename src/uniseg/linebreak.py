@@ -177,10 +177,12 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     run.set_skip_table(skip_table)
     # LB10
     run.head()
-    while run.walk():
+    while 1:
         if run.curr in (LB.CM, LB.ZWJ):
             run.set_char('A')
             run.set_attr(LB.AL)
+        if not run.walk():
+            break
     run.head()
     while run.walk():
         # LB11
