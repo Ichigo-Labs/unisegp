@@ -107,6 +107,18 @@ def line_break(c: str, index: int = 0, /) -> LineBreak:
     return LineBreak[_line_break(c[index])]
 
 
+def _eaw(ch: Optional[str]) -> Optional[str]:
+    return None if ch is None else east_asian_width(ch)
+
+
+def _cat(ch: Optional[str]) -> Optional[str]:
+    return None if ch is None else category(ch)
+
+
+def _ep(ch: Optional[str]) -> Optional[bool]:
+    return False if ch is None else extended_pictographic(ch)
+
+
 def resolve_lb1_linebreak(ch: str, /) -> LineBreak:
     lb = line_break(ch)
     cat = category(ch)
@@ -207,7 +219,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         elif (
             (
                 (run0 := run.is_following((LB.SP,), greedy=True))
-                and (run0.pc and category(run0.pc) == 'Pi')
+                and _cat(run0.pc) == 'Pi'
             )
             and (
                 (run1 := run0.is_following((LB.QU,))).prev in (
@@ -218,7 +230,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB15b
         elif (
-            run.cc and category(run.cc) == 'Pf' and run.curr == LB.QU
+            _cat(run.cc) == 'Pf' and run.curr == LB.QU
             and (
                 run.is_leading((LB.SP, LB.GL, LB.WJ, LB.CL, LB.QU, LB.CP,
                                 LB.EX, LB.IS, LB.SY, LB.BK, LB.CR, LB.LF, LB.NL, LB.ZW))
@@ -249,35 +261,29 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.break_here()
         # LB19
         elif (
-            (run.curr == LB.QU and run.cc and category(run.cc) != 'Pi')
-            or (run.prev == LB.QU and run.pc and category(run.pc) != 'Pi')
+            (run.curr == LB.QU and _cat(run.cc) != 'Pi')
+            or (run.prev == LB.QU and _cat(run.pc) != 'Pf')
         ):
             run.do_not_break_here()
         # LB19a
         elif (
             (
-                (run.pc and east_asian_width(run.pc) not in EastAsianTuple)
-                and run.curr == LB.QU
+                _eaw(run.pc) not in EastAsianTuple and run.curr == LB.QU
             )
             or (
                 run.curr == LB.QU
-                and (
-                    (run.nc and east_asian_width(run.nc) not in EastAsianTuple)
-                    or run.is_eot()
-                )
+                and (_eaw(run.nc) not in EastAsianTuple or run.is_eot())
             )
             or (
                 run.prev == LB.QU
-                and (run.cc and east_asian_width(run.cc) not in EastAsianTuple)
+                and _eaw(run.cc) not in EastAsianTuple
             )
             or (
                 run0 := run.is_following((LB.QU,))
-                and (
-                    (run0.pc and east_asian_width(run0.pc) not in EastAsianTuple)
-                    or run0.is_sot
-                )
+                and (_eaw(run0.pc) not in EastAsianTuple or run0.is_sot)
             )
         ):
+            print(f'LB19a {run.position=} {_eaw(run.nc)=}', file=stderr)
             run.do_not_break_here()
         # LB20
         elif run.curr == LB.CB or run.prev == LB.CB:
@@ -383,12 +389,13 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         # LB30
         elif (
             (
-                run.prev in (LB.AL, LB.HL, LB.NU) and run.curr == LB.OP
-                and run.cc and east_asian_width(run.cc) not in EastAsianTuple
+                run.prev in (LB.AL, LB.HL, LB.NU)
+                and run.curr == LB.OP
+                and _eaw(run.cc) not in EastAsianTuple
             )
             or (
                 run.prev == LB.CP
-                and run.pc and east_asian_width(run.pc) not in EastAsianTuple
+                and _eaw(run.pc) not in EastAsianTuple
                 and run.curr in (LB.AL, LB.HL, LB.NU)
             )
         ):
@@ -412,10 +419,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     while run.walk():
         if (
             (run.prev == LB.EB and run.curr == LB.EM)
-            or (
-                run.pc and category(run.pc) == 'Cn'
-                and extended_pictographic(run.pc) and run.curr == LB.EM
-            )
+            or (_cat(run.pc) == 'Cn' and _ep(run.pc) and run.curr == LB.EM)
         ):
             run.do_not_break_here()
     # LB31
