@@ -419,9 +419,9 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         ):
             run.do_not_break_here()
     # LB31
-    print(run.attributes(), file=stderr)
-    print(run.breakables(), file=stderr)
-    print(run._skip_table, file=stderr)
+    # print(run.attributes(), file=stderr)
+    # print(run.breakables(), file=stderr)
+    # print(run._skip_table, file=stderr)
     run.set_default(Breakable.Break)
     return run.literal_breakables()
 
