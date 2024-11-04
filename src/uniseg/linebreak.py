@@ -93,7 +93,7 @@ def line_break(c: str, index: int = 0, /) -> LineBreak:
     <LineBreak.SP: 'SP'>
     >>> line_break('1')
     <LineBreak.NU: 'NU'>
-    >>> line_break('\u1b44)
+    >>> line_break('\u1b44')
     <LineBreak.VI: 'VI'>
 
     If `index` is specified, this function consider `c` as a unicode
