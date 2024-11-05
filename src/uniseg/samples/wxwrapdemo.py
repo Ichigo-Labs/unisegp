@@ -10,12 +10,12 @@ The uniseg package is licensed under the MIT License.
 https://uniseg-py.readthedocs.io/
 """
 
-from typing import List, Optional, Sequence
+from collections.abc import Sequence
+from typing import Optional
 
 import wx
 
-from uniseg.wrap import wrap, Formatter
-
+from uniseg.wrap import Formatter, wrap
 
 default_text = """The quick (\u201cbrown\u201d) fox \
 can\u2019t jump 32.3 feet, right?
@@ -59,7 +59,6 @@ conversation?'
 class SampleWxFormatter(Formatter):
 
     def __init__(self, dc: wx.DC, log_width: int) -> None:
-
         self._dc = dc
         self._log_width = log_width
         self._log_cur_x = 0
@@ -67,30 +66,24 @@ class SampleWxFormatter(Formatter):
 
     @property
     def wrap_width(self) -> int:
-
         return self._log_width
 
     def reset(self) -> None:
-
         self._log_cur_x = 0
         self._log_cur_y = 0
 
     def text_extents(self, s: str) -> Sequence[int]:
-
         dc = self._dc
         return dc.GetPartialTextExtents(s)
 
-    def handle_text(self, text: str, extents: List[int]) -> None:
-
+    def handle_text(self, text: str, extents: list[int]) -> None:
         if not text or not extents:
             return
-
         dc = self._dc
         dc.DrawText(text, self._log_cur_x, self._log_cur_y)
         self._log_cur_x += extents[-1]
 
     def handle_new_line(self) -> None:
-
         dc = self._dc
         log_line_height = dc.GetCharHeight()
         self._log_cur_y += log_line_height
@@ -100,7 +93,6 @@ class SampleWxFormatter(Formatter):
 class App(wx.App):
 
     def OnInit(self) -> bool:
-
         frame = Frame(None, wx.ID_ANY, __file__)
 
         self.SetTopWindow(frame)
@@ -112,16 +104,18 @@ class Frame(wx.Frame):
 
     ID_FONT: int = wx.Window.NewControlId()
 
-    def __init__(self,
-                 parent: Optional[wx.Window],
-                 id_: int = wx.ID_ANY,
-                 title :str = wx.EmptyString,
-                 pos: wx.Point = wx.DefaultPosition,
-                 size: wx.Size = wx.DefaultSize,
-                 style: int = wx.DEFAULT_FRAME_STYLE,
-                 name: str = wx.FrameNameStr) -> None:
-
-        super(wx.Frame, self).__init__(parent, id_, title, pos, size, style, name)
+    def __init__(
+        self,
+        parent: Optional[wx.Window],
+        id_: int = wx.ID_ANY,
+        title: str = wx.EmptyString,
+        pos: wx.Point = wx.DefaultPosition,
+        size: wx.Size = wx.DefaultSize,
+        style: int = wx.DEFAULT_FRAME_STYLE,
+        name: str = wx.FrameNameStr
+    ) -> None:
+        super(wx.Frame, self).__init__(
+            parent, id_, title, pos, size, style, name)
 
         self.Bind(wx.EVT_MENU, self.OnCmdOpen, id=wx.ID_OPEN)
         self.Bind(wx.EVT_MENU, self.OnCmdExit, id=wx.ID_EXIT)
@@ -141,7 +135,6 @@ class Frame(wx.Frame):
         self.wrap_window = WrapWindow(self, wx.ID_ANY)
 
     def OnCmdOpen(self, evt: wx.CommandEvent) -> None:
-
         filename = wx.FileSelector('Open')
         if not filename:
             return
@@ -150,11 +143,9 @@ class Frame(wx.Frame):
         self.wrap_window.Refresh()
 
     def OnCmdExit(self, evt: wx.CommandEvent) -> None:
-
         self.Close()
 
     def OnCmdFont(self, evt: wx.CommandEvent) -> None:
-
         data = wx.FontData()
         font = self.wrap_window.GetFont()
         data.SetInitialFont(font)
@@ -173,14 +164,15 @@ class WrapWindow(wx.Window):
     _default_fontface = 'Times New Roman'
     _default_fontsize = 18
 
-    def __init__(self,
-                 parent: Optional[wx.Window],
-                 id_: int = wx.ID_ANY,
-                 pos: wx.Point = wx.DefaultPosition,
-                 size: wx.Size = wx.DefaultSize,
-                 style: int = 0,
-                 name: str = wx.PanelNameStr) -> None:
-
+    def __init__(
+        self,
+        parent: Optional[wx.Window],
+        id_: int = wx.ID_ANY,
+        pos: wx.Point = wx.DefaultPosition,
+        size: wx.Size = wx.DefaultSize,
+        style: int = 0,
+        name: str = wx.PanelNameStr
+    ) -> None:
         wx.Window.__init__(self, parent, id_, pos, size, style, name)
 
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
@@ -199,15 +191,12 @@ class WrapWindow(wx.Window):
         self.SetFont(font)
 
     def GetText(self) -> str:
-
         return self._text
 
     def SetText(self, value: str) -> None:
-
         self._text = value
 
     def OnPaint(self, evt: wx.PaintEvent) -> None:
-
         dc = wx.AutoBufferedPaintDC(self)
         dc.Clear()
 
@@ -215,19 +204,17 @@ class WrapWindow(wx.Window):
         dc.SetFont(font)
 
         dev_width, dev_height = self.GetClientSize()
-        log_width   = dc.DeviceToLogicalX(dev_width)
-        log_height  = dc.DeviceToLogicalY(dev_height)
+        log_width = dc.DeviceToLogicalX(dev_width)
+        log_height = dc.DeviceToLogicalY(dev_height)
 
         formatter = SampleWxFormatter(dc, log_width)
         wrap(formatter, self._text)
 
     def OnSize(self, evt: wx.SizeEvent):
-
         self.Refresh()
 
 
 def main() -> None:
-
     app = App(False)
     app.MainLoop()
 
