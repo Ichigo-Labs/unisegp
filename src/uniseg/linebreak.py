@@ -6,13 +6,12 @@ https://www.unicode.org/reports/tr14/tr14-53.html
 
 from collections.abc import Iterator
 from enum import Enum
-from sys import stderr
-from typing import Iterable, Optional
-from unicodedata import east_asian_width, category
+from typing import Optional
+from unicodedata import category, east_asian_width
 
-from uniseg.db import extended_pictographic
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
+from uniseg.db import extended_pictographic
 from uniseg.db import line_break as _line_break
 
 __all__ = [
