@@ -3,7 +3,10 @@
 import re
 from typing import Iterator, List, Literal, Optional, Sequence
 
-from unicodedata2 import east_asian_width
+try:
+    from unicodedata2 import east_asian_width # type: ignore
+except ImportError:
+    from unicodedata import east_asian_width
 
 from uniseg.codepoint import code_point
 from uniseg.graphemecluster import (grapheme_cluster_boundaries,
@@ -90,7 +93,6 @@ class Wrapper(object):
              offset: int = 0,
              *,
              char_wrap: bool = False) -> int:
-
         """Wrap string `s` with `formatter` and invoke its handlers
 
         The optional arguments, `cur` is the starting position of the string
@@ -133,7 +135,8 @@ class Wrapper(object):
                                                        breakpoint,
                                                        prev_boundary)
                         formatter.handle_text(line, line_extents)
-                        formatter.handle_new_line(); iline += 1
+                        formatter.handle_new_line()
+                        iline += 1
                         cur = 0
                         breakpoint = prev_boundary
                     cur += w
@@ -142,7 +145,8 @@ class Wrapper(object):
                 line = field[breakpoint:]
                 line_extents = partial_extents(field_extents, breakpoint)
                 formatter.handle_text(line, line_extents)
-            formatter.handle_new_line(); iline += 1
+            formatter.handle_new_line()
+            iline += 1
             cur = 0
         return iline
 
@@ -150,7 +154,6 @@ class Wrapper(object):
     def _partial_extents(extents: Sequence[int],
                          start: int,
                          stop: Optional[int] = None, /) -> List[int]:
-
         """(internal) return partial extents of `extents[start:end]` """
 
         if stop is None:
@@ -159,7 +162,7 @@ class Wrapper(object):
         return [extents[x] - extent_offset for x in range(start, stop)]
 
 
-### static objects
+# static objects
 _wrapper = Wrapper()
 
 
@@ -169,7 +172,6 @@ def wrap(formatter: Formatter,
          offset: int = 0,
          *,
          char_wrap: bool = False) -> int:
-
     """Wrap string `s` with `formatter` using the module's static
     :class:`Wrapper` instance
 
@@ -180,7 +182,7 @@ def wrap(formatter: Formatter,
     return _wrapper.wrap(formatter, s, cur, offset, char_wrap=char_wrap)
 
 
-### TT
+# TT
 
 class TTFormatter(Formatter):
     """A Fixed-width text wrapping formatter. """
@@ -196,7 +198,7 @@ class TTFormatter(Formatter):
 
         self.wrap_width = wrap_width
         self.tab_width = tab_width
-        self.ambiguous_as_wide  = ambiguous_as_wide
+        self.ambiguous_as_wide = ambiguous_as_wide
         self.tab_char = tab_char
 
     @property
@@ -225,7 +227,8 @@ class TTFormatter(Formatter):
     @tab_char.setter
     def tab_char(self, value: str):
         if (east_asian_width(value) not in ('N', 'Na', 'H')):
-            raise ValueError("only narrow code point is available for tab_char")
+            raise ValueError(
+                "only narrow code point is available for tab_char")
         self._tab_char = value
 
     @property
@@ -240,20 +243,17 @@ class TTFormatter(Formatter):
         self._ambiguous_as_wide = value
 
     def reset(self) -> None:
-
         """Reset all states of the formatter
         """
         del self._lines[:]
 
     def text_extents(self, s: str, /) -> List[int]:
-
         """Return a list of logical lengths from start of the string to
         each of characters in `s`
         """
         return tt_text_extents(s, ambiguous_as_wide=self.ambiguous_as_wide)
 
     def handle_text(self, text: str, extents: Sequence[int], /) -> None:
-
         """The handler which is invoked when a text should be put on the
         current position
         """
@@ -262,14 +262,12 @@ class TTFormatter(Formatter):
         self._lines[-1] += text
 
     def handle_new_line(self) -> None:
-
         """The handler which is invoked when the current line is over and a
         new line begins
         """
         self._lines.append('')
 
     def lines(self) -> Iterator[str]:
-
         """Iterate every wrapped line strings
         """
         if not self._lines[-1]:
@@ -278,7 +276,6 @@ class TTFormatter(Formatter):
 
 
 def tt_width(s: str, index: int = 0, ambiguous_as_wide: bool = False) -> Literal[1, 2]:
-
     """Return logical width of the grapheme cluster at `s[index]` on
     fixed-width typography
 
@@ -313,7 +310,6 @@ def tt_width(s: str, index: int = 0, ambiguous_as_wide: bool = False) -> Literal
 
 
 def tt_text_extents(s: str, *, ambiguous_as_wide: bool = False) -> List[int]:
-
     r"""Return a list of logical widths from the start of `s` to each of
     characters *(not of code points)* on fixed-width typography
 
@@ -362,7 +358,7 @@ def tt_wrap(s: str, wrap_width: int, /,
     return formatter.lines()
 
 
-### Main
+# Main
 
 if __name__ == '__main__':
     import doctest
