@@ -7,7 +7,8 @@ https://www.unicode.org/reports/tr14/tr14-53.html
 from collections.abc import Iterator
 from enum import Enum
 from typing import Optional
-from unicodedata import category, east_asian_width
+
+from unicodedata2 import category, east_asian_width
 
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)

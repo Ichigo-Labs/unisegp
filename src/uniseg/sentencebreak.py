@@ -6,8 +6,6 @@ https://www.unicode.org/reports/tr29/tr29-45.html
 
 from collections.abc import Iterator
 from enum import Enum
-from sys import stderr
-import sys
 from typing import Optional
 
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,

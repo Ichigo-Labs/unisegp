@@ -1,13 +1,14 @@
 """Unicode-aware text wrapping. """
 
 import re
-from typing import Iterator, Optional, Sequence, List, Literal
-from unicodedata import east_asian_width
+from typing import Iterator, List, Literal, Optional, Sequence
+
+from unicodedata2 import east_asian_width
 
 from uniseg.codepoint import code_point
-from uniseg.graphemecluster import grapheme_clusters, grapheme_cluster_boundaries
+from uniseg.graphemecluster import (grapheme_cluster_boundaries,
+                                    grapheme_clusters)
 from uniseg.linebreak import line_break_boundaries
-
 
 __all__ = [
     'Formatter',
