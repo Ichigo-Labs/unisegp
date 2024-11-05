@@ -3,4 +3,3 @@ pytest==8.3.3
 Sphinx==7.4.7
 sphinx-rtd-theme==3.0.1
 twine==5.1.1
-wxPython==4.2.1
