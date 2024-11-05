@@ -34,5 +34,7 @@ Repository = "https://bitbucket.org/emptypage/uniseg-py/"
 [tool.setuptools_scm]
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --doctest-ignore-import-errors"
+addopts = "--doctest-modules"
+doctest_optionflags = ["IGNORE_EXCEPTION_DETAIL"]
+norecursedirs = ["docs", "samples"]
 testpaths = ["src", "tests"]
