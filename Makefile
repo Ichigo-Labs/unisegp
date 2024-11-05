@@ -1,7 +1,7 @@
-.PHONY: all ucd code docs build test \
+.PHONY: all ucd gen docs build test \
 		pypi testpypi \
 		install check_git_status \
-		cleanall clean cleanucd cleancode cleandocs
+		cleanall clean cleanucd cleangen cleandocs
 
 # project
 
@@ -50,8 +50,8 @@ UCD_PROP_FILES = \
 UCD_TEST_FILES = \
 	$(DIR_UCD)/auxiliary/GraphemeBreakTest.txt \
 	$(DIR_UCD)/auxiliary/WordBreakTest.txt \
-	$(DIR_UCD)/auxiliary/LineBreakTest.txt \
-	$(DIR_UCD)/auxiliary/SentenceBreakTest.txt
+	$(DIR_UCD)/auxiliary/SentenceBreakTest.txt \
+	$(DIR_UCD)/auxiliary/LineBreakTest.txt
 
 UCD_FILES = $(UCD_PROP_FILES) $(UCD_TEST_FILES)
 
@@ -64,18 +64,18 @@ GEN_SRC_FILES = \
 GEN_TEST_FILES = \
 	$(DIR_TESTS)/test_graphemebreak.py \
 	$(DIR_TESTS)/test_wordbreak.py \
-	$(DIR_TESTS)/test_linebreak.py \
-	$(DIR_TESTS)/test_sentencebreak.py
+	$(DIR_TESTS)/test_sentencebreak.py \
+	$(DIR_TESTS)/test_linebreak.py
 
 GEN_FILES = $(GEN_SRC_FILES) $(GEN_TEST_FILES)
 
 
 # targets
-all: ucd code docs
+all: ucd gen docs
 
 ucd: $(UCD_FILES)
 
-code: $(GEN_FILES)
+gen: $(GEN_FILES)
 
 docs:
 	$(SPHINX_BUILD) -b html $(DIR_DOCS) $(DIR_DOCS_OUT)/html
@@ -83,7 +83,7 @@ docs:
 build: all
 	$(PYTHON) -m build
 
-test: code
+test: gen
 	$(PYTEST)
 
 pypi: check_git_status build
@@ -98,7 +98,7 @@ install:
 check_git_status:
 	@test -z "`git status -s`" || (echo "Repository is not clean" && exit 1)
 
-cleanall: clean cleanucd cleancode cleandocs
+cleanall: clean cleanucd cleangen cleandocs
 	-$(RM) -r $(DIR_SRC)/$(NAME).egg-info
 	-$(RM) -r $(DIR_DIST)
 
@@ -109,7 +109,7 @@ clean:
 cleanucd:
 	-$(RM) -r $(DIR_UCD)
 
-cleancode:
+cleangen:
 	-$(RM) $(GEN_FILES)
 
 cleandocs:
@@ -120,12 +120,12 @@ cleandocs:
 
 $(DIR_SRC)/uniseg/db_lookups.py: $(UCD_PROP_FILES)
 	$(PYTHON) $(DIR_TOOLS)/build_db_lookups.py -o $@ \
-		GraphemeClusterBreak=data/16.0.0/ucd/auxiliary/GraphemeBreakProperty.txt \
-		WordBreak=data/16.0.0/ucd/auxiliary/WordBreakProperty.txt \
-		SentenceBreak=data/16.0.0/ucd/auxiliary/SentenceBreakProperty.txt \
-		LineBreak=data/16.0.0/ucd/LineBreak.txt \
-		data/16.0.0/ucd/DerivedCoreProperties.txt \
-		data/16.0.0/ucd/emoji/emoji-data.txt
+		GraphemeClusterBreak=$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
+		WordBreak=$(DIR_UCD)/auxiliary/WordBreakProperty.txt \
+		SentenceBreak=$(DIR_UCD)/auxiliary/SentenceBreakProperty.txt \
+		LineBreak=$(DIR_UCD)/LineBreak.txt \
+		$(DIR_UCD)/DerivedCoreProperties.txt \
+		$(DIR_UCD)/emoji/emoji-data.txt
 
 $(DIR_SRC)/uniseg/grapheme_re.py: $(UCD_PROP_FILES)
 	$(PYTHON) $(DIR_TOOLS)/build_grapheme_re.py -o $@ \
@@ -137,20 +137,28 @@ $(DIR_SRC)/uniseg/grapheme_re.py: $(UCD_PROP_FILES)
 # generate test files
 
 $(DIR_TESTS)/test_graphemebreak.py: $(DIR_UCD)/auxiliary/GraphemeBreakTest.txt
-	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.graphemecluster -o $@ \
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py \
+		-m uniseg.graphemecluster \
+		-o $@ \
 		grapheme_cluster_boundaries $^
 
 $(DIR_TESTS)/test_wordbreak.py: $(DIR_UCD)/auxiliary/WordBreakTest.txt
-	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.wordbreak -o $@ \
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py \
+		-m uniseg.wordbreak \
+		-o $@ \
 		word_boundaries $^
 
-$(DIR_TESTS)/test_linebreak.py: $(DIR_UCD)/auxiliary/LineBreakTest.txt
-	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.linebreak -o $@ \
-		line_break_boundaries $^
-
 $(DIR_TESTS)/test_sentencebreak.py: $(DIR_UCD)/auxiliary/SentenceBreakTest.txt
-	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.sentencebreak -o $@ \
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py \
+		-m uniseg.sentencebreak \
+		-o $@ \
 		sentence_boundaries $^
+
+$(DIR_TESTS)/test_linebreak.py: $(DIR_UCD)/auxiliary/LineBreakTest.txt
+	$(PYTHON) $(DIR_TOOLS)/build_break_test.py \
+		-m uniseg.linebreak \
+		-o $@ \
+		line_break_boundaries $^
 
 
 # pattern rules
