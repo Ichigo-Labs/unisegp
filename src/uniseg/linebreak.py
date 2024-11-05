@@ -107,15 +107,15 @@ def line_break(c: str, index: int = 0, /) -> LineBreak:
     return LineBreak[_line_break(c[index])]
 
 
-def _eaw(ch: Optional[str]) -> Optional[str]:
+def _eaw(ch: Optional[str], /) -> Optional[str]:
     return None if ch is None else east_asian_width(ch)
 
 
-def _cat(ch: Optional[str]) -> Optional[str]:
+def _cat(ch: Optional[str], /) -> Optional[str]:
     return None if ch is None else category(ch)
 
 
-def _ep(ch: Optional[str]) -> Optional[bool]:
+def _ep(ch: Optional[str], /) -> Optional[bool]:
     return False if ch is None else extended_pictographic(ch)
 
 
@@ -152,6 +152,13 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
 
     # LB1
     run = Run(s, resolve_lb1_linebreak)
+    if legacy:
+        while 1:
+            if _eaw(run.cc) == 'A':
+                run.set_attr(LB.ID)
+            if not run.walk():
+                break
+        run.head()
     # LB2
     run.do_not_break_here()
     while run.walk():
