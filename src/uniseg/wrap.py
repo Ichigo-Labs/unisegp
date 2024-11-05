@@ -1,4 +1,4 @@
-"""Unicode-aware text wrapping. """
+"""Wrap text based on Unicode line breaking algorithm."""
 
 import re
 from collections.abc import Iterator, Sequence
