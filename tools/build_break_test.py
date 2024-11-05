@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Generate uniseg break test code."""
 
-import csv
 import re
 from argparse import ArgumentParser, FileType
 from textwrap import wrap
 from typing import NamedTuple, TextIO
+
+from uniseg.ucdtools import iter_records
 
 
 class Entry(NamedTuple):
@@ -73,9 +74,10 @@ def main() -> None:
                         help='module name for importing break_func')
     parser.add_argument('-o', '--output', default='-',
                         type=FileType('w', encoding='utf-8'))
-    parser.add_argument('break_func')
+    parser.add_argument('break_func',
+                        help='break function name')
     parser.add_argument('input', type=FileType('r', encoding='utf-8'),
-                        help='test csv file')
+                        help='UCD test file')
     args = parser.parse_args()
 
     module_name: str = args.module
@@ -91,9 +93,14 @@ def main() -> None:
     if module_name:
         codes.append(f'from {module_name} import {break_func}\n')
 
-    for fields in csv.reader(input):
-        test = Entry(*fields)
-        codes.append(generate_break_test_code(test, break_func))
+    records = list(iter_records(input))
+    digits = len(str(len(records)))
+    for i, record in enumerate(records, 1):
+        name = '_'.join([break_func, format(i, f'0{digits}d')])
+        pattern = record.fields[0]
+        comment = record.comment
+        entry = Entry(name, pattern, comment)
+        codes.append(generate_break_test_code(entry, break_func))
 
     codes.append(
         'if __name__ == "__main__":\n'

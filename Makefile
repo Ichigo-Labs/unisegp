@@ -1,7 +1,7 @@
-.PHONY: all ucd csv code docs build test \
+.PHONY: all ucd code docs build test \
 		pypi testpypi \
 		install check_git_status \
-		cleanall clean cleancsv cleanucd cleancode cleandocs
+		cleanall clean cleanucd cleancode cleandocs
 
 # project
 
@@ -17,7 +17,6 @@ DIR_TESTS = tests
 DIR_TOOLS = tools
 DIR_DOCS = docs
 DIR_DATA = data
-DIR_CSV = $(DIR_DATA)/$(UNICODE_VERSION)/csv
 DIR_UCD = $(DIR_DATA)/$(UNICODE_VERSION)/ucd
 DIR_DIST = dist
 DIR_DOCS_OUT = $(DIR_SRC)/$(NAME)/docs
@@ -56,15 +55,6 @@ UCD_TEST_FILES = \
 
 UCD_FILES = $(UCD_PROP_FILES) $(UCD_TEST_FILES)
 
-CSV_PROP_FILES = \
-	$(patsubst $(DIR_UCD)/%.txt, $(DIR_CSV)/%.csv, $(UCD_PROP_FILES))
-
-CSV_TEST_FILES = \
-	$(patsubst $(DIR_UCD)/%.txt, $(DIR_CSV)/%.csv, $(UCD_TEST_FILES))
-
-CSV_FILES = $(CSV_PROP_FILES) $(CSV_TEST_FILES)
-
-
 # generated code
 
 GEN_SRC_FILES = \
@@ -81,11 +71,9 @@ GEN_FILES = $(GEN_SRC_FILES) $(GEN_TEST_FILES)
 
 
 # targets
-all: ucd csv code docs
+all: ucd code docs
 
 ucd: $(UCD_FILES)
-
-csv: $(CSV_FILES)
 
 code: $(GEN_FILES)
 
@@ -110,16 +98,13 @@ install:
 check_git_status:
 	@test -z "`git status -s`" || (echo "Repository is not clean" && exit 1)
 
-cleanall: clean cleancsv cleanucd cleancode cleandocs
+cleanall: clean cleanucd cleancode cleandocs
 	-$(RM) -r $(DIR_SRC)/$(NAME).egg-info
 	-$(RM) -r $(DIR_DIST)
 
 clean:
 	-$(RM) -r $(DIR_SRC)/**/__pycache__
 	-$(RM) $(DIR_DIST)/*
-
-cleancsv:
-	-$(RM) -r $(DIR_CSV)
 
 cleanucd:
 	-$(RM) -r $(DIR_UCD)
@@ -151,19 +136,19 @@ $(DIR_SRC)/uniseg/grapheme_re.py: $(UCD_PROP_FILES)
 
 # generate test files
 
-$(DIR_TESTS)/test_graphemebreak.py: $(DIR_CSV)/auxiliary/GraphemeBreakTest.csv
+$(DIR_TESTS)/test_graphemebreak.py: $(DIR_UCD)/auxiliary/GraphemeBreakTest.txt
 	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.graphemecluster -o $@ \
 		grapheme_cluster_boundaries $^
 
-$(DIR_TESTS)/test_wordbreak.py: $(DIR_CSV)/auxiliary/WordBreakTest.csv
+$(DIR_TESTS)/test_wordbreak.py: $(DIR_UCD)/auxiliary/WordBreakTest.txt
 	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.wordbreak -o $@ \
 		word_boundaries $^
 
-$(DIR_TESTS)/test_linebreak.py: $(DIR_CSV)/auxiliary/LineBreakTest.csv
+$(DIR_TESTS)/test_linebreak.py: $(DIR_UCD)/auxiliary/LineBreakTest.txt
 	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.linebreak -o $@ \
 		line_break_boundaries $^
 
-$(DIR_TESTS)/test_sentencebreak.py: $(DIR_CSV)/auxiliary/SentenceBreakTest.csv
+$(DIR_TESTS)/test_sentencebreak.py: $(DIR_UCD)/auxiliary/SentenceBreakTest.txt
 	$(PYTHON) $(DIR_TOOLS)/build_break_test.py -m uniseg.sentencebreak -o $@ \
 		sentence_boundaries $^
 
@@ -172,11 +157,3 @@ $(DIR_TESTS)/test_sentencebreak.py: $(DIR_CSV)/auxiliary/SentenceBreakTest.csv
 
 $(DIR_UCD)/%:
 	$(CURL) --create-dirs -o $@ $(subst $(DIR_UCD),$(UCD_BASE_URL),$@)
-
-$(DIR_CSV)/%Test.csv: $(DIR_UCD)/%Test.txt
-	-$(MKDIR) -p $(dir $@)
-	$(PYTHON) $(DIR_TOOLS)/test2csv.py -p $(basename $(notdir $@)) -o $@ $<
-
-$(DIR_CSV)/%.csv: $(DIR_UCD)/%.txt
-	-$(MKDIR) -p $(dir $@)
-	$(PYTHON) $(DIR_TOOLS)/prop2csv.py -o $@ $<

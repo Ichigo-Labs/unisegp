@@ -150,7 +150,7 @@ def split_comment(line: str, /) -> tuple[str, str]:
     return data.strip(), comment.strip()
 
 
-def iter_records(stream: TextIO, /) -> Iterable[UcdRecord]:
+def iter_records(stream: TextIO, /) -> Iterator[UcdRecord]:
     """Iterate tuples of tokens on the text data (comments are removed)."""
     for line in stream:
         # strip comment
@@ -160,7 +160,7 @@ def iter_records(stream: TextIO, /) -> Iterable[UcdRecord]:
             yield UcdRecord(fields, comment_part)
 
 
-def iter_code_point_properties(stream: TextIO, /) -> Iterable[tuple[int, str]]:
+def iter_code_point_properties(stream: TextIO, /) -> Iterator[tuple[int, str]]:
     R"""Iterate tuples of code point interger and property string for every
     code point described in the UCD property text.
 
