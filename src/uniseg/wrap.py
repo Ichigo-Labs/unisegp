@@ -8,7 +8,6 @@ try:
 except ImportError:
     from unicodedata import east_asian_width
 
-from uniseg.codepoint import code_point
 from uniseg.graphemecluster import (grapheme_cluster_boundaries,
                                     grapheme_clusters)
 from uniseg.linebreak import line_break_boundaries
@@ -302,7 +301,7 @@ def tt_width(s: str, index: int = 0, ambiguous_as_wide: bool = False) -> Literal
     >>> tt_width('\\u03b1', ambiguous_as_wide=True)
     2
     """
-    cp = code_point(s, index)
+    cp = s[index]
     eaw = east_asian_width(cp)
     if eaw in ('W', 'F') or (eaw == 'A' and ambiguous_as_wide):
         return 2

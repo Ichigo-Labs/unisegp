@@ -9,7 +9,6 @@ from enum import Enum
 from typing import Iterator, Optional
 
 from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
-from uniseg.codepoint import code_point
 from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
 from uniseg.grapheme_re import PAT_EXTENDED_GRAPHEME_CLUSTER
 
@@ -67,7 +66,7 @@ def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
     >>> grapheme_cluster_break('a\x0d', 1).name
     'CR'
     """
-    name = _grapheme_cluster_break(code_point(ch, index))
+    name = _grapheme_cluster_break(ch[index])
     return GraphemeClusterBreak[name.upper()]
 
 

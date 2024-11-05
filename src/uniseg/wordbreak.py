@@ -9,7 +9,6 @@ from typing import Iterator, Optional
 
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
-from uniseg.codepoint import code_point
 from uniseg.db import extended_pictographic
 from uniseg.db import word_break as _word_break
 
@@ -72,7 +71,7 @@ def word_break(c: str, index: int = 0, /) -> WordBreak:
     >>> word_break('A\u30a2', 1)
     <WordBreak.KATAKANA: 'Katakana'>
     """
-    return WordBreak[_word_break(code_point(c, index)).upper()]
+    return WordBreak[_word_break(c[index]).upper()]
 
 
 def word_breakables(s: str, /) -> Breakables:

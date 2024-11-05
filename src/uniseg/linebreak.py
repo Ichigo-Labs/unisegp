@@ -9,7 +9,7 @@ from enum import Enum
 from typing import Optional
 
 try:
-    from unicodedata2 import category, east_asian_width # type: ignore
+    from unicodedata2 import category, east_asian_width  # type: ignore
 except ImportError:
     from unicodedata import category, east_asian_width
 
