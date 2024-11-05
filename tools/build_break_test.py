@@ -8,7 +8,7 @@ from textwrap import wrap
 from typing import NamedTuple, TextIO
 
 
-class TestEntry(NamedTuple):
+class Entry(NamedTuple):
     """Data class for test record."""
     name: str       # 'XxxxBreakTestNNNN'
     pattern: str    # '÷ 0020 ÷ 0020 ÷'
@@ -35,7 +35,7 @@ def parse_breaking_test_pattern(pattern: str) -> tuple[str, list[int]]:
     return ''.join(codepoints), breakpoints
 
 
-def generate_break_test_code(test: TestEntry, break_func_name: str) -> str:
+def generate_break_test_code(test: Entry, break_func_name: str) -> str:
     """Return test function code."""
 
     string, expect = parse_breaking_test_pattern(test.pattern)
@@ -92,7 +92,7 @@ def main() -> None:
         codes.append(f'from {module_name} import {break_func}\n')
 
     for fields in csv.reader(input):
-        test = TestEntry(*fields)
+        test = Entry(*fields)
         codes.append(generate_break_test_code(test, break_func))
 
     codes.append(
