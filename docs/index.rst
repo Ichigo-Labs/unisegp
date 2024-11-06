@@ -13,6 +13,7 @@ Table of Contents
    :numbered:
 
    introduction
+   unicodeversions
    modules
    samples
    license
