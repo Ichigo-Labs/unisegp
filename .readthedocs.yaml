@@ -8,22 +8,20 @@ version: 2
 # Set the version of Python and other tools you might need
 python:
   install:
-    - requirements: requirements.txt
+    - requirements: requirements-dev.txt
     - method: pip
       path: .
-      extra_requirements:
-        - dev
 
 build:
   os: ubuntu-22.04
   tools:
-    python: "3.8"
+    python: "3.9"
   apt_packages:
     - make
     - curl
   jobs:
-    pre_install:
-      - make code
+    pre_build:
+      - make all
 
 
 # Build documentation in the docs/ directory with Sphinx
