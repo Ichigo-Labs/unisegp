@@ -8,9 +8,10 @@ import re
 from enum import Enum
 from typing import Iterator, Optional
 
-from uniseg.breaking import Breakables, TailorFunc, boundaries, break_units
+from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
+                             boundaries, break_units)
 from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
-from uniseg.grapheme_re import PAT_EXTENDED_GRAPHEME_CLUSTER
+from uniseg.db import extended_pictographic
 
 __all__ = [
     'GraphemeClusterBreak',
@@ -20,9 +21,6 @@ __all__ = [
     'grapheme_cluster_boundaries',
     'grapheme_clusters',
 ]
-
-
-_rx_grapheme = re.compile(PAT_EXTENDED_GRAPHEME_CLUSTER)
 
 
 class GraphemeClusterBreak(Enum):
@@ -45,6 +43,10 @@ class GraphemeClusterBreak(Enum):
 
 # type alias for `GraphemeClusterBreak`
 GCB = GraphemeClusterBreak
+
+
+def _ep(ch: Optional[str], /) -> Optional[bool]:
+    return False if ch is None else extended_pictographic(ch)
 
 
 def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
@@ -85,11 +87,59 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     []
     """
     if not s:
-        return
-    for graphem in _rx_grapheme.findall(s):
-        yield 1
-        for _ in range(len(graphem) - 1):
-            yield 0
+        return iter([])
+
+    run = Run(s, grapheme_cluster_break)
+    while run.walk():
+        # GB3
+        if run.prev == GCB.CR and run.curr == GCB.LF:
+            run.do_not_break_here()
+        # GB4, GB5
+        elif (
+            run.prev in (GCB.CONTROL, GCB.CR, GCB.LF)
+            or run.curr in (GCB.CONTROL, GCB.CR, GCB.LF)
+        ):
+            run.break_here()
+        # GB6, GB7, GB8
+        elif (
+            (run.prev == GCB.L and run.curr in (GCB.L, GCB.V, GCB.LV, GCB.LVT))
+            or (run.prev in (GCB.LV, GCB.V) and run.curr in (GCB.V, GCB.T))
+            or (run.prev in (GCB.LVT, GCB.T) and run.curr == GCB.T)
+        ):
+            run.do_not_break_here()
+        elif run.curr in (GCB.EXTEND, GCB.ZWJ):
+            run.do_not_break_here()
+        # GB9a, GB9b
+        elif (
+            run.curr == GCB.SPACINGMARK
+            or run.prev == GCB.PREPEND
+        ):
+            run.do_not_break_here()
+        # GB9c
+        # TODO:
+        # GB11
+        elif (
+            _ep(run.is_following((GCB.ZWJ,)).is_following(
+                (GCB.EXTEND,), greedy=True).pc)
+            and _ep(run.cc)
+        ):
+            run.do_not_break_here()
+    # GB12, GB13
+    run.head()
+    while 1:
+        while run.curr != GCB.REGIONAL_INDICATOR:
+            if not run.walk():
+                break
+        if not run.walk():
+            break
+        while run.prev == run.curr == GCB.REGIONAL_INDICATOR:
+            run.do_not_break_here()
+            if not run.walk():
+                break
+            if not run.walk():
+                break
+    run.set_default(Breakable.Break)
+    return run.literal_breakables()
 
 
 def grapheme_cluster_boundaries(
