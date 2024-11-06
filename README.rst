@@ -22,27 +22,47 @@ Supporting segmentations are:
     `Code point <https://www.unicode.org/glossary/#code_point>`_ is *"any value
     in the Unicode codespace."* It is the basic unit for processing Unicode
     strings.
+
+    Historically, units per Unicode string object on elder versions of Python
+    was build-dependent.  Some builds uses UTF-16 as an implementation for that
+    and treat each code point greater than U+FFFF as a "surrogate pair", which
+    is a pair of the special two code points.  The `uniseg` package had
+    provided utility functions in order to treat Unicode strings per proper
+    code points on every platform.
+
+    Since Python 3.3, The Unicode string is implemented with "flexible string
+    representation", which gives access to full code points and
+    space-efficiency `[PEP 393]`_.  So you don't need to worry about treating complex
+    multi-code-point issue any more.  If you want to treat some Unicode
+    string per code point, just iterate that like: ``for c in s:``.  So
+    ``uniseg.codepoint`` module has been deprecated and deleted.
+
+    .. _[PEP 393]: https://peps.python.org/pep-0393/
+
 *grapheme cluster*
     `Grapheme cluster <https://www.unicode.org/glossary/#grapheme_cluster>`_
-    approximately represents *"user-perceived character."* They may be made
-    up of single or multiple Unicode code points. e.g. "G" + *acute-accent* is
+    approximately represents *"user-perceived character."*  They may be made
+    up of single or multiple Unicode code points.  e.g. "G" + *acute-accent* is
     a *user-perceived character*.
+
 *word break*
     Word boundaries are familiar segmentation in many common text operations.
-    e.g. Unit for text highlighting, cursor jumping etc. Note that *words* are
+    e.g. Unit for text highlighting, cursor jumping etc.  Note that *words* are
     not determinable only by spaces or punctuations in text in some languages.
     Such languages like Thai or Japanese require dictionaries to determine
-    appropriate word boundaries. Though the package only provides simple word
+    appropriate word boundaries.  Though the package only provides simple word
     breaking implementation which is based on the scripts and doesn't use any
     dictionaries, it also provides ways to customize its default behavior.
+
 *sentence break*
     Sentence breaks are also common in text processing but they are more
-    contextual and less formal. The sentence breaking implementation (which is
+    contextual and less formal.  The sentence breaking implementation (which is
     specified in UAX: Unicode Standard Annex) in the package is simple and
-    formal too. But it must be still useful in some usages.
+    formal too.  But it must be still useful in some usages.
+
 *line break*
     Implementing line breaking algorithm is one of the key features of this
-    package. The feature is important in many general text presentations in
+    package.  The feature is important in many general text presentations in
     both CLI and GUI applications.
 
 
