@@ -4,14 +4,14 @@ UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
 https://www.unicode.org/reports/tr29/tr29-45.html
 """
 
-import re
 from enum import Enum
 from typing import Iterator, Optional
 
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
-from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
 from uniseg.db import extended_pictographic
+from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
+from uniseg.db import indic_conjunct_break
 
 __all__ = [
     'GraphemeClusterBreak',
@@ -89,6 +89,20 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     if not s:
         return iter([])
 
+    run = Run(s, indic_conjunct_break)
+    while run.walk():
+        if (
+            (
+                run.is_following(('Extend', 'Linker'), greedy=True)
+                .prev == 'Consonant'
+                and run.is_following(('Extend',), greedy=True)
+                .prev != 'Consonant'
+            )
+            and run.curr == 'Consonant'
+        ):
+            run.do_not_break_here()
+    incb_breakables = run.breakables()
+
     run = Run(s, grapheme_cluster_break)
     while run.walk():
         # GB3
@@ -116,7 +130,8 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
         ):
             run.do_not_break_here()
         # GB9c
-        # TODO:
+        elif incb_breakables[run.position] is Breakable.DoNotBreak:
+            run.do_not_break_here()
         # GB11
         elif (
             _ep(run.is_following((GCB.ZWJ,)).is_following(
