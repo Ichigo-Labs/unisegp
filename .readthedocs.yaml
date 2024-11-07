@@ -20,7 +20,7 @@ build:
     - make
     - curl
   jobs:
-    pre_build:
+    pre_install:
       - make all
 
 
