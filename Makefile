@@ -19,9 +19,7 @@ DIR_DOCS = docs
 DIR_DATA = data
 DIR_UCD = $(DIR_DATA)/$(UNICODE_VERSION)/ucd
 DIR_DIST = dist
-DIR_DOCS_OUT = $(DIR_SRC)/$(NAME)/docs
-DIR_DOCS_BUILD = $(DIR_DOCS)/_build
-DIR_DOCS_BUILD_DOCTREE = $(DIR_DOCS)/_build/doctree
+DIR_DOCS_OUT = $(DIR_DOCS)/_build
 
 
 # commands
@@ -33,7 +31,7 @@ CURL = curl -s
 PYTHON = python
 PIP = python -m pip
 PYTEST = pytest
-SPHINX_BUILD = python -m sphinx.cmd.build -q -d $(DIR_DOCS_BUILD_DOCTREE)
+SPHINX_BUILD = sphinx-build -q
 TWINE = twine
 
 
@@ -70,14 +68,14 @@ GEN_FILES = $(GEN_SRC_FILES) $(GEN_TEST_FILES)
 
 
 # targets
-all: ucd gen docs
+all: gen
 
 ucd: $(UCD_FILES)
 
 gen: $(GEN_FILES)
 
 docs:
-	$(SPHINX_BUILD) -b html $(DIR_DOCS) $(DIR_DOCS_OUT)/html
+	$(SPHINX_BUILD) $(DIR_DOCS) $(DIR_DOCS_OUT)/html
 
 build: all
 	$(PYTHON) -m build
