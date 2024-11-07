@@ -42,5 +42,5 @@ def extended_pictographic(ch: str, /) -> bool:
     return bool(values[_find_break(ch)][INDEX_EXTENDED_PICTOGRAPHIC])
 
 
-def indic_conjunct_break(ch: str, /) -> bool:
-    return bool(values[_find_break(ch)][INDEX_INDIC_CONJUNCT_BREAK])
+def indic_conjunct_break(ch: str, /) -> str:
+    return values[_find_break(ch)][INDEX_INDIC_CONJUNCT_BREAK] or 'None'

@@ -90,7 +90,7 @@ def main() -> None:
                         help='UCD property files')
     args = parser.parse_args()
     output: TextIO = args.output
-    prop_args: Iterable[PropArg] = args.files
+    prop_args: list[PropArg] = args.files
 
     names = list[str]()
     db = [list[Optional[str]]() for cp in range(sys.maxunicode + 1)]
@@ -104,15 +104,27 @@ def main() -> None:
             names.append(name)
             item_dict = dict(items)
             for cp in range(sys.maxunicode + 1):
-                db[cp].append(item_dict.get(cp, ''))
+                record = item_dict.get(cp)
+                value = record.fields[0] if record else ''
+                db[cp].append(value)
         else:
-            # boolean property
-            for name, grouped in groupby(items, lambda x: x[1]):
+            # unnamed property
+            for name, grouped_items in groupby(items, lambda x: x[1].fields[0]):
                 print(name, file=sys.stderr)
                 names.append(name)
-                item_dict = dict(grouped)
+                item_dict = dict(grouped_items)
                 for cp in range(sys.maxunicode + 1):
-                    db[cp].append(item_dict.get(cp, ''))
+                    record = item_dict.get(cp)
+                    if record:
+                        if len(record.fields) == 1:
+                            value = 'Y'
+                        elif len(record.fields) == 2:
+                            value = record.fields[1]
+                        else:
+                            raise ValueError(f'{len(record.fields)}=')
+                    else:
+                        value = ''
+                    db[cp].append(value)
 
     sparse_records = tuple(tuple(items) for items in db)
     unique_records = tuple(sorted(set(sparse_records)))

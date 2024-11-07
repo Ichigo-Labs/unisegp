@@ -160,26 +160,16 @@ def iter_records(stream: TextIO, /) -> Iterator[UcdRecord]:
             yield UcdRecord(fields, comment_part)
 
 
-def iter_code_point_properties(stream: TextIO, /) -> Iterator[tuple[int, str]]:
-    R"""Iterate tuples of code point interger and property string for every
+def iter_code_point_properties(stream: TextIO, /) -> Iterator[tuple[int, UcdRecord]]:
+    """Iterate tuples of code point interger and property string for every
     code point described in the UCD property text.
-
-    >>> from io import StringIO
-    >>> text = (
-    ...     '002B          ; Math # Sm       PLUS SIGN\n'
-    ...     '003C..003E    ; Math # Sm   [3] LESS-THAN SIGN..GREATER-THAN SIGN\n'
-    ... )
-    >>> stream = StringIO(text)
-    >>> list(iter_code_point_properties(stream))
-    [(43, 'Math'), (60, 'Math'), (61, 'Math'), (62, 'Math')]
     """
     for record in iter_records(stream):
-        fields, __ = record
+        fields, comment = record
         if len(fields) > 1:
             span = CodePointSpan(fields[0])
-            prop = fields[1]
             for cp in span:
-                yield cp, prop
+                yield cp, UcdRecord(fields[1:], comment)
 
 
 def group_continuous(iterable: Iterable[int], /) -> Iterator[Iterable[int]]:
