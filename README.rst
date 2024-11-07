@@ -5,6 +5,15 @@ uniseg
 A Python package to determine Unicode text segmentations.
 
 
+News
+====
+
+We released the version 0.9.0 on November, 2024, and this is the first
+release ever which passes all the Unicode breaking tests (congrats!).  And now
+I'm going to make its release number to 1.0, with some breaking changes for the
+APIs soon.  Thank you.
+
+
 Features
 ========
 
@@ -33,7 +42,7 @@ Supporting segmentations are:
     Since Python 3.3, The Unicode string is implemented with "flexible string
     representation", which gives access to full code points and
     space-efficiency `[PEP 393]`_.  So you don't need to worry about treating complex
-    multi-code-point issue any more.  If you want to treat some Unicode
+    multi-code-points issue any more.  If you want to treat some Unicode
     string per code point, just iterate that like: ``for c in s:``.  So
     ``uniseg.codepoint`` module has been deprecated and deleted.
 
@@ -82,6 +91,13 @@ Install
 
 Changes
 =======
+
+0.9.0 (2024-11-07)
+
+- Unicode 16.0.0.
+- Rule-based grapheme cluster segmentation is back.
+- And, this is the first release ever that passes the entire Unicode breaking tests!
+
 
 0.8.1 (2024-08-13)
 
