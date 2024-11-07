@@ -6,7 +6,7 @@ from argparse import ArgumentParser, FileType
 from textwrap import wrap
 from typing import NamedTuple, TextIO
 
-from uniseg.ucdtools import iter_records
+from ucdtools import iter_records
 
 
 class Entry(NamedTuple):

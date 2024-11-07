@@ -4,9 +4,9 @@ from argparse import ArgumentParser, FileType
 from dataclasses import dataclass
 from itertools import groupby
 from pprint import pformat
-from typing import Iterable, Optional, TextIO
+from typing import Optional, TextIO
 
-from uniseg.ucdtools import iter_code_point_properties
+from ucdtools import iter_code_point_properties
 
 
 def getsize(data: list) -> int:
