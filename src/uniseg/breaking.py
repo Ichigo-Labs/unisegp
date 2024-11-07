@@ -340,6 +340,8 @@ class Run(Generic[T]):
         True
         >>> run.is_continuing('A', backward=True).curr
         'A'
+        >>> run.is_continuing('X', greedy=True, backward=True).curr
+        'B'
 
         >>> run = Run('abbbccd', lambda x: x.upper())
         >>> run.is_continuing('B', greedy=True).curr
