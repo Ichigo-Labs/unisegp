@@ -58,8 +58,7 @@ UCD_FILES = $(UCD_PROP_FILES) $(UCD_TEST_FILES)
 # generated code
 
 GEN_SRC_FILES = \
-	 $(DIR_SRC)/uniseg/db_lookups.py \
-	 $(DIR_SRC)/uniseg/grapheme_re.py
+	 $(DIR_SRC)/uniseg/db_lookups.py
 
 GEN_TEST_FILES = \
 	$(DIR_TESTS)/test_graphemebreak.py \
@@ -126,12 +125,6 @@ $(DIR_SRC)/uniseg/db_lookups.py: $(UCD_PROP_FILES)
 		LineBreak=$(DIR_UCD)/LineBreak.txt \
 		$(DIR_UCD)/DerivedCoreProperties.txt \
 		$(DIR_UCD)/emoji/emoji-data.txt
-
-$(DIR_SRC)/uniseg/grapheme_re.py: $(UCD_PROP_FILES)
-	$(PYTHON) $(DIR_TOOLS)/build_grapheme_re.py -o $@ \
-		$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
-		$(DIR_UCD)/emoji/emoji-data.txt \
-		$(DIR_UCD)/DerivedCoreProperties.txt
 
 
 # generate test files
