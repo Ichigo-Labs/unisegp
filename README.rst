@@ -125,12 +125,12 @@ Changes
 0.7.0 (2015-02-27)
   - CHANGE: Quitted gathering all submodules's members on the top, uniseg
     module.
-  - CHANGE: Reform :mod:`uniseg.wrap` module and sample scripts.
+  - CHANGE: Reform ``uniseg.wrap`` module and sample scripts.
   - Maintained uniseg.wrap module, and sample scripts work again.
 
 0.6.4 (2015-02-10)
-  - Add :data:`uniseg-dbpath` console command, which just print the path of
-    :data:`ucd.sqlite3`.
+  - Add ``uniseg-dbpath`` console command, which just print the path of
+    ``ucd.sqlite3``.
   - Include sample scripts under the package's subdirectory.
 
 0.6.3 (2015-01-25)
