@@ -33,8 +33,8 @@ You can see the Unicode version which :mod:`uniseg` supports by checking
     <https://docs.python.org/3.9/library/unicodedata.html>`_
 
 
-Python Versions and :data:`unicodedata.unidata_version`
-=======================================================
+Python Versions and :data:`unicodedata.unidata_version` values
+==============================================================
 
 ======  ===================================
 Python  :data:`unicodedata.unidata_version`
