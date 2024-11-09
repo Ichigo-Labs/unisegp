@@ -50,7 +50,7 @@ def _ep(ch: Optional[str], /) -> Optional[bool]:
 
 
 def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
-    r"""Return the Grapheme_Cluster_Break property of `ch`
+    r"""Return the Grapheme_Cluster_Break property of `ch`.
 
     `ch` must be a single Unicode string.
 
@@ -63,7 +63,7 @@ def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Grapheme_Cluster_Break property of the code
-    point at c[index].
+    point at ``c[index]``.
 
     >>> grapheme_cluster_break('a\x0d', 1).name
     'CR'

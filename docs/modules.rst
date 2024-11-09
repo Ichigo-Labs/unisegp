@@ -4,6 +4,7 @@ Module References
 
 .. toctree::
 
+   uniseg
    graphemecluster
    wordbreak
    sentencebreak
