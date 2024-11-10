@@ -8,6 +8,7 @@ from collections.abc import Iterator
 from enum import Enum
 from typing import Optional
 
+from uniseg import UnicodeProperty
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import sentence_break as _sentence_break
@@ -22,30 +23,30 @@ __all__ = [
 ]
 
 
-class SentenceBreak(Enum):
+class SentenceBreak(UnicodeProperty):
     """Sentence_Break property values."""
-    OTHER = 'Other'
+    Other = 'Other'
     CR = 'CR'
     LF = 'LF'
-    EXTEND = 'Extend'
-    SEP = 'Sep'
-    FORMAT = 'Format'
-    SP = 'Sp'
-    LOWER = 'Lower'
-    UPPER = 'Upper'
-    OLETTER = 'OLetter'
-    NUMERIC = 'Numeric'
-    ATERM = 'ATerm'
-    SCONTINUE = 'SContinue'
-    STERM = 'STerm'
-    CLOSE = 'Close'
+    Extend = 'Extend'
+    Sep = 'Sep'
+    Format = 'Format'
+    Sp = 'Sp'
+    Lower = 'Lower'
+    Upper = 'Upper'
+    OLetter = 'OLetter'
+    Numeric = 'Numeric'
+    ATerm = 'ATerm'
+    SContinue = 'SContinue'
+    STerm = 'STerm'
+    Close = 'Close'
 
 
 # type alias for `SentenceBreak`
 SB = SentenceBreak
 
-ParaSepTuple = (SB.SEP, SB.CR, SB.LF)
-SATermTuple = (SB.STERM, SB.ATERM)
+ParaSepTuple = (SB.Sep, SB.CR, SB.LF)
+SATermTuple = (SB.STerm, SB.ATerm)
 
 
 def sentence_break(c: str, index: int = 0, /) -> SentenceBreak:
@@ -54,23 +55,23 @@ def sentence_break(c: str, index: int = 0, /) -> SentenceBreak:
     `c` must be a single Unicode code point string.
 
     >>> sentence_break('\x0d')
-    <SentenceBreak.CR: 'CR'>
+    SentenceBreak.CR
     >>> sentence_break(' ')
-    <SentenceBreak.SP: 'Sp'>
+    SentenceBreak.Sp
     >>> sentence_break('a')
-    <SentenceBreak.LOWER: 'Lower'>
+    SentenceBreak.Lower
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Sentence_Break property of the code point at
     c[index].
 
     >>> sentence_break('a\x0d', 1)
-    <SentenceBreak.CR: 'CR'>
+    SentenceBreak.CR
 
     >>> sentence_break('/')
-    <SentenceBreak.OTHER: 'Other'>
+    SentenceBreak.Other
     """
-    return SentenceBreak[_sentence_break(c[index]).upper()]
+    return SentenceBreak[_sentence_break(c[index])]
 
 
 def sentence_breakables(s: str, /) -> Breakables:
@@ -97,63 +98,63 @@ def sentence_breakables(s: str, /) -> Breakables:
         elif run.prev in ParaSepTuple:
             run.break_here()
     # SB5
-    run.set_skip_table(x not in (SB.EXTEND, SB.FORMAT)
+    run.set_skip_table(x not in (SB.Extend, SB.Format)
                        for x in run.attributes())
     run.head()
     while run.walk():
         # SB6
-        if run.prev == SB.ATERM and run.curr == SB.NUMERIC:
+        if run.prev == SB.ATerm and run.curr == SB.Numeric:
             run.do_not_break_here()
         # SB7
         elif (
-            run.attr(-2) in (SB.UPPER, SB.LOWER)
-            and run.prev == SB.ATERM
-            and run.curr == SB.UPPER
+            run.attr(-2) in (SB.Upper, SB.Lower)
+            and run.prev == SB.ATerm
+            and run.curr == SB.Upper
         ):
             run.do_not_break_here()
         # SB8
         elif (
-            run.is_following((SB.SP,), greedy=True)
-            .is_following((SB.CLOSE,), greedy=True).prev == SB.ATERM
+            run.is_following((SB.Sp,), greedy=True)
+            .is_following((SB.Close,), greedy=True).prev == SB.ATerm
             and (
                 (
-                    run.curr in (SB.EXTEND, SB.FORMAT, SB.SP,
-                                 SB.NUMERIC, SB.SCONTINUE, SB.CLOSE)
-                    and run.is_leading((SB.EXTEND, SB.FORMAT, SB.SP, SB.NUMERIC,
-                                        SB.SCONTINUE, SB.CLOSE), greedy=True)
-                    .next == SB.LOWER
+                    run.curr in (SB.Extend, SB.Format, SB.Sp,
+                                 SB.Numeric, SB.SContinue, SB.Close)
+                    and run.is_leading((SB.Extend, SB.Format, SB.Sp, SB.Numeric,
+                                        SB.SContinue, SB.Close), greedy=True)
+                    .next == SB.Lower
                 )
-                or run.curr == SB.LOWER
+                or run.curr == SB.Lower
             )
         ):
             run.do_not_break_here()
         # SB8a
         elif (
-            run.is_following((SB.SP,), greedy=True)
-            .is_following((SB.CLOSE,), greedy=True).prev in SATermTuple
-            and run.curr in (SB.SCONTINUE,) + SATermTuple
+            run.is_following((SB.Sp,), greedy=True)
+            .is_following((SB.Close,), greedy=True).prev in SATermTuple
+            and run.curr in (SB.SContinue,) + SATermTuple
         ):
             run.do_not_break_here()
         # SB9
         elif (
-            run.is_following((SB.CLOSE,), greedy=True).prev in SATermTuple
-            and run.curr in (SB.CLOSE, SB.SP) + ParaSepTuple
+            run.is_following((SB.Close,), greedy=True).prev in SATermTuple
+            and run.curr in (SB.Close, SB.Sp) + ParaSepTuple
         ):
             run.do_not_break_here()
         # SB10
         elif (
-            run.is_following((SB.SP,), greedy=True)
-            .is_following((SB.CLOSE,), greedy=True).prev in SATermTuple
-            and run.curr in (SB.SP,) + ParaSepTuple
+            run.is_following((SB.Sp,), greedy=True)
+            .is_following((SB.Close,), greedy=True).prev in SATermTuple
+            and run.curr in (SB.Sp,) + ParaSepTuple
         ):
             run.do_not_break_here()
         # SB11
         elif (
-            run.is_following((SB.SP,), greedy=True)
-            .is_following((SB.CLOSE,), greedy=True).prev in SATermTuple
+            run.is_following((SB.Sp,), greedy=True)
+            .is_following((SB.Close,), greedy=True).prev in SATermTuple
             or run.is_following(ParaSepTuple, noskip=True)
-            .is_following((SB.SP,), greedy=True)
-            .is_following((SB.CLOSE,), greedy=True).prev in SATermTuple
+            .is_following((SB.Sp,), greedy=True)
+            .is_following((SB.Close,), greedy=True).prev in SATermTuple
         ):
             run.break_here()
         else:
