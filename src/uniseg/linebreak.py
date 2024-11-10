@@ -31,101 +31,101 @@ __all__ = [
 class LineBreak(UnicodeProperty):
     """Line_Break property values."""
     BK = 'BK'
-    """Mandatory Break"""
+    """Line_Break property value BK, Mandatory Break"""
     CR = 'CR'
-    """Carriage Return"""
+    """Line_Break property value CR, Carriage Return"""
     LF = 'LF'
-    """Line Feed"""
+    """Line_Break property value LF, Line Feed"""
     CM = 'CM'
-    """Combining Mark"""
+    """Line_Break property value CM, Combining Mark"""
     NL = 'NL'
-    """Next Line"""
+    """Line_Break property value NL, Next Line"""
     SG = 'SG'
-    """Surrogate"""
+    """Line_Break property value SG, Surrogate"""
     WJ = 'WJ'
-    """Word Joiner"""
+    """Line_Break property value WJ, Word Joiner"""
     ZW = 'ZW'
-    """Zero Width Space"""
+    """Line_Break property value ZW, Zero Width Space"""
     GL = 'GL'
-    """Non-breaking ("Glue")"""
+    """Line_Break property value GL, Non-breaking ("Glue")"""
     SP = 'SP'
-    """Space"""
+    """Line_Break property value SP, Space"""
     ZWJ = 'ZWJ'
-    """Zero Width Joiner"""
+    """ZLine_Break property value ZWJ, Zero Width Joiner"""
     B2 = 'B2'
-    """Break Opportunity Before and After"""
+    """Line_Break property value B2, Break Opportunity Before and After"""
     BA = 'BA'
-    """Break After"""
+    """Line_Break property value BA, Break After"""
     BB = 'BB'
-    """Break Before"""
+    """Line_Break property value BB, Break Before"""
     HY = 'HY'
-    """Hyphen"""
+    """Line_Break property value HY, Hyphen"""
     CB = 'CB'
-    """Contingent Break Opportunity"""
+    """Line_Break property value CB, Contingent Break Opportunity"""
     CL = 'CL'
-    """Close Punctuation"""
+    """Line_Break property value CL, Close Punctuation"""
     CP = 'CP'
-    """Close Parenthesis"""
+    """Line_Break property value CP, Close Parenthesis"""
     EX = 'EX'
-    """Exclamation/Interrogation"""
+    """Line_Break property value EX, Exclamation/Interrogation"""
     IN = 'IN'
-    """Inseparable"""
+    """Line_Break property value IN, Inseparable"""
     NS = 'NS'
-    """Nonstarter"""
+    """Line_Break property value NS, Nonstarter"""
     OP = 'OP'
-    """Open Punctuation"""
+    """Line_Break property value OP, Open Punctuation"""
     QU = 'QU'
-    """Quotation"""
+    """Line_Break property value QU, Quotation"""
     IS = 'IS'
-    """Infix Numeric Separator"""
+    """Line_Break property value IS, Infix Numeric Separator"""
     NU = 'NU'
-    """Numeric"""
+    """Line_Break property value NU, Numeric"""
     PO = 'PO'
-    """Postfix Numeric"""
+    """Line_Break property value PO, Postfix Numeric"""
     PR = 'PR'
-    """Prefix Numeric"""
+    """Line_Break property value PR, Prefix Numeric"""
     SY = 'SY'
-    """Symbols Allowing Break After"""
+    """Line_Break property value SY, Symbols Allowing Break After"""
     AI = 'AI'
-    """Ambiguous (Alphabetic or Ideographic)"""
+    """Line_Break property value AI, Ambiguous (Alphabetic or Ideographic)"""
     AK = 'AK'
-    """Aksara"""
+    """Line_Break property value AK, Aksara"""
     AL = 'AL'
-    """Alphabetic"""
+    """Line_Break property value AL, Alphabetic"""
     AP = 'AP'
-    """Aksara Pre-Base"""
+    """Line_Break property value AP, Aksara Pre-Base"""
     AS = 'AS'
-    """Aksara Start"""
+    """Line_Break property value AS, Aksara Start"""
     CJ = 'CJ'
-    """Conditional Japanese Starter"""
+    """Line_Break property value CJ, Conditional Japanese Starter"""
     EB = 'EB'
-    """Emoji Base"""
+    """Line_Break property value EB, Emoji Base"""
     EM = 'EM'
-    """Emoji Modifier"""
+    """Line_Break property value EM, Emoji Modifier"""
     H2 = 'H2'
-    """Hangul LV Syllable"""
+    """Line_Break property value H2, Hangul LV Syllable"""
     H3 = 'H3'
-    """Hangul LVT Syllable"""
+    """Line_Break property value H3, Hangul LVT Syllable"""
     HL = 'HL'
-    """Hebrew Letter"""
+    """Line_Break property value HL, Hebrew Letter"""
     ID = 'ID'
-    """Ideographic"""
+    """Line_Break property value ID, Ideographic"""
     JL = 'JL'
-    """Hangul L Jamo"""
+    """Line_Break property value JL, Hangul L Jamo"""
     JV = 'JV'
-    """Hangul V Jamo"""
+    """Line_Break property value JV, Hangul V Jamo"""
     JT = 'JT'
-    """Hangul T Jamo"""
+    """Line_Break property value JT, Hangul T Jamo"""
     RI = 'RI'
-    """Regional Indicator"""
+    """Line_Break property value RI, Regional Indicator"""
     SA = 'SA'
-    """Complex Context Dependent (South East Asian)"""
+    """Line_Break property value SA, Complex Context Dependent (South East Asian)"""
     VF = 'VF'
-    """Virama Final"""
+    """Line_Break property value VF, Virama Final"""
     VI = 'VI'
-    """Virama"""
+    """Line_Break property value VI, Virama"""
     XX = 'XX'
-    """Unknown"""
+    """Line_Break property value XX, Unknown"""
 
 
 # type alias for `LineBreak`
