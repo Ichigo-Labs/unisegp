@@ -26,19 +26,33 @@ __all__ = [
 class GraphemeClusterBreak(UnicodeProperty):
     """Grapheme_Cluster_Break property values in UAX #29."""
     Other = 'Other'
+    """Grapheme_Cluster_Break property value Other"""
     CR = 'CR'
+    """Grapheme_Cluster_Break property value CR"""
     LF = 'LF'
+    """Grapheme_Cluster_Break property value LF"""
     Control = 'Control'
+    """Grapheme_Cluster_Break property value Control"""
     Extend = 'Extend'
+    """Grapheme_Cluster_Break property value Extend"""
     ZWJ = 'ZWJ'
+    """Grapheme_Cluster_Break property value ZWJ"""
     Regional_Indicator = 'Regional_Indicator'
+    """Grapheme_Cluster_Break property value Regional_Indicator"""
     Prepend = 'Prepend'
+    """Grapheme_Cluster_Break property value Prepend"""
     SpacingMark = 'SpacingMark'
+    """Grapheme_Cluster_Break property value SpacingMark"""
     L = 'L'
+    """Grapheme_Cluster_Break property value L"""
     V = 'V'
+    """Grapheme_Cluster_Break property value V"""
     T = 'T'
+    """Grapheme_Cluster_Break property value T"""
     LV = 'LV'
+    """Grapheme_Cluster_Break property value LV"""
     LVT = 'LVT'
+    """Grapheme_Cluster_Break property value LVT"""
 
 
 # type alias for `GraphemeClusterBreak`

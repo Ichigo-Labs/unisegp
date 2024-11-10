@@ -1,10 +1,9 @@
 """Unicode word boundaries.
 
-UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
-https://www.unicode.org/reports/tr29/tr29-45.html
+`UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
+<https://www.unicode.org/reports/tr29/tr29-45.html>`_
 """
 
-from enum import Enum
 from typing import Iterator, Optional
 
 from uniseg import UnicodeProperty
@@ -26,24 +25,43 @@ __all__ = [
 class WordBreak(UnicodeProperty):
     """Word_Break property values."""
     Other = 'Other'
+    """Word_Break property value Other"""
     CR = 'CR'
+    """Word_Break property value CR"""
     LF = 'LF'
+    """Word_Break property value LF"""
     Newline = 'Newline'
+    """Word_Break property value Newline"""
     Extend = 'Extend'
+    """Word_Break property value Extend"""
     ZWJ = 'ZWJ'
+    """Word_Break property value ZWJ"""
     Regional_Indicator = 'Regional_Indicator'
+    """Word_Break property value Regional_Indicator"""
     Format = 'Format'
+    """Word_Break property value Format"""
     Katakana = 'Katakana'
+    """Word_Break property value Katakana"""
     Hebrew_Letter = 'Hebrew_Letter'
+    """Word_Break property value Hebrew_Letter"""
     ALetter = 'ALetter'
+    """Word_Break property value ALetter"""
     Single_Quote = 'Single_Quote'
+    """Word_Break property value Single_Quote"""
     Double_Quote = 'Double_Quote'
+    """Word_Break property value Double_Quote"""
     MidNumLet = 'MidNumLet'
+    """Word_Break property value MidNumLet"""
     MidLetter = 'MidLetter'
+    """Word_Break property value MidLetter"""
     MidNum = 'MidNum'
+    """Word_Break property value MidNum"""
     Numeric = 'Numeric'
+    """Word_Break property value Numeric"""
     ExtendNumLet = 'ExtendNumLet'
+    """Word_Break property value ExtendNumLet"""
     WSegSpace = 'WSegSpace'
+    """Word_Break property value WSegSpace"""
 
 
 # type alias for `WordBreak`

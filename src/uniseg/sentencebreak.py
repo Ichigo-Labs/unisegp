@@ -1,11 +1,10 @@
 """Unicode sentence boundaries.
 
-UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
-https://www.unicode.org/reports/tr29/tr29-45.html
+`UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
+<https://www.unicode.org/reports/tr29/tr29-45.html>`_
 """
 
 from collections.abc import Iterator
-from enum import Enum
 from typing import Optional
 
 from uniseg import UnicodeProperty
@@ -26,20 +25,35 @@ __all__ = [
 class SentenceBreak(UnicodeProperty):
     """Sentence_Break property values."""
     Other = 'Other'
+    """Sentence_Break property value Other"""
     CR = 'CR'
+    """Sentence_Break property value CR"""
     LF = 'LF'
+    """Sentence_Break property value LF"""
     Extend = 'Extend'
+    """Sentence_Break property value Extend"""
     Sep = 'Sep'
+    """Sentence_Break property value Sep"""
     Format = 'Format'
+    """Sentence_Break property value Format"""
     Sp = 'Sp'
+    """Sentence_Break property value Sp"""
     Lower = 'Lower'
+    """Sentence_Break property value Lower"""
     Upper = 'Upper'
+    """Sentence_Break property value Upper"""
     OLetter = 'OLetter'
+    """Sentence_Break property value OLetter"""
     Numeric = 'Numeric'
+    """Sentence_Break property value Numeric"""
     ATerm = 'ATerm'
+    """Sentence_Break property value ATerm"""
     SContinue = 'SContinue'
+    """Sentence_Break property value SContinue"""
     STerm = 'STerm'
+    """Sentence_Break property value STerm"""
     Close = 'Close'
+    """Sentence_Break property value Close"""
 
 
 # type alias for `SentenceBreak`
