@@ -13,12 +13,15 @@ try:
 except ImportError:
     from unicodedata import category, east_asian_width
 
+from uniseg import UnicodeProperty
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import extended_pictographic
 from uniseg.db import line_break as _line_break
 
 __all__ = [
+    'LineBreak',
+    'LB',
     'line_break',
     'line_break_breakables',
     'line_break_boundaries',
@@ -26,7 +29,7 @@ __all__ = [
 ]
 
 
-class LineBreak(Enum):
+class LineBreak(UnicodeProperty):
     """Line_Break property values."""
     BK = 'BK'   # Mandatory Break
     CR = 'CR'   # Carriage Return
@@ -91,20 +94,20 @@ def line_break(c: str, index: int = 0, /) -> LineBreak:
     `c` must be a single Unicode code point string.
 
     >>> line_break('\x0d')
-    <LineBreak.CR: 'CR'>
+    LineBreak.CR
     >>> line_break(' ')
-    <LineBreak.SP: 'SP'>
+    LineBreak.SP
     >>> line_break('1')
-    <LineBreak.NU: 'NU'>
+    LineBreak.NU
     >>> line_break('\u1b44')
-    <LineBreak.VI: 'VI'>
+    LineBreak.VI
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Line_Break property of the code point at
     c[index].
 
     >>> line_break('a\x0d', 1)
-    <LineBreak.CR: 'CR'>
+    LineBreak.CR
     """
 
     return LineBreak[_line_break(c[index])]
