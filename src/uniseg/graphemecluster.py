@@ -1,12 +1,12 @@
 """Unicode grapheme cluster boundaries.
 
-UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
-https://www.unicode.org/reports/tr29/tr29-45.html
+`UAX #29: Unicode Text Segmentation (Unicode 16.0.0)
+<https://www.unicode.org/reports/tr29/tr29-45.html>`_
 """
 
-from enum import Enum
 from typing import Iterator, Optional
 
+from uniseg import UnicodeProperty
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import extended_pictographic
@@ -23,17 +23,17 @@ __all__ = [
 ]
 
 
-class GraphemeClusterBreak(Enum):
+class GraphemeClusterBreak(UnicodeProperty):
     """Grapheme_Cluster_Break property values in UAX #29."""
-    OTHER = 'Other'
+    Other = 'Other'
     CR = 'CR'
     LF = 'LF'
-    CONTROL = 'Control'
-    EXTEND = 'Extend'
+    Control = 'Control'
+    Extend = 'Extend'
     ZWJ = 'ZWJ'
-    REGIONAL_INDICATOR = 'Regional_Indicator'
-    PREPEND = 'Prepend'
-    SPACINGMARK = 'SpacingMark'
+    Regional_Indicator = 'Regional_Indicator'
+    Prepend = 'Prepend'
+    SpacingMark = 'SpacingMark'
     L = 'L'
     V = 'V'
     T = 'T'
@@ -55,11 +55,11 @@ def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
     `ch` must be a single Unicode string.
 
     >>> grapheme_cluster_break('a')
-    <GraphemeClusterBreak.OTHER: 'Other'>
+    GraphemeClusterBreak.Other
     >>> grapheme_cluster_break('\x0d')
-    <GraphemeClusterBreak.CR: 'CR'>
-    >>> grapheme_cluster_break('\x0a').name
-    'LF'
+    GraphemeClusterBreak.CR
+    >>> print(grapheme_cluster_break('\x0a'))
+    LF
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Grapheme_Cluster_Break property of the code
@@ -69,7 +69,7 @@ def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
     'CR'
     """
     name = _grapheme_cluster_break(ch[index])
-    return GraphemeClusterBreak[name.upper()]
+    return GraphemeClusterBreak[name]
 
 
 def grapheme_cluster_breakables(s: str, /) -> Breakables:
@@ -110,8 +110,8 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # GB4, GB5
         elif (
-            run.prev in (GCB.CONTROL, GCB.CR, GCB.LF)
-            or run.curr in (GCB.CONTROL, GCB.CR, GCB.LF)
+            run.prev in (GCB.Control, GCB.CR, GCB.LF)
+            or run.curr in (GCB.Control, GCB.CR, GCB.LF)
         ):
             run.break_here()
         # GB6, GB7, GB8
@@ -121,12 +121,12 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
             or (run.prev in (GCB.LVT, GCB.T) and run.curr == GCB.T)
         ):
             run.do_not_break_here()
-        elif run.curr in (GCB.EXTEND, GCB.ZWJ):
+        elif run.curr in (GCB.Extend, GCB.ZWJ):
             run.do_not_break_here()
         # GB9a, GB9b
         elif (
-            run.curr == GCB.SPACINGMARK
-            or run.prev == GCB.PREPEND
+            run.curr == GCB.SpacingMark
+            or run.prev == GCB.Prepend
         ):
             run.do_not_break_here()
         # GB9c
@@ -135,19 +135,19 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
         # GB11
         elif (
             _ep(run.is_following((GCB.ZWJ,)).is_following(
-                (GCB.EXTEND,), greedy=True).pc)
+                (GCB.Extend,), greedy=True).pc)
             and _ep(run.cc)
         ):
             run.do_not_break_here()
     # GB12, GB13
     run.head()
     while 1:
-        while run.curr != GCB.REGIONAL_INDICATOR:
+        while run.curr != GCB.Regional_Indicator:
             if not run.walk():
                 break
         if not run.walk():
             break
-        while run.prev == run.curr == GCB.REGIONAL_INDICATOR:
+        while run.prev == run.curr == GCB.Regional_Indicator:
             run.do_not_break_here()
             if not run.walk():
                 break
