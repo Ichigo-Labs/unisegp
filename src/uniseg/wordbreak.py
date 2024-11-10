@@ -7,6 +7,7 @@ https://www.unicode.org/reports/tr29/tr29-45.html
 from enum import Enum
 from typing import Iterator, Optional
 
+from uniseg import UnicodeProperty
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import extended_pictographic
@@ -22,34 +23,34 @@ __all__ = [
 ]
 
 
-class WordBreak(Enum):
+class WordBreak(UnicodeProperty):
     """Word_Break property values."""
-    OTHER = 'Other'
+    Other = 'Other'
     CR = 'CR'
     LF = 'LF'
-    NEWLINE = 'Newline'
-    EXTEND = 'Extend'
+    Newline = 'Newline'
+    Extend = 'Extend'
     ZWJ = 'ZWJ'
-    REGIONAL_INDICATOR = 'Regional_Indicator'
-    FORMAT = 'Format'
-    KATAKANA = 'Katakana'
-    HEBREW_LETTER = 'Hebrew_Letter'
-    ALETTER = 'ALetter'
-    SINGLE_QUOTE = 'Single_Quote'
-    DOUBLE_QUOTE = 'Double_Quote'
-    MIDNUMLET = 'MidNumLet'
-    MIDLETTER = 'MidLetter'
-    MIDNUM = 'MidNum'
-    NUMERIC = 'Numeric'
-    EXTENDNUMLET = 'ExtendNumLet'
-    WSEGSPACE = 'WSegSpace'
+    Regional_Indicator = 'Regional_Indicator'
+    Format = 'Format'
+    Katakana = 'Katakana'
+    Hebrew_Letter = 'Hebrew_Letter'
+    ALetter = 'ALetter'
+    Single_Quote = 'Single_Quote'
+    Double_Quote = 'Double_Quote'
+    MidNumLet = 'MidNumLet'
+    MidLetter = 'MidLetter'
+    MidNum = 'MidNum'
+    Numeric = 'Numeric'
+    ExtendNumLet = 'ExtendNumLet'
+    WSegSpace = 'WSegSpace'
 
 
 # type alias for `WordBreak`
 WB = WordBreak
 
-AHLetterTuple = (WB.ALETTER, WB.HEBREW_LETTER)
-MidNumLetQTuple = (WB.MIDNUMLET, WB.SINGLE_QUOTE)
+AHLetterTuple = (WB.ALetter, WB.Hebrew_Letter)
+MidNumLetQTuple = (WB.MidNumLet, WB.Single_Quote)
 
 
 def word_break(c: str, index: int = 0, /) -> WordBreak:
@@ -58,20 +59,20 @@ def word_break(c: str, index: int = 0, /) -> WordBreak:
     `c` must be a single Unicode code point string.
 
     >>> word_break('\x0d')
-    <WordBreak.CR: 'CR'>
+    WordBreak.CR
     >>> word_break('\x0b')
-    <WordBreak.NEWLINE: 'Newline'>
+    WordBreak.Newline
     >>> word_break('\u30a2')
-    <WordBreak.KATAKANA: 'Katakana'>
+    WordBreak.Katakana
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Word_Break property of the code point at
     c[index].
 
     >>> word_break('A\u30a2', 1)
-    <WordBreak.KATAKANA: 'Katakana'>
+    WordBreak.Katakana
     """
-    return WordBreak[_word_break(c[index]).upper()]
+    return WordBreak[_word_break(c[index])]
 
 
 def word_breakables(s: str, /) -> Breakables:
@@ -96,22 +97,22 @@ def word_breakables(s: str, /) -> Breakables:
         if run.prev == WB.CR and run.curr == WB.LF:
             run.do_not_break_here()
         # WB3a
-        elif run.prev in (WB.NEWLINE, WB.CR, WB.LF):
+        elif run.prev in (WB.Newline, WB.CR, WB.LF):
             run.break_here()
         # WB3b
-        elif run.curr in (WB.NEWLINE, WB.CR, WB.LF):
+        elif run.curr in (WB.Newline, WB.CR, WB.LF):
             run.break_here()
         # WB3c
         elif run.prev == WB.ZWJ and run.cc and extended_pictographic(run.cc):
             run.do_not_break_here()
         # WB3d
-        elif run.prev == run.curr == WB.WSEGSPACE:
+        elif run.prev == run.curr == WB.WSegSpace:
             run.do_not_break_here()
         # WB4
-        elif run.curr in (WB.FORMAT, WB.EXTEND, WB.ZWJ):
+        elif run.curr in (WB.Format, WB.Extend, WB.ZWJ):
             run.do_not_break_here()
     # WB4
-    run.set_skip_table(x not in (WB.EXTEND, WB.FORMAT, WB.ZWJ)
+    run.set_skip_table(x not in (WB.Extend, WB.Format, WB.ZWJ)
                        for x in run.attributes())
     run.head()
     while run.walk():
@@ -121,82 +122,82 @@ def word_breakables(s: str, /) -> Breakables:
         # WB6
         elif (
             run.prev in AHLetterTuple
-            and run.curr in (WB.MIDLETTER,) + MidNumLetQTuple
+            and run.curr in (WB.MidLetter,) + MidNumLetQTuple
             and run.next in AHLetterTuple
         ):
             run.do_not_break_here()
         # WB7
         elif (
             run.attr(-2) in AHLetterTuple
-            and run.prev in (WB.MIDLETTER,) + MidNumLetQTuple
+            and run.prev in (WB.MidLetter,) + MidNumLetQTuple
             and run.curr in AHLetterTuple
         ):
             run.do_not_break_here()
         # WB7a
-        elif run.prev == WB.HEBREW_LETTER and run.curr == WB.SINGLE_QUOTE:
+        elif run.prev == WB.Hebrew_Letter and run.curr == WB.Single_Quote:
             run.do_not_break_here()
         # WB7b
         elif (
-            run.prev == WB.HEBREW_LETTER
-            and run.curr == WB.DOUBLE_QUOTE
-            and run.next == WB.HEBREW_LETTER
+            run.prev == WB.Hebrew_Letter
+            and run.curr == WB.Double_Quote
+            and run.next == WB.Hebrew_Letter
         ):
             run.do_not_break_here()
         # WB7c
         elif (
-            run.attr(-2) == WB.HEBREW_LETTER
-            and run.prev == WB.DOUBLE_QUOTE
-            and run.curr == WB.HEBREW_LETTER
+            run.attr(-2) == WB.Hebrew_Letter
+            and run.prev == WB.Double_Quote
+            and run.curr == WB.Hebrew_Letter
         ):
             run.do_not_break_here()
         # WB8
-        elif run.prev == run.curr == WB.NUMERIC:
+        elif run.prev == run.curr == WB.Numeric:
             run.do_not_break_here()
         # WB9
-        elif run.prev in AHLetterTuple and run.curr == WB.NUMERIC:
+        elif run.prev in AHLetterTuple and run.curr == WB.Numeric:
             run.do_not_break_here()
         # WB10
-        elif run.prev == WB.NUMERIC and run.curr in AHLetterTuple:
+        elif run.prev == WB.Numeric and run.curr in AHLetterTuple:
             run.do_not_break_here()
         # WB11
         elif (
-            run.attr(-2) == WB.NUMERIC
-            and run.prev in (WB.MIDNUM,) + MidNumLetQTuple
-            and run.curr == WB.NUMERIC
+            run.attr(-2) == WB.Numeric
+            and run.prev in (WB.MidNum,) + MidNumLetQTuple
+            and run.curr == WB.Numeric
         ):
             run.do_not_break_here()
         # WB12
         elif (
-            run.prev == WB.NUMERIC
-            and run.curr in (WB.MIDNUM,) + MidNumLetQTuple
-            and run.next == WB.NUMERIC
+            run.prev == WB.Numeric
+            and run.curr in (WB.MidNum,) + MidNumLetQTuple
+            and run.next == WB.Numeric
         ):
             run.do_not_break_here()
         # WB13
-        elif run.prev == run.curr == WB.KATAKANA:
+        elif run.prev == run.curr == WB.Katakana:
             run.do_not_break_here()
         # WB13a
         elif (
             run.prev in AHLetterTuple +
-                (WB.NUMERIC, WB.KATAKANA, WB.EXTENDNUMLET)
-            and run.curr == WB.EXTENDNUMLET
+                (WB.Numeric, WB.Katakana, WB.ExtendNumLet)
+            and run.curr == WB.ExtendNumLet
         ):
             run.do_not_break_here()
         # WB13b
         elif (
-            run.prev == WB.EXTENDNUMLET
-            and run.curr in AHLetterTuple + (WB.NUMERIC, WB.KATAKANA)
+            run.prev == WB.ExtendNumLet
+            and run.curr in AHLetterTuple + (WB.Numeric, WB.Katakana)
         ):
             run.do_not_break_here()
     run.head()
     # WB15, WB16
     while 1:
-        while run.curr != WB.REGIONAL_INDICATOR:
+        while run.curr != WB.Regional_Indicator:
             if not run.walk():
                 break
         if not run.walk():
             break
-        while run.prev == run.curr == WB.REGIONAL_INDICATOR:
+        while run.prev == run.curr == WB.Regional_Indicator:
             run.do_not_break_here()
             if not run.walk():
                 break
