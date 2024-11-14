@@ -6,22 +6,17 @@ INDEX_GRAPHEME_CLUSTER_BREAK = columns.index('GraphemeClusterBreak')
 INDEX_WORD_BREAK = columns.index('WordBreak')
 INDEX_SENTENCE_BREAK = columns.index('SentenceBreak')
 INDEX_LINE_BREAK = columns.index('LineBreak')
-INDEX_EXTENDED_PICTOGRAPHIC = columns.index('Extended_Pictographic')
 INDEX_INDIC_CONJUNCT_BREAK = columns.index('InCB')
-
-
-def get_value_index(key: int, /) -> int:
-    """Find index in hashmap."""
-    index = index1[key >> shift]
-    return index2[(index << shift) + (key & ((1 << shift) - 1))]
 
 
 def get_column_index(column_name: str) -> int:
     return columns.index(column_name)
 
 
-def get_value(key: int, icol: int, /) -> str:
-    return values[get_value_index(key)][icol]
+def get_value(key: int, icolumn: int, /) -> str:
+    index = index1[key >> shift]
+    ivalue = index2[(index << shift) + (key & ((1 << shift) - 1))]
+    return values[ivalue][icolumn]
 
 
 def grapheme_cluster_break(ch: str, /) -> str:
@@ -38,10 +33,6 @@ def sentence_break(ch: str, /) -> str:
 
 def line_break(ch: str, /) -> str:
     return get_value(ord(ch), INDEX_LINE_BREAK) or 'XX'
-
-
-def extended_pictographic(ch: str, /) -> bool:
-    return bool(get_value(ord(ch), INDEX_EXTENDED_PICTOGRAPHIC))
 
 
 def indic_conjunct_break(ch: str, /) -> str:

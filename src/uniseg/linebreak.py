@@ -15,8 +15,8 @@ except ImportError:
 from uniseg import UnicodeProperty
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
-from uniseg.db import extended_pictographic
 from uniseg.db import line_break as _line_break
+from uniseg.emoji import extended_pictographic
 
 __all__ = [
     'LineBreak',
