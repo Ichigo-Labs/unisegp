@@ -10,4 +10,5 @@ INDEX_EXTENDED_PICTOGRAPHIC = get_column_index('Extended_Pictographic')
 
 
 def extended_pictographic(ch: str, /) -> bool:
+    """Return Extended_Pictographic boolean Unicode property value for `ch`."""
     return bool(get_value(ord(ch), INDEX_EXTENDED_PICTOGRAPHIC))
