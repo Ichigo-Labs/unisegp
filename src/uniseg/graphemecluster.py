@@ -9,7 +9,7 @@ from typing import Iterator, Optional
 from uniseg import UnicodeProperty
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
-from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
+from uniseg.db import get_column_index, get_value
 from uniseg.derived import InCB, indic_conjunct_break
 from uniseg.emoji import extended_pictographic
 
@@ -21,6 +21,8 @@ __all__ = [
     'grapheme_cluster_boundaries',
     'grapheme_clusters',
 ]
+
+INDEX_GRAPHEME_CLUSTER_BREAK = get_column_index('GraphemeClusterBreak')
 
 
 class GraphemeClusterBreak(UnicodeProperty):
@@ -82,8 +84,9 @@ def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
     >>> grapheme_cluster_break('a\x0d', 1).name
     'CR'
     """
-    name = _grapheme_cluster_break(ch[index])
-    return GraphemeClusterBreak[name]
+    return GraphemeClusterBreak[
+        get_value(ord(ch[index]), INDEX_GRAPHEME_CLUSTER_BREAK) or 'Other'
+    ]
 
 
 def grapheme_cluster_breakables(s: str, /) -> Breakables:
