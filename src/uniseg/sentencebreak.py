@@ -7,13 +7,13 @@
 from collections.abc import Iterator
 from typing import Optional
 
-from uniseg import UnicodeProperty
+from uniseg import Unicode_Property
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import get_column_index, get_value
 
 __all__ = [
-    'SentenceBreak',
+    'Sentence_Break',
     'SB',
     'sentence_break',
     'sentence_breakables',
@@ -24,7 +24,7 @@ __all__ = [
 INDEX_SENTENCE_BREAK = get_column_index('SentenceBreak')
 
 
-class SentenceBreak(UnicodeProperty):
+class Sentence_Break(Unicode_Property):
     """Sentence_Break property values."""
     Other = 'Other'
     """Sentence_Break property value Other"""
@@ -59,35 +59,35 @@ class SentenceBreak(UnicodeProperty):
 
 
 # type alias for `SentenceBreak`
-SB = SentenceBreak
+SB = Sentence_Break
 
 ParaSepTuple = (SB.Sep, SB.CR, SB.LF)
 SATermTuple = (SB.STerm, SB.ATerm)
 
 
-def sentence_break(c: str, index: int = 0, /) -> SentenceBreak:
+def sentence_break(c: str, index: int = 0, /) -> Sentence_Break:
     R"""Return Sentence_Break property value of `c`.
 
     `c` must be a single Unicode code point string.
 
     >>> sentence_break('\x0d')
-    SentenceBreak.CR
+    Sentence_Break.CR
     >>> sentence_break(' ')
-    SentenceBreak.Sp
+    Sentence_Break.Sp
     >>> sentence_break('a')
-    SentenceBreak.Lower
+    Sentence_Break.Lower
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Sentence_Break property of the code point at
     c[index].
 
     >>> sentence_break('a\x0d', 1)
-    SentenceBreak.CR
+    Sentence_Break.CR
 
     >>> sentence_break('/')
-    SentenceBreak.Other
+    Sentence_Break.Other
     """
-    return SentenceBreak[get_value(ord(c[index]), INDEX_SENTENCE_BREAK) or 'Other']
+    return Sentence_Break[get_value(ord(c[index]), INDEX_SENTENCE_BREAK) or 'Other']
 
 
 def sentence_breakables(s: str, /) -> Breakables:

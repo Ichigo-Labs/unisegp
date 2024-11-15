@@ -6,7 +6,7 @@
 
 from typing import Iterator, Optional
 
-from uniseg import UnicodeProperty
+from uniseg import Unicode_Property
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import get_column_index, get_value
@@ -14,7 +14,7 @@ from uniseg.derived import InCB, indic_conjunct_break
 from uniseg.emoji import extended_pictographic
 
 __all__ = [
-    'GraphemeClusterBreak',
+    'Grapheme_Cluster_Break',
     'GCB',
     'grapheme_cluster_break',
     'grapheme_cluster_breakables',
@@ -25,7 +25,7 @@ __all__ = [
 INDEX_GRAPHEME_CLUSTER_BREAK = get_column_index('GraphemeClusterBreak')
 
 
-class GraphemeClusterBreak(UnicodeProperty):
+class Grapheme_Cluster_Break(Unicode_Property):
     """Grapheme_Cluster_Break property values in UAX #29."""
     Other = 'Other'
     """Grapheme_Cluster_Break property value Other"""
@@ -58,22 +58,22 @@ class GraphemeClusterBreak(UnicodeProperty):
 
 
 # type alias for `GraphemeClusterBreak`
-GCB = GraphemeClusterBreak
+GCB = Grapheme_Cluster_Break
 
 
 def _ep(ch: Optional[str], /) -> Optional[bool]:
     return False if ch is None else extended_pictographic(ch)
 
 
-def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
+def grapheme_cluster_break(ch: str, index: int = 0, /) -> Grapheme_Cluster_Break:
     r"""Return the Grapheme_Cluster_Break property of `ch`.
 
     `ch` must be a single Unicode string.
 
     >>> grapheme_cluster_break('a')
-    GraphemeClusterBreak.Other
+    Grapheme_Cluster_Break.Other
     >>> grapheme_cluster_break('\x0d')
-    GraphemeClusterBreak.CR
+    Grapheme_Cluster_Break.CR
     >>> print(grapheme_cluster_break('\x0a'))
     LF
 
@@ -84,7 +84,7 @@ def grapheme_cluster_break(ch: str, index: int = 0, /) -> GraphemeClusterBreak:
     >>> grapheme_cluster_break('a\x0d', 1).name
     'CR'
     """
-    return GraphemeClusterBreak[
+    return Grapheme_Cluster_Break[
         get_value(ord(ch[index]), INDEX_GRAPHEME_CLUSTER_BREAK) or 'Other'
     ]
 

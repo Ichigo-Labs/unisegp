@@ -12,14 +12,14 @@ try:
 except ImportError:
     from unicodedata import category, east_asian_width
 
-from uniseg import UnicodeProperty
+from uniseg import Unicode_Property
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import get_column_index, get_value
 from uniseg.emoji import extended_pictographic
 
 __all__ = [
-    'LineBreak',
+    'Line_Break',
     'LB',
     'line_break',
     'line_break_breakables',
@@ -30,7 +30,7 @@ __all__ = [
 INDEX_LINE_BREAK = get_column_index('LineBreak')
 
 
-class LineBreak(UnicodeProperty):
+class Line_Break(Unicode_Property):
     """Line_Break property values."""
     BK = 'BK'
     """Line_Break property value BK, Mandatory Break"""
@@ -131,35 +131,35 @@ class LineBreak(UnicodeProperty):
 
 
 # type alias for `LineBreak`
-LB = LineBreak
+LB = Line_Break
 
 
 EastAsianTuple = ('F', 'W', 'H')
 
 
-def line_break(c: str, index: int = 0, /) -> LineBreak:
+def line_break(c: str, index: int = 0, /) -> Line_Break:
     R"""Return the Line_Break property for `c`.
 
     `c` must be a single Unicode code point string.
 
     >>> line_break('\x0d')
-    LineBreak.CR
+    Line_Break.CR
     >>> line_break(' ')
-    LineBreak.SP
+    Line_Break.SP
     >>> line_break('1')
-    LineBreak.NU
+    Line_Break.NU
     >>> line_break('\u1b44')
-    LineBreak.VI
+    Line_Break.VI
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Line_Break property of the code point at
     c[index].
 
     >>> line_break('a\x0d', 1)
-    LineBreak.CR
+    Line_Break.CR
     """
 
-    return LineBreak[get_value(ord(c[index]), INDEX_LINE_BREAK) or 'XX']
+    return Line_Break[get_value(ord(c[index]), INDEX_LINE_BREAK) or 'XX']
 
 
 def _eaw(ch: Optional[str], /) -> Optional[str]:
@@ -174,7 +174,7 @@ def _ep(ch: Optional[str], /) -> Optional[bool]:
     return False if ch is None else extended_pictographic(ch)
 
 
-def resolve_lb1_linebreak(ch: str, /) -> LineBreak:
+def resolve_lb1_linebreak(ch: str, /) -> Line_Break:
     lb = line_break(ch)
     cat = category(ch)
     if lb in (LB.AI, LB.SG, LB.XX):

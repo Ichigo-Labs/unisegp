@@ -20,7 +20,7 @@ unidata_version = '16.0.0'
 """Version of the Unicode used in the package."""
 
 
-class UnicodeProperty(str, Enum):
+class Unicode_Property(str, Enum):
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}.{self.name}'

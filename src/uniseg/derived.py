@@ -4,11 +4,11 @@
 <https://www.unicode.org/reports/tr44/tr44-34.html>`_
 """
 
-from uniseg import UnicodeProperty
+from uniseg import Unicode_Property
 from uniseg.db import get_column_index, get_value
 
 __all__ = [
-    'IndicConjunctBreak',
+    'Indic_Conjunct_Break',
     'InCB',
     'math',
     'alphabetic',
@@ -54,7 +54,7 @@ INDEX_GRAPHEME_BASE = get_column_index('Grapheme_Base')
 INDEX_INDIC_CONJUNCT_BREAK = get_column_index('InCB')
 
 
-class IndicConjunctBreak(UnicodeProperty):
+class Indic_Conjunct_Break(Unicode_Property):
     """Derived Property: Indic_Conjunct_Break."""
     None_ = 'None'
     """Indic_Conjunct_Break=None"""
@@ -66,7 +66,7 @@ class IndicConjunctBreak(UnicodeProperty):
     """Indic_Conjunct_Break=Extend"""
 
 
-InCB = IndicConjunctBreak
+InCB = Indic_Conjunct_Break
 
 
 def math(ch: str, /) -> bool:
@@ -289,15 +289,15 @@ def grapheme_base(ch: str, /) -> bool:
     return bool(get_value(ord(ch), INDEX_GRAPHEME_BASE))
 
 
-def indic_conjunct_break(ch: str, /) -> IndicConjunctBreak:
+def indic_conjunct_break(ch: str, /) -> Indic_Conjunct_Break:
     """Retrun Indic_Conjunct_Break derived property for `ch`.
 
     >>> indic_conjunct_break('A')
-    IndicConjunctBreak.None_
+    Indic_Conjunct_Break.None_
     >>> indic_conjunct_break('\u094d')
-    IndicConjunctBreak.Linker
+    Indic_Conjunct_Break.Linker
     """
-    return IndicConjunctBreak[
+    return Indic_Conjunct_Break[
         get_value(ord(ch), INDEX_INDIC_CONJUNCT_BREAK) or 'None_'
     ]
 

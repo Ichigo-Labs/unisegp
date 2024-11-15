@@ -6,14 +6,14 @@
 
 from typing import Iterator, Optional
 
-from uniseg import UnicodeProperty
+from uniseg import Unicode_Property
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import get_column_index, get_value
 from uniseg.emoji import extended_pictographic
 
 __all__ = [
-    'WordBreak',
+    'Word_Break',
     'WB',
     'word_break',
     'word_breakables',
@@ -24,7 +24,7 @@ __all__ = [
 INDEX_WORD_BREAK = get_column_index('WordBreak')
 
 
-class WordBreak(UnicodeProperty):
+class Word_Break(Unicode_Property):
     """Word_Break property values."""
     Other = 'Other'
     """Word_Break property value Other"""
@@ -67,32 +67,32 @@ class WordBreak(UnicodeProperty):
 
 
 # type alias for `WordBreak`
-WB = WordBreak
+WB = Word_Break
 
 AHLetterTuple = (WB.ALetter, WB.Hebrew_Letter)
 MidNumLetQTuple = (WB.MidNumLet, WB.Single_Quote)
 
 
-def word_break(c: str, index: int = 0, /) -> WordBreak:
+def word_break(c: str, index: int = 0, /) -> Word_Break:
     R"""Return the Word_Break property of `c`
 
     `c` must be a single Unicode code point string.
 
     >>> word_break('\x0d')
-    WordBreak.CR
+    Word_Break.CR
     >>> word_break('\x0b')
-    WordBreak.Newline
+    Word_Break.Newline
     >>> word_break('\u30a2')
-    WordBreak.Katakana
+    Word_Break.Katakana
 
     If `index` is specified, this function consider `c` as a unicode
     string and return Word_Break property of the code point at
     c[index].
 
     >>> word_break('A\u30a2', 1)
-    WordBreak.Katakana
+    Word_Break.Katakana
     """
-    return WordBreak[get_value(ord(c[index]), INDEX_WORD_BREAK) or 'Other']
+    return Word_Break[get_value(ord(c[index]), INDEX_WORD_BREAK) or 'Other']
 
 
 def word_breakables(s: str, /) -> Breakables:
