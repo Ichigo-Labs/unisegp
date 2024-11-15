@@ -2,7 +2,6 @@
 
 from uniseg.db_lookups import columns, index1, index2, shift, values
 
-INDEX_WORD_BREAK = columns.index('WordBreak')
 INDEX_SENTENCE_BREAK = columns.index('SentenceBreak')
 INDEX_LINE_BREAK = columns.index('LineBreak')
 
@@ -15,10 +14,6 @@ def get_value(key: int, icolumn: int, /) -> str:
     index = index1[key >> shift]
     ivalue = index2[(index << shift) + (key & ((1 << shift) - 1))]
     return values[ivalue][icolumn]
-
-
-def word_break(ch: str, /) -> str:
-    return get_value(ord(ch), INDEX_WORD_BREAK) or 'Other'
 
 
 def sentence_break(ch: str, /) -> str:
