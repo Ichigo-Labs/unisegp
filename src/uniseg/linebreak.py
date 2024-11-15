@@ -137,7 +137,7 @@ LB = Line_Break
 EastAsianTuple = ('F', 'W', 'H')
 
 
-def line_break(c: str, index: int = 0, /) -> Line_Break:
+def line_break(c: str, /) -> Line_Break:
     R"""Return the Line_Break property for `c`.
 
     `c` must be a single Unicode code point string.
@@ -150,15 +150,8 @@ def line_break(c: str, index: int = 0, /) -> Line_Break:
     Line_Break.NU
     >>> line_break('\u1b44')
     Line_Break.VI
-
-    If `index` is specified, this function consider `c` as a unicode
-    string and return Line_Break property of the code point at
-    c[index].
-
-    >>> line_break('a\x0d', 1)
-    Line_Break.CR
     """
-    return Line_Break[get_value(ord(c[index]), INDEX_LINE_BREAK) or 'XX']
+    return Line_Break[get_value(ord(c), INDEX_LINE_BREAK) or 'XX']
 
 
 def _eaw(ch: Optional[str], /) -> Optional[str]:

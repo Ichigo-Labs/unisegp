@@ -65,7 +65,7 @@ ParaSepTuple = (SB.Sep, SB.CR, SB.LF)
 SATermTuple = (SB.STerm, SB.ATerm)
 
 
-def sentence_break(c: str, index: int = 0, /) -> Sentence_Break:
+def sentence_break(c: str, /) -> Sentence_Break:
     R"""Return Sentence_Break property value of `c`.
 
     `c` must be a single Unicode code point string.
@@ -77,17 +77,10 @@ def sentence_break(c: str, index: int = 0, /) -> Sentence_Break:
     >>> sentence_break('a')
     Sentence_Break.Lower
 
-    If `index` is specified, this function consider `c` as a unicode
-    string and return Sentence_Break property of the code point at
-    c[index].
-
-    >>> sentence_break('a\x0d', 1)
-    Sentence_Break.CR
-
     >>> sentence_break('/')
     Sentence_Break.Other
     """
-    return Sentence_Break[get_value(ord(c[index]), INDEX_SENTENCE_BREAK) or 'Other']
+    return Sentence_Break[get_value(ord(c), INDEX_SENTENCE_BREAK) or 'Other']
 
 
 def sentence_breakables(s: str, /) -> Breakables:

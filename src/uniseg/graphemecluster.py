@@ -65,7 +65,7 @@ def _ep(ch: Optional[str], /) -> Optional[bool]:
     return False if ch is None else extended_pictographic(ch)
 
 
-def grapheme_cluster_break(ch: str, index: int = 0, /) -> Grapheme_Cluster_Break:
+def grapheme_cluster_break(ch: str, /) -> Grapheme_Cluster_Break:
     r"""Return the Grapheme_Cluster_Break property of `ch`.
 
     `ch` must be a single Unicode string.
@@ -76,16 +76,9 @@ def grapheme_cluster_break(ch: str, index: int = 0, /) -> Grapheme_Cluster_Break
     Grapheme_Cluster_Break.CR
     >>> print(grapheme_cluster_break('\x0a'))
     LF
-
-    If `index` is specified, this function consider `c` as a unicode
-    string and return Grapheme_Cluster_Break property of the code
-    point at ``c[index]``.
-
-    >>> grapheme_cluster_break('a\x0d', 1).name
-    'CR'
     """
     return Grapheme_Cluster_Break[
-        get_value(ord(ch[index]), INDEX_GRAPHEME_CLUSTER_BREAK) or 'Other'
+        get_value(ord(ch), INDEX_GRAPHEME_CLUSTER_BREAK) or 'Other'
     ]
 
 

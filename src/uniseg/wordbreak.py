@@ -73,7 +73,7 @@ AHLetterTuple = (WB.ALetter, WB.Hebrew_Letter)
 MidNumLetQTuple = (WB.MidNumLet, WB.Single_Quote)
 
 
-def word_break(c: str, index: int = 0, /) -> Word_Break:
+def word_break(c: str, /) -> Word_Break:
     R"""Return the Word_Break property of `c`
 
     `c` must be a single Unicode code point string.
@@ -84,15 +84,8 @@ def word_break(c: str, index: int = 0, /) -> Word_Break:
     Word_Break.Newline
     >>> word_break('\u30a2')
     Word_Break.Katakana
-
-    If `index` is specified, this function consider `c` as a unicode
-    string and return Word_Break property of the code point at
-    c[index].
-
-    >>> word_break('A\u30a2', 1)
-    Word_Break.Katakana
     """
-    return Word_Break[get_value(ord(c[index]), INDEX_WORD_BREAK) or 'Other']
+    return Word_Break[get_value(ord(c), INDEX_WORD_BREAK) or 'Other']
 
 
 def word_breakables(s: str, /) -> Breakables:
