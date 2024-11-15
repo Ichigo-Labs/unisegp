@@ -7,6 +7,31 @@
 from uniseg import UnicodeProperty
 from uniseg.db import get_column_index, get_value
 
+__all__ = [
+    'IndicConjunctBreak',
+    'InCB',
+    'math',
+    'alphabetic',
+    'lowercase',
+    'uppercase',
+    'cased',
+    'case_ignorable',
+    'changes_when_lowercased',
+    'changes_when_uppercased',
+    'changes_when_titlecased',
+    'changes_when_casefolded',
+    'changes_when_casemapped',
+    'id_start',
+    'id_continue',
+    'xid_start',
+    'xid_continue',
+    'default_ignorable_code_point',
+    'grapheme_extend',
+    'grapheme_base',
+    'indic_conjunct_break',
+]
+
+
 INDEX_MATH = get_column_index('Math')
 INDEX_ALPHABETIC = get_column_index('Alphabetic')
 INDEX_LOWERCASE = get_column_index('Lowercase')
@@ -64,6 +89,17 @@ def alphabetic(ch: str, /) -> bool:
     False
     """
     return bool(get_value(ord(ch), INDEX_ALPHABETIC))
+
+
+def lowercase(ch: str, /) -> bool:
+    """Return Lowercase boolean derived Unicode property value for `ch`.
+
+    >>> lowercase('A')
+    False
+    >>> lowercase('a')
+    True
+    """
+    return bool(get_value(ord(ch), INDEX_LOWERCASE))
 
 
 def uppercase(ch: str, /) -> bool:
