@@ -274,8 +274,9 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             (run0 := run.is_following(LB.SP, greedy=True))
             and _cat(run0.pc) == 'Pi'
             and (
-                (run1 := run0.is_following(LB.QU)).prev in (
-                    LB.BK, LB.CR, LB.LF, LB.NL, LB.OP, LB.QU, LB.GL, LB.SP, LB.ZW)
+                (run1 := run0.is_following(LB.QU))
+                .prev in (LB.BK, LB.CR, LB.LF, LB.NL, LB.OP,
+                          LB.QU, LB.GL, LB.SP, LB.ZW)
                 or run1.is_sot()
             )
         ):
@@ -285,8 +286,10 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             _cat(run.cc) == 'Pf'
             and run.curr == LB.QU
             and (
-                run.is_leading((LB.SP, LB.GL, LB.WJ, LB.CL, LB.QU, LB.CP,
-                                LB.EX, LB.IS, LB.SY, LB.BK, LB.CR, LB.LF, LB.NL, LB.ZW))
+                run.is_leading((
+                    LB.SP, LB.GL, LB.WJ, LB.CL, LB.QU, LB.CP, LB.EX,
+                    LB.IS, LB.SY, LB.BK, LB.CR, LB.LF, LB.NL, LB.ZW
+                ))
                 or run.is_eot()
             )
         ):
@@ -384,17 +387,30 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB25
         elif (
-            (run.is_following((LB.CL, LB.CP)).is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
+            (run.is_following((LB.CL, LB.CP))
+             .is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
              and run.curr in (LB.PO, LB.PR))
-            or (run.is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
-                and run.curr in (LB.PO, LB.PR))
-            or (run.prev in (LB.PO, LB.PR) and run.curr == LB.OP and run.next == LB.NU)
-            or (run.prev in (LB.PO, LB.PR) and run.curr == LB.OP and run.next == LB.IS
-                and run.attr(2) == LB.NU)
+            or (
+                run.is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
+                and run.curr in (LB.PO, LB.PR)
+            )
+            or (
+                run.prev in (LB.PO, LB.PR)
+                and run.curr == LB.OP
+                and run.next == LB.NU
+            )
+            or (
+                run.prev in (LB.PO, LB.PR)
+                and run.curr == LB.OP
+                and run.next == LB.IS
+                and run.attr(2) == LB.NU
+            )
             or (run.prev in (LB.PO, LB.PR) and run.curr == LB.NU)
             or (run.prev in (LB.HY, LB.IS) and run.curr == LB.NU)
-            or (run.is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
-                and run.curr == LB.NU)
+            or (
+                run.is_following((LB.SY, LB.IS), greedy=True).prev == LB.NU
+                and run.curr == LB.NU
+            )
         ):
             run.do_not_break_here()
         # LB26
@@ -406,8 +422,14 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB27
         elif (
-            (run.prev in (LB.JL, LB.JV, LB.JT, LB.H2, LB.H3) and run.curr == LB.PO)
-            or (run.prev == LB.PR and run.curr in (LB.JL, LB.JV, LB.JT, LB.H2, LB.H3))
+            (
+                run.prev in (LB.JL, LB.JV, LB.JT, LB.H2, LB.H3)
+                and run.curr == LB.PO
+            )
+            or (
+                run.prev == LB.PR
+                and run.curr in (LB.JL, LB.JV, LB.JT, LB.H2, LB.H3)
+            )
         ):
             run.do_not_break_here()
         # LB28
