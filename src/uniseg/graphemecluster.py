@@ -109,12 +109,9 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     run = Run(s, indic_conjunct_break)
     while run.walk():
         if (
-            (
-                run.is_following((InCB.Extend, InCB.Linker), greedy=True)
-                .prev == 'Consonant'
-                and run.is_following((InCB.Extend,), greedy=True)
-                .prev != 'Consonant'
-            )
+            run.is_following((InCB.Extend, InCB.Linker),
+                             greedy=True).prev == 'Consonant'
+            and run.is_following((InCB.Extend,), greedy=True).prev != 'Consonant'
             and run.curr == 'Consonant'
         ):
             run.do_not_break_here()

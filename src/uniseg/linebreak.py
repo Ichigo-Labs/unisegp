@@ -158,7 +158,6 @@ def line_break(c: str, index: int = 0, /) -> Line_Break:
     >>> line_break('a\x0d', 1)
     Line_Break.CR
     """
-
     return Line_Break[get_value(ord(c[index]), INDEX_LINE_BREAK) or 'XX']
 
 
@@ -279,10 +278,8 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB15a
         elif (
-            (
-                (run0 := run.is_following((LB.SP,), greedy=True))
-                and _cat(run0.pc) == 'Pi'
-            )
+            (run0 := run.is_following((LB.SP,), greedy=True))
+            and _cat(run0.pc) == 'Pi'
             and (
                 (run1 := run0.is_following((LB.QU,))).prev in (
                     LB.BK, LB.CR, LB.LF, LB.NL, LB.OP, LB.QU, LB.GL, LB.SP, LB.ZW)
@@ -292,7 +289,8 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB15b
         elif (
-            _cat(run.cc) == 'Pf' and run.curr == LB.QU
+            _cat(run.cc) == 'Pf'
+            and run.curr == LB.QU
             and (
                 run.is_leading((LB.SP, LB.GL, LB.WJ, LB.CL, LB.QU, LB.CP,
                                 LB.EX, LB.IS, LB.SY, LB.BK, LB.CR, LB.LF, LB.NL, LB.ZW))
