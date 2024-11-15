@@ -15,7 +15,7 @@ except ImportError:
 from uniseg import UnicodeProperty
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
-from uniseg.db import line_break as _line_break
+from uniseg.db import get_column_index, get_value
 from uniseg.emoji import extended_pictographic
 
 __all__ = [
@@ -26,6 +26,8 @@ __all__ = [
     'line_break_boundaries',
     'line_break_units',
 ]
+
+INDEX_LINE_BREAK = get_column_index('LineBreak')
 
 
 class LineBreak(UnicodeProperty):
@@ -157,7 +159,7 @@ def line_break(c: str, index: int = 0, /) -> LineBreak:
     LineBreak.CR
     """
 
-    return LineBreak[_line_break(c[index])]
+    return LineBreak[get_value(ord(c[index]), INDEX_LINE_BREAK) or 'XX']
 
 
 def _eaw(ch: Optional[str], /) -> Optional[str]:
