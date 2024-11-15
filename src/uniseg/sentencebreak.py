@@ -130,8 +130,8 @@ def sentence_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # SB8
         elif (
-            run.is_following((SB.Sp,), greedy=True)
-            .is_following((SB.Close,), greedy=True).prev == SB.ATerm
+            run.is_following(SB.Sp, greedy=True)
+            .is_following(SB.Close, greedy=True).prev == SB.ATerm
             and (
                 (
                     run.curr in (SB.Extend, SB.Format, SB.Sp,
@@ -146,31 +146,31 @@ def sentence_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # SB8a
         elif (
-            run.is_following((SB.Sp,), greedy=True)
-            .is_following((SB.Close,), greedy=True).prev in SATermTuple
+            run.is_following(SB.Sp, greedy=True)
+            .is_following(SB.Close, greedy=True).prev in SATermTuple
             and run.curr in (SB.SContinue,) + SATermTuple
         ):
             run.do_not_break_here()
         # SB9
         elif (
-            run.is_following((SB.Close,), greedy=True).prev in SATermTuple
+            run.is_following(SB.Close, greedy=True).prev in SATermTuple
             and run.curr in (SB.Close, SB.Sp) + ParaSepTuple
         ):
             run.do_not_break_here()
         # SB10
         elif (
-            run.is_following((SB.Sp,), greedy=True)
-            .is_following((SB.Close,), greedy=True).prev in SATermTuple
+            run.is_following(SB.Sp, greedy=True)
+            .is_following(SB.Close, greedy=True).prev in SATermTuple
             and run.curr in (SB.Sp,) + ParaSepTuple
         ):
             run.do_not_break_here()
         # SB11
         elif (
-            run.is_following((SB.Sp,), greedy=True)
-            .is_following((SB.Close,), greedy=True).prev in SATermTuple
+            run.is_following(SB.Sp, greedy=True)
+            .is_following(SB.Close, greedy=True).prev in SATermTuple
             or run.is_following(ParaSepTuple, noskip=True)
-            .is_following((SB.Sp,), greedy=True)
-            .is_following((SB.Close,), greedy=True).prev in SATermTuple
+            .is_following(SB.Sp, greedy=True)
+            .is_following(SB.Close, greedy=True).prev in SATermTuple
         ):
             run.break_here()
         else:

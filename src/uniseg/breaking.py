@@ -1,9 +1,9 @@
 """Breakable table and string tokenization."""
 
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Callable, Container, Iterable, Iterator, Sequence
 from copy import copy
 from enum import Enum
-from typing import Any, Generic, Literal, Optional, TypeVar
+from typing import Any, Generic, Literal, Optional, TypeVar, Union
 
 __all__ = [
     'Breakable',
@@ -36,7 +36,7 @@ class Run(Generic[T]):
     """A utitlity class which helps treating break determination for a string."""
     __slots__ = [
         '_text', '_chars', '_attributes', '_skip_table', '_breakables',
-        '_position', '_condition'
+        '_position', '_condition', '_attr_type'
     ]
 
     def __init__(self, text: str, func: Callable[[str], T] = lambda x: x, /):
@@ -51,6 +51,8 @@ class Run(Generic[T]):
         self._text = text
         self._chars = list(text)
         self._attributes = [func(c) for c in text]
+        self._attr_type = type(
+            self._attributes[0]) if self._attributes else None
         self._skip_table = [1 for __ in text]
         self._breakables = list[Optional[Breakable]](None for __ in text)
         self._position = 0
@@ -312,7 +314,7 @@ class Run(Generic[T]):
 
     def is_continuing(
         self,
-        attrs: Sequence[T],
+        attrinfo: Union[T, tuple[T, ...]],
         /,
         greedy: bool = False,
         backward: bool = False,
@@ -359,7 +361,12 @@ class Run(Generic[T]):
         'C'
         >>> run.is_continuing('B', greedy=True, backward=True).prev
         'A'
+
+        >>> run = Run('abcde')
+        >>> run.is_continuing(('b', 'x')).curr
+        'b'
         """
+        attrs = attrinfo if isinstance(attrinfo, tuple) else (attrinfo,)
         run = copy(self)
         vec = -1 if backward else 1
         if greedy:
@@ -373,12 +380,12 @@ class Run(Generic[T]):
         return run
 
     def is_following(
-        self, attrs: Sequence[T], /, greedy: bool = False, noskip: bool = False
+        self, attrs: Union[T, tuple[T, ...]], /, greedy: bool = False, noskip: bool = False
     ) -> 'Run[T]':
         return self.is_continuing(attrs, greedy=greedy, backward=True, noskip=noskip)
 
     def is_leading(
-        self, attrs: Sequence[T], /, greedy: bool = False, noskip: bool = False
+        self, attrs: Union[T, tuple[T, ...]], /, greedy: bool = False, noskip: bool = False
     ) -> 'Run[T]':
         return self.is_continuing(attrs, greedy=greedy, noskip=noskip)
 

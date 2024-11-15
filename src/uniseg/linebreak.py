@@ -231,7 +231,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         elif run.curr in (LB.SP, LB.ZW):
             run.do_not_break_here()
         # LB8
-        elif run.is_following((LB.SP,), greedy=True).prev == LB.ZW:
+        elif run.is_following(LB.SP, greedy=True).prev == LB.ZW:
             run.break_here()
         # LB8a
         elif run.prev == LB.ZWJ:
@@ -274,14 +274,14 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         elif run.curr in (LB.CL, LB.CP, LB.EX, LB.SY):
             run.do_not_break_here()
         # LB14
-        elif run.is_following((LB.SP,), greedy=True).prev == LB.OP:
+        elif run.is_following(LB.SP, greedy=True).prev == LB.OP:
             run.do_not_break_here()
         # LB15a
         elif (
-            (run0 := run.is_following((LB.SP,), greedy=True))
+            (run0 := run.is_following(LB.SP, greedy=True))
             and _cat(run0.pc) == 'Pi'
             and (
-                (run1 := run0.is_following((LB.QU,))).prev in (
+                (run1 := run0.is_following(LB.QU)).prev in (
                     LB.BK, LB.CR, LB.LF, LB.NL, LB.OP, LB.QU, LB.GL, LB.SP, LB.ZW)
                 or run1.is_sot()
             )
@@ -306,13 +306,13 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB16
         elif (
-            run.is_following((LB.SP,), greedy=True).prev in (LB.CL, LB.CP)
+            run.is_following(LB.SP, greedy=True).prev in (LB.CL, LB.CP)
             and run.curr == LB.NS
         ):
             run.do_not_break_here()
         # LB17
         elif (
-            run.is_following((LB.SP,), greedy=True).prev == LB.B2
+            run.is_following(LB.SP, greedy=True).prev == LB.B2
             and run.curr == LB.B2
         ):
             run.do_not_break_here()
@@ -339,7 +339,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
                 and _eaw(run.cc) not in EastAsianTuple
             )
             or (
-                (run0 := run.is_following((LB.QU,)))
+                (run0 := run.is_following(LB.QU))
                 and (_eaw(run0.pc) not in EastAsianTuple or run0.is_sot())
             )
         ):

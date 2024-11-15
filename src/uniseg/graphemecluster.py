@@ -111,7 +111,7 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
         if (
             run.is_following((InCB.Extend, InCB.Linker),
                              greedy=True).prev == InCB.Consonant
-            and run.is_following((InCB.Extend,), greedy=True).prev != InCB.Consonant
+            and run.is_following(InCB.Extend, greedy=True).prev != InCB.Consonant
             and run.curr == InCB.Consonant
         ):
             run.do_not_break_here()
@@ -148,8 +148,8 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # GB11
         elif (
-            _ep(run.is_following((GCB.ZWJ,)).is_following(
-                (GCB.Extend,), greedy=True).pc)
+            _ep(run.is_following(GCB.ZWJ).is_following(
+                GCB.Extend, greedy=True).pc)
             and _ep(run.cc)
         ):
             run.do_not_break_here()
