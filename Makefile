@@ -117,10 +117,10 @@ cleandocs:
 
 $(DIR_SRC)/uniseg/db_lookups.py: $(UCD_PROP_FILES)
 	$(PYTHON) $(DIR_TOOLS)/build_db_lookups.py -o $@ \
-		GraphemeClusterBreak=$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
-		WordBreak=$(DIR_UCD)/auxiliary/WordBreakProperty.txt \
-		SentenceBreak=$(DIR_UCD)/auxiliary/SentenceBreakProperty.txt \
-		LineBreak=$(DIR_UCD)/LineBreak.txt \
+		Grapheme_Cluster_Break=$(DIR_UCD)/auxiliary/GraphemeBreakProperty.txt \
+		Word_Break=$(DIR_UCD)/auxiliary/WordBreakProperty.txt \
+		Sentence_Break=$(DIR_UCD)/auxiliary/SentenceBreakProperty.txt \
+		Line_Break=$(DIR_UCD)/LineBreak.txt \
 		$(DIR_UCD)/DerivedCoreProperties.txt \
 		$(DIR_UCD)/emoji/emoji-data.txt
 

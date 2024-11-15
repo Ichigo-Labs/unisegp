@@ -21,7 +21,7 @@ __all__ = [
     'sentences',
 ]
 
-INDEX_SENTENCE_BREAK = get_column_index('SentenceBreak')
+INDEX_SENTENCE_BREAK = get_column_index('Sentence_Break')
 
 
 class Sentence_Break(Unicode_Property):

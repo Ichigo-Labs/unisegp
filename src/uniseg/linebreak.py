@@ -27,7 +27,7 @@ __all__ = [
     'line_break_units',
 ]
 
-INDEX_LINE_BREAK = get_column_index('LineBreak')
+INDEX_LINE_BREAK = get_column_index('Line_Break')
 
 
 class Line_Break(Unicode_Property):

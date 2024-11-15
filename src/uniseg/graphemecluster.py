@@ -22,7 +22,7 @@ __all__ = [
     'grapheme_clusters',
 ]
 
-INDEX_GRAPHEME_CLUSTER_BREAK = get_column_index('GraphemeClusterBreak')
+INDEX_GRAPHEME_CLUSTER_BREAK = get_column_index('Grapheme_Cluster_Break')
 
 
 class Grapheme_Cluster_Break(Unicode_Property):

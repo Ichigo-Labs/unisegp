@@ -21,7 +21,7 @@ __all__ = [
     'words',
 ]
 
-INDEX_WORD_BREAK = get_column_index('WordBreak')
+INDEX_WORD_BREAK = get_column_index('Word_Break')
 
 
 class Word_Break(Unicode_Property):
