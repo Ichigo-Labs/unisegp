@@ -10,7 +10,7 @@ from uniseg import UnicodeProperty
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import grapheme_cluster_break as _grapheme_cluster_break
-from uniseg.db import indic_conjunct_break
+from uniseg.derived import InCB, indic_conjunct_break
 from uniseg.emoji import extended_pictographic
 
 __all__ = [
@@ -107,9 +107,9 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     while run.walk():
         if (
             (
-                run.is_following(('Extend', 'Linker'), greedy=True)
+                run.is_following((InCB.Extend, InCB.Linker), greedy=True)
                 .prev == 'Consonant'
-                and run.is_following(('Extend',), greedy=True)
+                and run.is_following((InCB.Extend,), greedy=True)
                 .prev != 'Consonant'
             )
             and run.curr == 'Consonant'

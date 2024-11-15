@@ -6,7 +6,6 @@ INDEX_GRAPHEME_CLUSTER_BREAK = columns.index('GraphemeClusterBreak')
 INDEX_WORD_BREAK = columns.index('WordBreak')
 INDEX_SENTENCE_BREAK = columns.index('SentenceBreak')
 INDEX_LINE_BREAK = columns.index('LineBreak')
-INDEX_INDIC_CONJUNCT_BREAK = columns.index('InCB')
 
 
 def get_column_index(column_name: str) -> int:
@@ -33,7 +32,3 @@ def sentence_break(ch: str, /) -> str:
 
 def line_break(ch: str, /) -> str:
     return get_value(ord(ch), INDEX_LINE_BREAK) or 'XX'
-
-
-def indic_conjunct_break(ch: str, /) -> str:
-    return get_value(ord(ch), INDEX_INDIC_CONJUNCT_BREAK) or 'None'
