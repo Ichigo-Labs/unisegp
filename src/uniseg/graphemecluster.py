@@ -138,10 +138,7 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
         elif run.curr in (GCB.Extend, GCB.ZWJ):
             run.do_not_break_here()
         # GB9a, GB9b
-        elif (
-            run.curr == GCB.SpacingMark
-            or run.prev == GCB.Prepend
-        ):
+        elif run.curr == GCB.SpacingMark or run.prev == GCB.Prepend:
             run.do_not_break_here()
         # GB9c
         elif incb_breakables[run.position] is Breakable.DoNotBreak:
