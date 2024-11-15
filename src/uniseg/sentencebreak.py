@@ -10,7 +10,7 @@ from typing import Optional
 from uniseg import UnicodeProperty
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
-from uniseg.db import sentence_break as _sentence_break
+from uniseg.db import get_column_index, get_value
 
 __all__ = [
     'SentenceBreak',
@@ -20,6 +20,8 @@ __all__ = [
     'sentence_boundaries',
     'sentences',
 ]
+
+INDEX_SENTENCE_BREAK = get_column_index('SentenceBreak')
 
 
 class SentenceBreak(UnicodeProperty):
@@ -85,7 +87,7 @@ def sentence_break(c: str, index: int = 0, /) -> SentenceBreak:
     >>> sentence_break('/')
     SentenceBreak.Other
     """
-    return SentenceBreak[_sentence_break(c[index])]
+    return SentenceBreak[get_value(ord(c[index]), INDEX_SENTENCE_BREAK) or 'Other']
 
 
 def sentence_breakables(s: str, /) -> Breakables:
