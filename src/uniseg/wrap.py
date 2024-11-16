@@ -4,14 +4,10 @@ import re
 from collections.abc import Iterator, Sequence
 from typing import Literal, Optional
 
-try:
-    from unicodedata2 import east_asian_width  # type: ignore
-except ImportError:
-    from unicodedata import east_asian_width
-
 from uniseg.graphemecluster import (grapheme_cluster_boundaries,
                                     grapheme_clusters)
 from uniseg.linebreak import line_break_boundaries
+from uniseg.unicodedata_ import EA, east_asian_width_
 
 __all__ = [
     'Formatter',
@@ -229,7 +225,7 @@ class TTFormatter(Formatter):
 
     @tab_char.setter
     def tab_char(self, value: str):
-        if (east_asian_width(value) not in ('N', 'Na', 'H')):
+        if (east_asian_width_(value) not in (EA.N, EA.Na, EA.H)):
             raise ValueError(
                 'only narrow code point is available for tab_char'
             )
@@ -305,8 +301,8 @@ def tt_width(s: str, index: int = 0, ambiguous_as_wide: bool = False) -> Literal
     2
     """
     cp = s[index]
-    eaw = east_asian_width(cp)
-    if eaw in ('W', 'F') or (eaw == 'A' and ambiguous_as_wide):
+    eaw = east_asian_width_(cp)
+    if eaw in (EA.W, EA.F) or (eaw == EA.A and ambiguous_as_wide):
         return 2
     return 1
 

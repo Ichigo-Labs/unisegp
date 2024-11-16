@@ -7,16 +7,13 @@
 from collections.abc import Iterator
 from typing import Optional
 
-try:
-    from unicodedata2 import category, east_asian_width  # type: ignore
-except ImportError:
-    from unicodedata import category, east_asian_width
-
 from uniseg import Unicode_Property
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
 from uniseg.db import get_column_index, get_value
 from uniseg.emoji import extended_pictographic
+from uniseg.unicodedata_ import (EA, GC, East_Asian_Width, General_Category,
+                                 east_asian_width_, general_category_)
 
 __all__ = [
     'Line_Break',
@@ -134,7 +131,7 @@ class Line_Break(Unicode_Property):
 LB = Line_Break
 
 
-EastAsianTuple = ('F', 'W', 'H')
+EastAsianTuple = (EA.F, EA.W, EA.H)
 
 
 def line_break(c: str, /) -> Line_Break:
@@ -154,25 +151,25 @@ def line_break(c: str, /) -> Line_Break:
     return Line_Break[get_value(ord(c), INDEX_LINE_BREAK) or 'XX']
 
 
-def _eaw(ch: Optional[str], /) -> Optional[str]:
-    return None if ch is None else east_asian_width(ch)
+def _ea(ch: Optional[str], /) -> Optional[East_Asian_Width]:
+    return None if ch is None else east_asian_width_(ch)
 
 
-def _cat(ch: Optional[str], /) -> Optional[str]:
-    return None if ch is None else category(ch)
+def _cat(ch: Optional[str], /) -> Optional[General_Category]:
+    return None if ch is None else general_category_(ch)
 
 
-def _ep(ch: Optional[str], /) -> Optional[bool]:
+def _extpict(ch: Optional[str], /) -> Optional[bool]:
     return False if ch is None else extended_pictographic(ch)
 
 
 def resolve_lb1_linebreak(ch: str, /) -> Line_Break:
     lb = line_break(ch)
-    cat = category(ch)
+    cat = general_category_(ch)
     if lb in (LB.AI, LB.SG, LB.XX):
         lb = LB.AL
     elif lb == LB.SA:
-        if cat in ('Mn', 'Mc'):
+        if cat in (GC.Mn, GC.Mc):
             lb = LB.CM
         else:
             lb = LB.AL
@@ -201,7 +198,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     run = Run(s, resolve_lb1_linebreak)
     if legacy:
         while 1:
-            if _eaw(run.cc) == 'A':
+            if _ea(run.cc) == EA.A:
                 run.set_attr(LB.ID)
             if not run.walk():
                 break
@@ -272,7 +269,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
         # LB15a
         elif (
             (run0 := run.is_following(LB.SP, greedy=True))
-            and _cat(run0.pc) == 'Pi'
+            and _cat(run0.pc) == GC.Pi
             and (
                 (run1 := run0.is_following(LB.QU))
                 .prev in (LB.BK, LB.CR, LB.LF, LB.NL, LB.OP,
@@ -283,7 +280,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.do_not_break_here()
         # LB15b
         elif (
-            _cat(run.cc) == 'Pf'
+            _cat(run.cc) == GC.Pf
             and run.curr == LB.QU
             and (
                 run.is_leading((
@@ -317,26 +314,26 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             run.break_here()
         # LB19
         elif (
-            (run.curr == LB.QU and _cat(run.cc) != 'Pi')
-            or (run.prev == LB.QU and _cat(run.pc) != 'Pf')
+            (run.curr == LB.QU and _cat(run.cc) != GC.Pi)
+            or (run.prev == LB.QU and _cat(run.pc) != GC.Pf)
         ):
             run.do_not_break_here()
         # LB19a
         elif (
             (
-                _eaw(run.pc) not in EastAsianTuple and run.curr == LB.QU
+                _ea(run.pc) not in EastAsianTuple and run.curr == LB.QU
             )
             or (
                 run.curr == LB.QU
-                and (_eaw(run.nc) not in EastAsianTuple or run.is_eot())
+                and (_ea(run.nc) not in EastAsianTuple or run.is_eot())
             )
             or (
                 run.prev == LB.QU
-                and _eaw(run.cc) not in EastAsianTuple
+                and _ea(run.cc) not in EastAsianTuple
             )
             or (
                 (run0 := run.is_following(LB.QU))
-                and (_eaw(run0.pc) not in EastAsianTuple or run0.is_sot())
+                and (_ea(run0.pc) not in EastAsianTuple or run0.is_sot())
             )
         ):
             run.do_not_break_here()
@@ -465,11 +462,11 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
             (
                 run.prev in (LB.AL, LB.HL, LB.NU)
                 and run.curr == LB.OP
-                and _eaw(run.cc) not in EastAsianTuple
+                and _ea(run.cc) not in EastAsianTuple
             )
             or (
                 run.prev == LB.CP
-                and _eaw(run.pc) not in EastAsianTuple
+                and _ea(run.pc) not in EastAsianTuple
                 and run.curr in (LB.AL, LB.HL, LB.NU)
             )
         ):
@@ -493,7 +490,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     while run.walk():
         if (
             (run.prev == LB.EB and run.curr == LB.EM)
-            or (_cat(run.pc) == 'Cn' and _ep(run.pc) and run.curr == LB.EM)
+            or (_cat(run.pc) == GC.Cn and _extpict(run.pc) and run.curr == LB.EM)
         ):
             run.do_not_break_here()
     # LB31
