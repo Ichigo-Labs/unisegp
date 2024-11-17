@@ -9,4 +9,6 @@ Module References
    wordbreak
    sentencebreak
    linebreak
+   derived
+   emoji
    wrap
