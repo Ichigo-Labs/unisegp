@@ -5,7 +5,7 @@
 """
 
 from uniseg import Unicode_Property
-from uniseg.db import get_column_index, get_value
+from uniseg.db import get_handle, get_value
 
 __all__ = [
     'Indic_Conjunct_Break',
@@ -32,26 +32,25 @@ __all__ = [
 ]
 
 
-INDEX_MATH = get_column_index('Math')
-INDEX_ALPHABETIC = get_column_index('Alphabetic')
-INDEX_LOWERCASE = get_column_index('Lowercase')
-INDEX_UPPERCASE = get_column_index('Uppercase')
-INDEX_CASED = get_column_index('Cased')
-INDEX_CASE_IGNORABLE = get_column_index('Case_Ignorable')
-INDEX_CHANGES_WHEN_LOWERCASED = get_column_index('Changes_When_Lowercased')
-INDEX_CHANGES_WHEN_UPPERCASED = get_column_index('Changes_When_Uppercased')
-INDEX_CHANGES_WHEN_TITLECASED = get_column_index('Changes_When_Titlecased')
-INDEX_CHANGES_WHEN_CASEFOLDED = get_column_index('Changes_When_Casefolded')
-INDEX_CHANGES_WHEN_CASEMAPPED = get_column_index('Changes_When_Casemapped')
-INDEX_ID_START = get_column_index('ID_Start')
-INDEX_ID_CONTINUE = get_column_index('ID_Continue')
-INDEX_XID_START = get_column_index('XID_Start')
-INDEX_XID_CONTINUE = get_column_index('XID_Continue')
-INDEX_DEFAULT_IGNORABLE_CODE_POINT = get_column_index(
-    'Default_Ignorable_Code_Point')
-INDEX_GRAPHEME_EXTEND = get_column_index('Grapheme_Extend')
-INDEX_GRAPHEME_BASE = get_column_index('Grapheme_Base')
-INDEX_INDIC_CONJUNCT_BREAK = get_column_index('InCB')
+H_MATH = get_handle('Math')
+H_ALPHABETIC = get_handle('Alphabetic')
+H_LOWERCASE = get_handle('Lowercase')
+H_UPPERCASE = get_handle('Uppercase')
+H_CASED = get_handle('Cased')
+H_CASE_IGNORABLE = get_handle('Case_Ignorable')
+H_CHANGES_WHEN_LOWERCASED = get_handle('Changes_When_Lowercased')
+H_CHANGES_WHEN_UPPERCASED = get_handle('Changes_When_Uppercased')
+H_CHANGES_WHEN_TITLECASED = get_handle('Changes_When_Titlecased')
+H_CHANGES_WHEN_CASEFOLDED = get_handle('Changes_When_Casefolded')
+H_CHANGES_WHEN_CASEMAPPED = get_handle('Changes_When_Casemapped')
+H_ID_START = get_handle('ID_Start')
+H_ID_CONTINUE = get_handle('ID_Continue')
+H_XID_START = get_handle('XID_Start')
+H_XID_CONTINUE = get_handle('XID_Continue')
+H_DEFAULT_IGNORABLE_CODE_POINT = get_handle('Default_Ignorable_Code_Point')
+H_GRAPHEME_EXTEND = get_handle('Grapheme_Extend')
+H_GRAPHEME_BASE = get_handle('Grapheme_Base')
+H_INDIC_CONJUNCT_BREAK = get_handle('InCB')
 
 
 class Indic_Conjunct_Break(Unicode_Property):
@@ -77,7 +76,7 @@ def math(ch: str, /) -> bool:
     >>> math('+')
     True
     """
-    return bool(get_value(ord(ch), INDEX_MATH))
+    return bool(get_value(H_MATH, ord(ch)))
 
 
 def alphabetic(ch: str, /) -> bool:
@@ -88,7 +87,7 @@ def alphabetic(ch: str, /) -> bool:
     >>> alphabetic('1')
     False
     """
-    return bool(get_value(ord(ch), INDEX_ALPHABETIC))
+    return bool(get_value(H_ALPHABETIC, ord(ch)))
 
 
 def lowercase(ch: str, /) -> bool:
@@ -99,7 +98,7 @@ def lowercase(ch: str, /) -> bool:
     >>> lowercase('a')
     True
     """
-    return bool(get_value(ord(ch), INDEX_LOWERCASE))
+    return bool(get_value(H_LOWERCASE, ord(ch)))
 
 
 def uppercase(ch: str, /) -> bool:
@@ -110,7 +109,7 @@ def uppercase(ch: str, /) -> bool:
     >>> uppercase('a')
     False
     """
-    return bool(get_value(ord(ch), INDEX_UPPERCASE))
+    return bool(get_value(H_UPPERCASE, ord(ch)))
 
 
 def cased(ch: str, /) -> bool:
@@ -123,7 +122,7 @@ def cased(ch: str, /) -> bool:
     >>> cased('*')
     False
     """
-    return bool(get_value(ord(ch), INDEX_CASED))
+    return bool(get_value(H_CASED, ord(ch)))
 
 
 def case_ignorable(ch: str, /) -> bool:
@@ -134,7 +133,7 @@ def case_ignorable(ch: str, /) -> bool:
     >>> case_ignorable('.')
     True
     """
-    return bool(get_value(ord(ch), INDEX_CASE_IGNORABLE))
+    return bool(get_value(H_CASE_IGNORABLE, ord(ch)))
 
 
 def changes_when_lowercased(ch: str, /) -> bool:
@@ -146,7 +145,7 @@ def changes_when_lowercased(ch: str, /) -> bool:
     >>> changes_when_lowercased('a')
     False
     """
-    return bool(get_value(ord(ch), INDEX_CHANGES_WHEN_LOWERCASED))
+    return bool(get_value(H_CHANGES_WHEN_LOWERCASED, ord(ch)))
 
 
 def changes_when_uppercased(ch: str, /) -> bool:
@@ -158,7 +157,7 @@ def changes_when_uppercased(ch: str, /) -> bool:
     >>> changes_when_uppercased('a')
     True
     """
-    return bool(get_value(ord(ch), INDEX_CHANGES_WHEN_UPPERCASED))
+    return bool(get_value(H_CHANGES_WHEN_UPPERCASED, ord(ch)))
 
 
 def changes_when_titlecased(ch: str, /) -> bool:
@@ -170,7 +169,7 @@ def changes_when_titlecased(ch: str, /) -> bool:
     >>> changes_when_titlecased('a')
     True
     """
-    return bool(get_value(ord(ch), INDEX_CHANGES_WHEN_TITLECASED))
+    return bool(get_value(H_CHANGES_WHEN_TITLECASED, ord(ch)))
 
 
 def changes_when_casefolded(ch: str, /) -> bool:
@@ -182,7 +181,7 @@ def changes_when_casefolded(ch: str, /) -> bool:
     >>> changes_when_casefolded('a')
     False
     """
-    return bool(get_value(ord(ch), INDEX_CHANGES_WHEN_CASEFOLDED))
+    return bool(get_value(H_CHANGES_WHEN_CASEFOLDED, ord(ch)))
 
 
 def changes_when_casemapped(ch: str, /) -> bool:
@@ -196,7 +195,7 @@ def changes_when_casemapped(ch: str, /) -> bool:
     >>> changes_when_casemapped('1')
     False
     """
-    return bool(get_value(ord(ch), INDEX_CHANGES_WHEN_CASEMAPPED))
+    return bool(get_value(H_CHANGES_WHEN_CASEMAPPED, ord(ch)))
 
 
 def id_start(ch: str, /) -> bool:
@@ -209,7 +208,7 @@ def id_start(ch: str, /) -> bool:
     >>> id_start('1')
     False
     """
-    return bool(get_value(ord(ch), INDEX_ID_START))
+    return bool(get_value(H_ID_START, ord(ch)))
 
 
 def id_continue(ch: str, /) -> bool:
@@ -224,7 +223,7 @@ def id_continue(ch: str, /) -> bool:
     >>> id_continue('.')
     False
     """
-    return bool(get_value(ord(ch), INDEX_ID_CONTINUE))
+    return bool(get_value(H_ID_CONTINUE, ord(ch)))
 
 
 def xid_start(ch: str, /) -> bool:
@@ -237,7 +236,7 @@ def xid_start(ch: str, /) -> bool:
     >>> xid_start('1')
     False
     """
-    return bool(get_value(ord(ch), INDEX_XID_START))
+    return bool(get_value(H_XID_START, ord(ch)))
 
 
 def xid_continue(ch: str, /) -> bool:
@@ -252,7 +251,7 @@ def xid_continue(ch: str, /) -> bool:
     >>> xid_continue('.')
     False
     """
-    return bool(get_value(ord(ch), INDEX_XID_CONTINUE))
+    return bool(get_value(H_XID_CONTINUE, ord(ch)))
 
 
 def default_ignorable_code_point(ch: str, /) -> bool:
@@ -264,7 +263,7 @@ def default_ignorable_code_point(ch: str, /) -> bool:
     >>> default_ignorable_code_point('\u00ad')
     True
     """
-    return bool(get_value(ord(ch), INDEX_DEFAULT_IGNORABLE_CODE_POINT))
+    return bool(get_value(H_DEFAULT_IGNORABLE_CODE_POINT, ord(ch)))
 
 
 def grapheme_extend(ch: str, /) -> bool:
@@ -275,7 +274,7 @@ def grapheme_extend(ch: str, /) -> bool:
     >>> grapheme_extend('\u0300')
     True
     """
-    return bool(get_value(ord(ch), INDEX_GRAPHEME_EXTEND))
+    return bool(get_value(H_GRAPHEME_EXTEND, ord(ch)))
 
 
 def grapheme_base(ch: str, /) -> bool:
@@ -286,7 +285,7 @@ def grapheme_base(ch: str, /) -> bool:
     >>> grapheme_extend('\u0300')
     True
     """
-    return bool(get_value(ord(ch), INDEX_GRAPHEME_BASE))
+    return bool(get_value(H_GRAPHEME_BASE, ord(ch)))
 
 
 def indic_conjunct_break(ch: str, /) -> Indic_Conjunct_Break:
@@ -298,7 +297,7 @@ def indic_conjunct_break(ch: str, /) -> Indic_Conjunct_Break:
     Indic_Conjunct_Break.Linker
     """
     return Indic_Conjunct_Break[
-        get_value(ord(ch), INDEX_INDIC_CONJUNCT_BREAK) or 'None_'
+        get_value(H_INDIC_CONJUNCT_BREAK, ord(ch)) or 'None_'
     ]
 
 

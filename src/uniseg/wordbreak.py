@@ -9,7 +9,7 @@ from typing import Iterator, Optional
 from uniseg import Unicode_Property
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
-from uniseg.db import get_column_index, get_value
+from uniseg.db import get_handle, get_value
 from uniseg.emoji import extended_pictographic
 
 __all__ = [
@@ -21,7 +21,8 @@ __all__ = [
     'words',
 ]
 
-INDEX_WORD_BREAK = get_column_index('Word_Break')
+
+H_WORD_BREAK = get_handle('Word_Break')
 
 
 class Word_Break(Unicode_Property):
@@ -85,7 +86,7 @@ def word_break(c: str, /) -> Word_Break:
     >>> word_break('\u30a2')
     Word_Break.Katakana
     """
-    return Word_Break[get_value(ord(c), INDEX_WORD_BREAK) or 'Other']
+    return Word_Break[get_value(H_WORD_BREAK, ord(c)) or 'Other']
 
 
 def word_breakables(s: str, /) -> Breakables:

@@ -10,7 +10,7 @@ from typing import Optional
 from uniseg import Unicode_Property
 from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
                              boundaries, break_units)
-from uniseg.db import get_column_index, get_value
+from uniseg.db import get_handle, get_value
 from uniseg.emoji import extended_pictographic
 from uniseg.unicodedata_ import (EA, GC, East_Asian_Width, General_Category,
                                  east_asian_width_, general_category_)
@@ -24,7 +24,7 @@ __all__ = [
     'line_break_units',
 ]
 
-INDEX_LINE_BREAK = get_column_index('Line_Break')
+H_LINE_BREAK = get_handle('Line_Break')
 
 
 class Line_Break(Unicode_Property):
@@ -148,7 +148,7 @@ def line_break(c: str, /) -> Line_Break:
     >>> line_break('\u1b44')
     Line_Break.VI
     """
-    return Line_Break[get_value(ord(c), INDEX_LINE_BREAK) or 'XX']
+    return Line_Break[get_value(H_LINE_BREAK, ord(c)) or 'XX']
 
 
 def _ea(ch: Optional[str], /) -> Optional[East_Asian_Width]:

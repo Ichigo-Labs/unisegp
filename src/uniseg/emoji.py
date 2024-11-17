@@ -4,7 +4,7 @@
 <https://www.unicode.org/reports/tr51/tr51-27.html>`_
 """
 
-from uniseg.db import get_column_index, get_value
+from uniseg.db import get_handle, get_value
 
 __all__ = [
     'emoji',
@@ -14,11 +14,12 @@ __all__ = [
     'extended_pictographic',
 ]
 
-INDEX_EMOJI = get_column_index('Emoji')
-INDEX_EMOJI_PRESENTATION = get_column_index('Emoji_Presentation')
-INDEX_EMOJI_MODIFIER_BASE = get_column_index('Emoji_Modifier_Base')
-INDEX_EMOJI_COMPONENT = get_column_index('Emoji_Component')
-INDEX_EXTENDED_PICTOGRAPHIC = get_column_index('Extended_Pictographic')
+
+H_EMOJI = get_handle('Emoji')
+H_EMOJI_PRESENTATION = get_handle('Emoji_Presentation')
+H_EMOJI_MODIFIER_BASE = get_handle('Emoji_Modifier_Base')
+H_EMOJI_COMPONENT = get_handle('Emoji_Component')
+H_EXTENDED_PICTOGRAPHIC = get_handle('Extended_Pictographic')
 
 
 def emoji(ch: str, /) -> bool:
@@ -29,7 +30,7 @@ def emoji(ch: str, /) -> bool:
     >>> emoji('🐸')
     True
     """
-    return bool(get_value(ord(ch), INDEX_EMOJI))
+    return bool(get_value(H_EMOJI, ord(ch)))
 
 
 def emoji_presentation(ch: str, /) -> bool:
@@ -40,7 +41,7 @@ def emoji_presentation(ch: str, /) -> bool:
     >>> emoji_presentation('🌞')
     True
     """
-    return bool(get_value(ord(ch), INDEX_EMOJI_PRESENTATION))
+    return bool(get_value(H_EMOJI_PRESENTATION, ord(ch)))
 
 
 def emoji_modifier_base(ch: str, /) -> bool:
@@ -51,7 +52,7 @@ def emoji_modifier_base(ch: str, /) -> bool:
     >>> emoji_modifier_base('👼')
     True
     """
-    return bool(get_value(ord(ch), INDEX_EMOJI_MODIFIER_BASE))
+    return bool(get_value(H_EMOJI_MODIFIER_BASE, ord(ch)))
 
 
 def emoji_component(ch: str, /) -> bool:
@@ -62,7 +63,7 @@ def emoji_component(ch: str, /) -> bool:
     >>> emoji_component('#')
     True
     """
-    return bool(get_value(ord(ch), INDEX_EMOJI_COMPONENT))
+    return bool(get_value(H_EMOJI_COMPONENT, ord(ch)))
 
 
 def extended_pictographic(ch: str, /) -> bool:
@@ -73,7 +74,7 @@ def extended_pictographic(ch: str, /) -> bool:
     >>> extended_pictographic('🐤')
     True
     """
-    return bool(get_value(ord(ch), INDEX_EXTENDED_PICTOGRAPHIC))
+    return bool(get_value(H_EXTENDED_PICTOGRAPHIC, ord(ch)))
 
 
 if __name__ == '__main__':
