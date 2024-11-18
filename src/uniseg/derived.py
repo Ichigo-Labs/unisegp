@@ -68,52 +68,52 @@ class Indic_Conjunct_Break(Unicode_Property):
 InCB = Indic_Conjunct_Break
 
 
-def math(ch: str, /) -> bool:
-    """Return Math boolean derived Unicode property value for `ch`.
+def math(c: str, /) -> bool:
+    """Return Math boolean derived Unicode property value for `c`.
 
     >>> math('A')
     False
     >>> math('+')
     True
     """
-    return bool(get_value(H_MATH, ord(ch)))
+    return bool(get_value(H_MATH, ord(c)))
 
 
-def alphabetic(ch: str, /) -> bool:
-    """Return Alphabetic boolean derived Unicode property value for `ch`.
+def alphabetic(c: str, /) -> bool:
+    """Return Alphabetic boolean derived Unicode property value for `c`.
 
     >>> alphabetic('A')
     True
     >>> alphabetic('1')
     False
     """
-    return bool(get_value(H_ALPHABETIC, ord(ch)))
+    return bool(get_value(H_ALPHABETIC, ord(c)))
 
 
-def lowercase(ch: str, /) -> bool:
-    """Return Lowercase boolean derived Unicode property value for `ch`.
+def lowercase(c: str, /) -> bool:
+    """Return Lowercase boolean derived Unicode property value for `c`.
 
     >>> lowercase('A')
     False
     >>> lowercase('a')
     True
     """
-    return bool(get_value(H_LOWERCASE, ord(ch)))
+    return bool(get_value(H_LOWERCASE, ord(c)))
 
 
-def uppercase(ch: str, /) -> bool:
-    """Return Uppercase boolean derived Unicode property value for `ch`.
+def uppercase(c: str, /) -> bool:
+    """Return Uppercase boolean derived Unicode property value for `c`.
 
     >>> uppercase('A')
     True
     >>> uppercase('a')
     False
     """
-    return bool(get_value(H_UPPERCASE, ord(ch)))
+    return bool(get_value(H_UPPERCASE, ord(c)))
 
 
-def cased(ch: str, /) -> bool:
-    """Return Cased boolean derived Unicode property value for `ch`.
+def cased(c: str, /) -> bool:
+    """Return Cased boolean derived Unicode property value for `c`.
 
     >>> cased('A')
     True
@@ -122,71 +122,71 @@ def cased(ch: str, /) -> bool:
     >>> cased('*')
     False
     """
-    return bool(get_value(H_CASED, ord(ch)))
+    return bool(get_value(H_CASED, ord(c)))
 
 
-def case_ignorable(ch: str, /) -> bool:
-    """Return Case_Ignorable boolean derived Unicode property value for `ch`.
+def case_ignorable(c: str, /) -> bool:
+    """Return Case_Ignorable boolean derived Unicode property value for `c`.
 
     >>> case_ignorable('A')
     False
     >>> case_ignorable('.')
     True
     """
-    return bool(get_value(H_CASE_IGNORABLE, ord(ch)))
+    return bool(get_value(H_CASE_IGNORABLE, ord(c)))
 
 
-def changes_when_lowercased(ch: str, /) -> bool:
+def changes_when_lowercased(c: str, /) -> bool:
     """Return Changes_When_Lowercased boolean derived Unicode property value
-    for `ch`.
+    for `c`.
 
     >>> changes_when_lowercased('A')
     True
     >>> changes_when_lowercased('a')
     False
     """
-    return bool(get_value(H_CHANGES_WHEN_LOWERCASED, ord(ch)))
+    return bool(get_value(H_CHANGES_WHEN_LOWERCASED, ord(c)))
 
 
-def changes_when_uppercased(ch: str, /) -> bool:
+def changes_when_uppercased(c: str, /) -> bool:
     """Return Changes_When_Uppercased boolean derived Unicode property value
-    for `ch`.
+    for `c`.
 
     >>> changes_when_uppercased('A')
     False
     >>> changes_when_uppercased('a')
     True
     """
-    return bool(get_value(H_CHANGES_WHEN_UPPERCASED, ord(ch)))
+    return bool(get_value(H_CHANGES_WHEN_UPPERCASED, ord(c)))
 
 
-def changes_when_titlecased(ch: str, /) -> bool:
+def changes_when_titlecased(c: str, /) -> bool:
     """Return Changes_When_Titlecased boolean derived Unicode property value
-    for `ch`.
+    for `c`.
 
     >>> changes_when_titlecased('A')
     False
     >>> changes_when_titlecased('a')
     True
     """
-    return bool(get_value(H_CHANGES_WHEN_TITLECASED, ord(ch)))
+    return bool(get_value(H_CHANGES_WHEN_TITLECASED, ord(c)))
 
 
-def changes_when_casefolded(ch: str, /) -> bool:
+def changes_when_casefolded(c: str, /) -> bool:
     """Return Changes_When_Casefolded boolean derived Unicode property value
-    for `ch`.
+    for `c`.
 
     >>> changes_when_casefolded('A')
     True
     >>> changes_when_casefolded('a')
     False
     """
-    return bool(get_value(H_CHANGES_WHEN_CASEFOLDED, ord(ch)))
+    return bool(get_value(H_CHANGES_WHEN_CASEFOLDED, ord(c)))
 
 
-def changes_when_casemapped(ch: str, /) -> bool:
+def changes_when_casemapped(c: str, /) -> bool:
     """Return Changes_When_Casemapped boolean derived Unicode property value
-    for `ch`.
+    for `c`.
 
     >>> changes_when_casemapped('A')
     True
@@ -195,11 +195,11 @@ def changes_when_casemapped(ch: str, /) -> bool:
     >>> changes_when_casemapped('1')
     False
     """
-    return bool(get_value(H_CHANGES_WHEN_CASEMAPPED, ord(ch)))
+    return bool(get_value(H_CHANGES_WHEN_CASEMAPPED, ord(c)))
 
 
-def id_start(ch: str, /) -> bool:
-    """Return ID_Start boolean derived Unicode property value for `ch`.
+def id_start(c: str, /) -> bool:
+    """Return ID_Start boolean derived Unicode property value for `c`.
 
     >>> id_start('A')
     True
@@ -208,11 +208,11 @@ def id_start(ch: str, /) -> bool:
     >>> id_start('1')
     False
     """
-    return bool(get_value(H_ID_START, ord(ch)))
+    return bool(get_value(H_ID_START, ord(c)))
 
 
-def id_continue(ch: str, /) -> bool:
-    """Return ID_Continue boolean derived Unicode property value for `ch`.
+def id_continue(c: str, /) -> bool:
+    """Return ID_Continue boolean derived Unicode property value for `c`.
 
     >>> id_continue('A')
     True
@@ -223,11 +223,11 @@ def id_continue(ch: str, /) -> bool:
     >>> id_continue('.')
     False
     """
-    return bool(get_value(H_ID_CONTINUE, ord(ch)))
+    return bool(get_value(H_ID_CONTINUE, ord(c)))
 
 
-def xid_start(ch: str, /) -> bool:
-    """Return XID_Start boolean derived Unicode property value for `ch`.
+def xid_start(c: str, /) -> bool:
+    """Return XID_Start boolean derived Unicode property value for `c`.
 
     >>> xid_start('A')
     True
@@ -236,11 +236,11 @@ def xid_start(ch: str, /) -> bool:
     >>> xid_start('1')
     False
     """
-    return bool(get_value(H_XID_START, ord(ch)))
+    return bool(get_value(H_XID_START, ord(c)))
 
 
-def xid_continue(ch: str, /) -> bool:
-    """Return XID_Continue boolean derived Unicode property value for `ch`.
+def xid_continue(c: str, /) -> bool:
+    """Return XID_Continue boolean derived Unicode property value for `c`.
 
     >>> xid_continue('A')
     True
@@ -251,45 +251,45 @@ def xid_continue(ch: str, /) -> bool:
     >>> xid_continue('.')
     False
     """
-    return bool(get_value(H_XID_CONTINUE, ord(ch)))
+    return bool(get_value(H_XID_CONTINUE, ord(c)))
 
 
-def default_ignorable_code_point(ch: str, /) -> bool:
+def default_ignorable_code_point(c: str, /) -> bool:
     """Return Default_Ignorable_Code_Point boolean derived Unicode property
-    value for `ch`.
+    value for `c`.
 
     >>> default_ignorable_code_point('A')
     False
     >>> default_ignorable_code_point('\u00ad')
     True
     """
-    return bool(get_value(H_DEFAULT_IGNORABLE_CODE_POINT, ord(ch)))
+    return bool(get_value(H_DEFAULT_IGNORABLE_CODE_POINT, ord(c)))
 
 
-def grapheme_extend(ch: str, /) -> bool:
-    """Return Grapheme_Extend boolean derived Unicode property value for `ch`.
+def grapheme_extend(c: str, /) -> bool:
+    """Return Grapheme_Extend boolean derived Unicode property value for `c`.
 
     >>> grapheme_extend('A')
     False
     >>> grapheme_extend('\u0300')
     True
     """
-    return bool(get_value(H_GRAPHEME_EXTEND, ord(ch)))
+    return bool(get_value(H_GRAPHEME_EXTEND, ord(c)))
 
 
-def grapheme_base(ch: str, /) -> bool:
-    """Return Grapheme_Base boolean derived Unicode property value for `ch`.
+def grapheme_base(c: str, /) -> bool:
+    """Return Grapheme_Base boolean derived Unicode property value for `c`.
 
     >>> grapheme_base('A')
     True
     >>> grapheme_extend('\u0300')
     True
     """
-    return bool(get_value(H_GRAPHEME_BASE, ord(ch)))
+    return bool(get_value(H_GRAPHEME_BASE, ord(c)))
 
 
-def indic_conjunct_break(ch: str, /) -> Indic_Conjunct_Break:
-    """Retrun Indic_Conjunct_Break derived property for `ch`.
+def indic_conjunct_break(c: str, /) -> Indic_Conjunct_Break:
+    """Retrun Indic_Conjunct_Break derived property for `c`.
 
     >>> indic_conjunct_break('A')
     Indic_Conjunct_Break.None_
@@ -297,7 +297,7 @@ def indic_conjunct_break(ch: str, /) -> Indic_Conjunct_Break:
     Indic_Conjunct_Break.Linker
     """
     return Indic_Conjunct_Break[
-        get_value(H_INDIC_CONJUNCT_BREAK, ord(ch)) or 'None_'
+        get_value(H_INDIC_CONJUNCT_BREAK, ord(c)) or 'None_'
     ]
 
 

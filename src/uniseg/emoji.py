@@ -22,59 +22,59 @@ H_EMOJI_COMPONENT = get_handle('Emoji_Component')
 H_EXTENDED_PICTOGRAPHIC = get_handle('Extended_Pictographic')
 
 
-def emoji(ch: str, /) -> bool:
-    """Return Emoji boolean Unicode property value for `ch`.
+def emoji(c: str, /) -> bool:
+    """Return Emoji boolean Unicode property value for `c`.
 
     >>> emoji('A')
     False
     >>> emoji('🐸')
     True
     """
-    return bool(get_value(H_EMOJI, ord(ch)))
+    return bool(get_value(H_EMOJI, ord(c)))
 
 
-def emoji_presentation(ch: str, /) -> bool:
-    """Return Emoji_Presentation boolean Unicode property value for `ch`.
+def emoji_presentation(c: str, /) -> bool:
+    """Return Emoji_Presentation boolean Unicode property value for `c`.
 
     >>> emoji_presentation('A')
     False
     >>> emoji_presentation('🌞')
     True
     """
-    return bool(get_value(H_EMOJI_PRESENTATION, ord(ch)))
+    return bool(get_value(H_EMOJI_PRESENTATION, ord(c)))
 
 
-def emoji_modifier_base(ch: str, /) -> bool:
-    """Return Emoji_Modifier_Base boolean Unicode property value for `ch`.
+def emoji_modifier_base(c: str, /) -> bool:
+    """Return Emoji_Modifier_Base boolean Unicode property value for `c`.
 
     >>> emoji_modifier_base('A')
     False
     >>> emoji_modifier_base('👼')
     True
     """
-    return bool(get_value(H_EMOJI_MODIFIER_BASE, ord(ch)))
+    return bool(get_value(H_EMOJI_MODIFIER_BASE, ord(c)))
 
 
-def emoji_component(ch: str, /) -> bool:
-    """Return Emoji_Component boolean Unicode property value for `ch`.
+def emoji_component(c: str, /) -> bool:
+    """Return Emoji_Component boolean Unicode property value for `c`.
 
     >>> emoji_component('A')
     False
     >>> emoji_component('#')
     True
     """
-    return bool(get_value(H_EMOJI_COMPONENT, ord(ch)))
+    return bool(get_value(H_EMOJI_COMPONENT, ord(c)))
 
 
-def extended_pictographic(ch: str, /) -> bool:
-    """Return Extended_Pictographic boolean Unicode property value for `ch`.
+def extended_pictographic(c: str, /) -> bool:
+    """Return Extended_Pictographic boolean Unicode property value for `c`.
 
     >>> extended_pictographic('A')
     False
     >>> extended_pictographic('🐤')
     True
     """
-    return bool(get_value(H_EXTENDED_PICTOGRAPHIC, ord(ch)))
+    return bool(get_value(H_EXTENDED_PICTOGRAPHIC, ord(c)))
 
 
 if __name__ == '__main__':

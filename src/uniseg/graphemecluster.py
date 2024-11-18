@@ -62,14 +62,14 @@ class Grapheme_Cluster_Break(Unicode_Property):
 GCB = Grapheme_Cluster_Break
 
 
-def _ep(ch: Optional[str], /) -> Optional[bool]:
-    return False if ch is None else extended_pictographic(ch)
+def _ep(c: Optional[str], /) -> Optional[bool]:
+    return False if c is None else extended_pictographic(c)
 
 
-def grapheme_cluster_break(ch: str, /) -> Grapheme_Cluster_Break:
-    r"""Return the Grapheme_Cluster_Break property of `ch`.
+def grapheme_cluster_break(c: str, /) -> Grapheme_Cluster_Break:
+    r"""Return the Grapheme_Cluster_Break property of `c`.
 
-    `ch` must be a single Unicode string.
+    `c` must be a single Unicode string.
 
     >>> grapheme_cluster_break('a')
     Grapheme_Cluster_Break.Other
@@ -79,7 +79,7 @@ def grapheme_cluster_break(ch: str, /) -> Grapheme_Cluster_Break:
     LF
     """
     return Grapheme_Cluster_Break[
-        get_value(H_GRAPHEME_CLUSTER_BREAK, ord(ch)) or 'Other'
+        get_value(H_GRAPHEME_CLUSTER_BREAK, ord(c)) or 'Other'
     ]
 
 

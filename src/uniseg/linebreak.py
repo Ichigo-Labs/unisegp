@@ -151,21 +151,21 @@ def line_break(c: str, /) -> Line_Break:
     return Line_Break[get_value(H_LINE_BREAK, ord(c)) or 'XX']
 
 
-def _ea(ch: Optional[str], /) -> Optional[East_Asian_Width]:
-    return None if ch is None else east_asian_width_(ch)
+def _ea(c: Optional[str], /) -> Optional[East_Asian_Width]:
+    return None if c is None else east_asian_width_(c)
 
 
-def _cat(ch: Optional[str], /) -> Optional[General_Category]:
-    return None if ch is None else general_category_(ch)
+def _cat(c: Optional[str], /) -> Optional[General_Category]:
+    return None if c is None else general_category_(c)
 
 
-def _extpict(ch: Optional[str], /) -> Optional[bool]:
-    return False if ch is None else extended_pictographic(ch)
+def _extpict(c: Optional[str], /) -> Optional[bool]:
+    return False if c is None else extended_pictographic(c)
 
 
-def resolve_lb1_linebreak(ch: str, /) -> Line_Break:
-    lb = line_break(ch)
-    cat = general_category_(ch)
+def resolve_lb1_linebreak(c: str, /) -> Line_Break:
+    lb = line_break(c)
+    cat = general_category_(c)
     if lb in (LB.AI, LB.SG, LB.XX):
         lb = LB.AL
     elif lb == LB.SA:
