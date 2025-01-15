@@ -273,8 +273,7 @@ class TTFormatter(Formatter):
         return iter(self._lines)
 
 
-def tt_width(s: str, /, *,
-             index: int = 0,
+def tt_width(s: str, /, index: int = 0, *,
              ambiguous_as_wide: bool = False,
              ) -> Literal[1, 2]:
     """Return logical width of the grapheme cluster at `s[index]` on
