@@ -337,24 +337,25 @@ def tt_text_extents(s: str, *, ambiguous_as_wide: bool = False) -> list[int]:
     return widths
 
 
-def tt_wrap(
-    s: str,
-    wrap_width: int,
-    /,
-    tab_width: int = 8,
-    tab_char: str = ' ',
-    ambiguous_as_wide: bool = False,
-    cur: int = 0,
-    offset: int = 0,
-    char_wrap: bool = False
-) -> Iterator[str]:
+def tt_wrap(s: str, wrap_width: int, /,
+            tab_width: int = 8,
+            tab_char: str = ' ',
+            ambiguous_as_wide: bool = False,
+            cur: int = 0,
+            offset: int = 0,
+            char_wrap: bool = False,
+            ) -> Iterator[str]:
     """Wrap `s` with given parameters and return a list of wrapped lines.
 
     See :class:`TTFormatter` for `wrap_width`, `tab_width` and `tab_char`, and
     :func:`tt_wrap` for `cur`, `offset` and `char_wrap`.
     """
-    formatter = TTFormatter(wrap_width=wrap_width, tab_width=tab_width,
-                            tab_char=tab_char, ambiguous_as_wide=ambiguous_as_wide)
+    formatter = TTFormatter(
+        wrap_width=wrap_width,
+        tab_width=tab_width,
+        tab_char=tab_char,
+        ambiguous_as_wide=ambiguous_as_wide,
+    )
     _wrapper.wrap(formatter, s, cur, offset, char_wrap=char_wrap)
     return formatter.lines()
 
