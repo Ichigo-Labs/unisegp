@@ -49,7 +49,7 @@ Supporting segmentations are:
   space-efficiency `[PEP 393]`_.  So you don't need to worry about treating
   complex multi-code-points issue any more.  If you want to treat some Unicode
   string per code point, just iterate that like: ``for c in s:``.  So
-  :mod:`uniseg.codepoint` module has been deprecated and deleted.
+  ``uniseg.codepoint`` module has been deprecated and deleted.
 
   .. _[PEP 393]: https://peps.python.org/pep-0393/
 
@@ -170,6 +170,6 @@ Related / Similar Projects
 `pytextseg <https://pypi.python.org/pypi/pytextseg>`_ - Python module for textsegmentation
   *pytextseg* package focuses very similar goal to ours; it provides
   Unicode-aware text wrapping features. They designed and uses their
-  original string class (not built-in :class:`unicode` / :class:`str`
-  classes) for the purpose. We use strings as just ordinary built-in
-  :class:`unicode` / :class:`str` objects for text processing in our modules.
+  original string class (not built-in ``unicod`` / ``str`` classes) for the
+  purpose. We use strings as just ordinary built-in ``unicode`` / ``str``
+  objects for text processing in our modules.
