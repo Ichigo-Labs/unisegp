@@ -36,4 +36,4 @@ Repository = "https://bitbucket.org/emptypage/uniseg-py/"
 addopts = "--doctest-modules"
 doctest_optionflags = ["IGNORE_EXCEPTION_DETAIL"]
 norecursedirs = ["docs", "samples"]
-testpaths = ["src", "tests"]
+testpaths = ["src", "tests", "tools"]
