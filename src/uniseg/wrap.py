@@ -321,7 +321,11 @@ def tt_text_extents(s: str, *, ambiguous_as_wide: bool = False) -> list[int]:
     [2]
 
     The meaning of `ambiguous_as_wide` is the same as that of
-    :func:`tt_width`.
+    :func:`tt_width`:
+    >>> tt_text_extents('αβ')
+    [1, 2]
+    >>> tt_text_extents('αβ', ambiguous_as_wide=True)
+    [2, 4]
     """
     widths: list[int] = []
     total_width = 0
