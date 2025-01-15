@@ -273,7 +273,10 @@ class TTFormatter(Formatter):
         return iter(self._lines)
 
 
-def tt_width(s: str, index: int = 0, ambiguous_as_wide: bool = False) -> Literal[1, 2]:
+def tt_width(s: str, /, *,
+             index: int = 0,
+             ambiguous_as_wide: bool = False,
+             ) -> Literal[1, 2]:
     """Return logical width of the grapheme cluster at `s[index]` on
     fixed-width typography
 
@@ -330,7 +333,7 @@ def tt_text_extents(s: str, *, ambiguous_as_wide: bool = False) -> list[int]:
     widths: list[int] = []
     total_width = 0
     for g in grapheme_clusters(s):
-        total_width += tt_width(g, ambiguous_as_wide)
+        total_width += tt_width(g, ambiguous_as_wide=ambiguous_as_wide)
         widths.extend(total_width for __ in g)
     return widths
 
