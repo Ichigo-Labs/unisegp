@@ -358,7 +358,6 @@ def tt_wrap(s: str, wrap_width: int, /,
     ['和歌は、人の心を種とし', 'て、万の言の葉とぞなれり', 'ける。']
 
     Tab options:
-
     >>> s3 = 'A\\tquick\\tbrown fox\\njumped\\tover\\tthe lazy dog.'
     >>> print(''.join(tt_wrap(s3, 24)))
     A       quick   brown fox
@@ -369,6 +368,11 @@ def tt_wrap(s: str, wrap_width: int, /,
     >>> print(''.join(tt_wrap(s3, 24, tab_char='+')))
     A+++++++quick+++brown fox
     jumped++over++++the lazy dog.
+
+    An option for treating code points of which East_Asian_Width propertiy is
+    'A' (ambiguous):
+    >>> list(tt_wrap(s1, 24, ambiguous_as_wide=True))
+    ['A quick brown fox ', 'jumped over the lazy ', 'dog.']
     """
     formatter = TTFormatter(
         wrap_width=wrap_width,
