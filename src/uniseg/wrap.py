@@ -308,32 +308,26 @@ def tt_width(s: str, index: int = 0, ambiguous_as_wide: bool = False) -> Literal
 
 
 def tt_text_extents(s: str, *, ambiguous_as_wide: bool = False) -> list[int]:
-    R"""Return a list of logical widths from the start of `s` to each of
+    """Return a list of logical widths from the start of `s` to each of
     characters *(not of code points)* on fixed-width typography
 
     >>> tt_text_extents('')
     []
     >>> tt_text_extents('abc')
     [1, 2, 3]
-    >>> tt_text_extents('\u3042\u3044\u3046')
+    >>> tt_text_extents('あいう')
     [2, 4, 6]
-    >>> import sys
-    >>> s = '\U00029e3d'   # test a code point out of BMP
-    >>> actual = tt_text_extents(s)
-    >>> expect = [2] if sys.maxunicode > 0xffff else [2, 2]
-    >>> len(s) == len(expect)
-    True
-    >>> actual == expect
-    True
+    >>> actual = tt_text_extents('𩸽') # test a code point out of BMP
+    [2]
 
     The meaning of `ambiguous_as_wide` is the same as that of
     :func:`tt_width`.
     """
-    widths = []
+    widths: list[int] = []
     total_width = 0
-    for gc in grapheme_clusters(s):
-        total_width += tt_width(gc, ambiguous_as_wide)
-        widths.extend(total_width for __ in gc)
+    for g in grapheme_clusters(s):
+        total_width += tt_width(g, ambiguous_as_wide)
+        widths.extend(total_width for __ in g)
     return widths
 
 
