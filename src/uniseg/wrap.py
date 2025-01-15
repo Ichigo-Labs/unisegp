@@ -349,6 +349,26 @@ def tt_wrap(s: str, wrap_width: int, /,
 
     See :class:`TTFormatter` for `wrap_width`, `tab_width` and `tab_char`, and
     :func:`tt_wrap` for `cur`, `offset` and `char_wrap`.
+
+    >>> s1 = 'A quick brown fox jumped over the lazy dog.'
+    >>> list(tt_wrap(s1, 24))
+    ['A quick brown fox ', 'jumped over the lazy ', 'dog.']
+    >>> s2 = '和歌は、人の心を種として、万の言の葉とぞなれりける。'
+    >>> list(tt_wrap(s2, 24))
+    ['和歌は、人の心を種とし', 'て、万の言の葉とぞなれり', 'ける。']
+
+    Tab options:
+
+    >>> s3 = 'A\\tquick\\tbrown fox\\njumped\\tover\\tthe lazy dog.'
+    >>> print(''.join(tt_wrap(s3, 24)))
+    A       quick   brown fox
+    jumped  over    the lazy dog.
+    >>> print(''.join(tt_wrap(s3, 24, tab_width=10)))
+    A         quick     brown fox
+    jumped    over      the lazy dog.
+    >>> print(''.join(tt_wrap(s3, 24, tab_char='+')))
+    A+++++++quick+++brown fox
+    jumped++over++++the lazy dog.
     """
     formatter = TTFormatter(
         wrap_width=wrap_width,
