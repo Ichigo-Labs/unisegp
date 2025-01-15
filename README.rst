@@ -99,6 +99,9 @@ Install
 Changes
 =======
 
+0.9.1 (2025-01-16)
+  - Fix ``ambiguous_as_wide`` options are not working on ``uniseg.wrap``.
+
 0.9.0 (2024-11-07)
   - Unicode 16.0.0.
   - Rule-based grapheme cluster segmentation is back.
