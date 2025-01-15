@@ -317,7 +317,7 @@ def tt_text_extents(s: str, *, ambiguous_as_wide: bool = False) -> list[int]:
     [1, 2, 3]
     >>> tt_text_extents('あいう')
     [2, 4, 6]
-    >>> actual = tt_text_extents('𩸽') # test a code point out of BMP
+    >>> tt_text_extents('𩸽') # test a code point out of BMP
     [2]
 
     The meaning of `ambiguous_as_wide` is the same as that of
