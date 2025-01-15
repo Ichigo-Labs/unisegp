@@ -284,9 +284,9 @@ def tt_width(s: str, index: int = 0, ambiguous_as_wide: bool = False) -> Literal
 
     >>> tt_width('A')
     1
-    >>> tt_width('\\u8240')     # U+8240: CJK UNIFIED IDEOGRAPH-8240
+    >>> tt_width('\\u8240') # U+8240: CJK UNIFIED IDEOGRAPH-8240
     2
-    >>> tt_width('g\\u0308')    # U+0308: COMBINING DIAERESIS
+    >>> tt_width('g\\u0308') # U+0308: COMBINING DIAERESIS
     1
     >>> tt_width('\\U00029e3d') # U+29E3D: CJK UNIFIED IDEOGRAPH-29E3D
     2
@@ -295,9 +295,9 @@ def tt_width(s: str, index: int = 0, ambiguous_as_wide: bool = False) -> Literal
     greek alphabets are treated as they have fullwidth as well as ideographics
     does.
 
-    >>> tt_width('\\u03b1')     # U+03B1: GREEK SMALL LETTER ALPHA
+    >>> tt_width('α') # U+03B1: GREEK SMALL LETTER ALPHA
     1
-    >>> tt_width('\\u03b1', ambiguous_as_wide=True)
+    >>> tt_width('α', ambiguous_as_wide=True)
     2
     """
     cp = s[index]
