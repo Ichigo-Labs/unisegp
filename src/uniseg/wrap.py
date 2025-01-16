@@ -16,11 +16,11 @@ __all__ = [
     'TTFormatter',
     'tt_width',
     'tt_text_extents',
-    'tt_wrap'
+    'tt_wrap',
 ]
 
 
-class Formatter(object):
+class Formatter:
     """Abstruct base class for formatters invoked by a :class:`Wrapper` object.
 
     This class is implemented only for convinience sake and does nothing
@@ -60,7 +60,7 @@ class Formatter(object):
         """
         raise NotImplementedError()
 
-    def handle_text(self, text: str, extents: list[int]) -> None:
+    def handle_text(self, text: str, extents: list[int], /) -> None:
         """Handler method which is invoked when `text` should be put on the
         current position with `extents`.
         """
@@ -73,22 +73,16 @@ class Formatter(object):
         raise NotImplementedError()
 
 
-class Wrapper(object):
+class Wrapper:
     """Text wrapping engine.
 
     Usually, you don't need to create an instance of the class directly.  Use
     :func:`wrap` instead.
     """
 
-    def wrap(
-        self,
-        formatter: Formatter,
-        s: str,
-        cur: int = 0,
-        offset: int = 0,
-        *,
-        char_wrap: bool = False
-    ) -> int:
+    def wrap(self, formatter: Formatter, s: str, cur: int = 0, offset: int = 0, /, *,
+             char_wrap: bool = False,
+             ) -> int:
         """Wrap string `s` with `formatter` and invoke its handlers.
 
         The optional arguments, `cur` is the starting position of the string
@@ -163,14 +157,9 @@ class Wrapper(object):
 _wrapper = Wrapper()
 
 
-def wrap(
-    formatter: Formatter,
-    s: str,
-    cur: int = 0,
-    offset: int = 0,
-    *,
-    char_wrap: bool = False
-) -> int:
+def wrap(formatter: Formatter, s: str, cur: int = 0, offset: int = 0, /, *,
+         char_wrap: bool = False,
+         ) -> int:
     """Wrap string `s` with `formatter` using the module's static
     :class:`Wrapper` instance
 
@@ -186,14 +175,12 @@ def wrap(
 class TTFormatter(Formatter):
     """Fixed-width text wrapping formatter."""
 
-    def __init__(
-        self,
-        *,
-        wrap_width: int,
-        tab_width: int = 8,
-        tab_char: str = ' ',
-        ambiguous_as_wide: bool = False
-    ):
+    def __init__(self, *,
+                 wrap_width: int,
+                 tab_width: int = 8,
+                 tab_char: str = ' ',
+                 ambiguous_as_wide: bool = False,
+                 ) -> None:
         self._lines = ['']
         self.wrap_width = wrap_width
         self.tab_width = tab_width
@@ -226,9 +213,7 @@ class TTFormatter(Formatter):
     @tab_char.setter
     def tab_char(self, value: str):
         if (east_asian_width_(value) not in (EA.N, EA.Na, EA.H)):
-            raise ValueError(
-                'only narrow code point is available for tab_char'
-            )
+            raise ValueError('only narrow code point is available for tab_char')
         self._tab_char = value
 
     @property
@@ -276,7 +261,7 @@ class TTFormatter(Formatter):
 def tt_width(s: str, /, index: int = 0, *,
              ambiguous_as_wide: bool = False,
              ) -> Literal[1, 2]:
-    """Return logical width of the grapheme cluster at `s[index]` on
+    R"""Return logical width of the grapheme cluster at `s[index]` on
     fixed-width typography
 
     Return value will be ``1`` (halfwidth) or ``2`` (fullwidth).
@@ -286,11 +271,11 @@ def tt_width(s: str, /, index: int = 0, *,
 
     >>> tt_width('A')
     1
-    >>> tt_width('\\u8240') # U+8240: CJK UNIFIED IDEOGRAPH-8240
+    >>> tt_width('\u8240') # U+8240: CJK UNIFIED IDEOGRAPH-8240
     2
-    >>> tt_width('g\\u0308') # U+0308: COMBINING DIAERESIS
+    >>> tt_width('g\u0308') # U+0308: COMBINING DIAERESIS
     1
-    >>> tt_width('\\U00029e3d') # U+29E3D: CJK UNIFIED IDEOGRAPH-29E3D
+    >>> tt_width('\U00029e3d') # U+29E3D: CJK UNIFIED IDEOGRAPH-29E3D
     2
 
     If `ambiguous_as_wide` is specified to ``True``, some characters such as
@@ -309,8 +294,10 @@ def tt_width(s: str, /, index: int = 0, *,
     return 1
 
 
-def tt_text_extents(s: str, *, ambiguous_as_wide: bool = False) -> list[int]:
-    """Return a list of logical widths from the start of `s` to each of
+def tt_text_extents(s: str, /, *,
+                    ambiguous_as_wide: bool = False,
+                    ) -> list[int]:
+    R"""Return a list of logical widths from the start of `s` to each of
     characters *(not of code points)* on fixed-width typography
 
     >>> tt_text_extents('')
@@ -337,7 +324,7 @@ def tt_text_extents(s: str, *, ambiguous_as_wide: bool = False) -> list[int]:
     return widths
 
 
-def tt_wrap(s: str, wrap_width: int, /,
+def tt_wrap(s: str, wrap_width: int, /, *,
             tab_width: int = 8,
             tab_char: str = ' ',
             ambiguous_as_wide: bool = False,
@@ -345,7 +332,7 @@ def tt_wrap(s: str, wrap_width: int, /,
             offset: int = 0,
             char_wrap: bool = False,
             ) -> Iterator[str]:
-    """Wrap `s` with given parameters and return a list of wrapped lines.
+    R"""Wrap `s` with given parameters and return a list of wrapped lines.
 
     See :class:`TTFormatter` for `wrap_width`, `tab_width` and `tab_char`, and
     :func:`tt_wrap` for `cur`, `offset` and `char_wrap`.
@@ -359,7 +346,7 @@ def tt_wrap(s: str, wrap_width: int, /,
 
     Tab options:
 
-    >>> s3 = 'A\\tquick\\tbrown fox\\njumped\\tover\\tthe lazy dog.'
+    >>> s3 = 'A\tquick\tbrown fox\njumped\tover\tthe lazy dog.'
     >>> print(''.join(tt_wrap(s3, 24)))
     A       quick   brown fox
     jumped  over    the lazy dog.
