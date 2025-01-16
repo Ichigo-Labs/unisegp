@@ -79,11 +79,11 @@ def word_break(c: str, /) -> Word_Break:
 
     `c` must be a single Unicode code point string.
 
-    >>> word_break('\x0d')
+    >>> word_break('\r')
     Word_Break.CR
     >>> word_break('\x0b')
     Word_Break.Newline
-    >>> word_break('\u30a2')
+    >>> word_break('ア')
     Word_Break.Katakana
     """
     return Word_Break[get_value(H_WORD_BREAK, ord(c)) or 'Other']
@@ -192,8 +192,7 @@ def word_breakables(s: str, /) -> Breakables:
             run.do_not_break_here()
         # WB13a
         elif (
-            run.prev in AHLetterTuple +
-                (WB.Numeric, WB.Katakana, WB.ExtendNumLet)
+            run.prev in AHLetterTuple + (WB.Numeric, WB.Katakana, WB.ExtendNumLet)
             and run.curr == WB.ExtendNumLet
         ):
             run.do_not_break_here()
@@ -228,7 +227,6 @@ def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[
     This function yields indices from the first boundary position (> 0)
     to the end of the string (== len(s)).
     """
-
     breakables = word_breakables(s)
     if tailor is not None:
         breakables = tailor(s, breakables)
@@ -242,8 +240,8 @@ def words(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
     http://www.unicode.org/reports/tr29/tr29-15.html#Word_Boundaries
 
     >>> s = 'The quick (“brown”) fox can’t jump 32.3 feet, right?'
-    >>> print('|'.join(words(s)))
-    The| |quick| |(|“|brown|”|)| |fox| |can’t| |jump| |32.3| |feet|,| |right|?
+    >>> '|'.join(words(s))
+    'The| |quick| |(|“|brown|”|)| |fox| |can’t| |jump| |32.3| |feet|,| |right|?'
     >>> list(words(''))
     []
     """

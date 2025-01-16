@@ -71,13 +71,12 @@ def sentence_break(c: str, /) -> Sentence_Break:
 
     `c` must be a single Unicode code point string.
 
-    >>> sentence_break('\x0d')
+    >>> sentence_break('\r')
     Sentence_Break.CR
     >>> sentence_break(' ')
     Sentence_Break.Sp
     >>> sentence_break('a')
     Sentence_Break.Lower
-
     >>> sentence_break('/')
     Sentence_Break.Other
     """
@@ -91,9 +90,9 @@ def sentence_breakables(s: str, /) -> Breakables:
     1 for "break" and 0 for "do not break".  The length of iteration
     will be the same as ``len(s)``.
 
-    >>> from pprint import pprint
+    >>> from pprint import pp
     >>> s = 'He said, \u201cAre you going?\u201d John shook his head.'
-    >>> pprint(list(sentence_breakables(s)), width=76, compact=True)
+    >>> pp(list(sentence_breakables(s)), width=76, compact=True)
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     """
@@ -174,14 +173,15 @@ def sentence_breakables(s: str, /) -> Breakables:
     return run.literal_breakables()
 
 
-def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
+def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None, /
+                        ) -> Iterator[int]:
     R"""Iterate indices of the sentence boundaries of `s`.
 
     This function yields from 0 to the end of the string (== len(s)).
 
     >>> list(sentence_boundaries('ABC'))
     [0, 3]
-    >>> s = 'He said, \u201cAre you going?\u201d John shook his head.'
+    >>> s = 'He said, “Are you going?” John shook his head.'
     >>> list(sentence_boundaries(s))
     [0, 26, 46]
     >>> list(sentence_boundaries(''))
@@ -196,9 +196,9 @@ def sentence_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Itera
 def sentences(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
     R"""Iterate every sentence of `s`.
 
-    >>> s = 'He said, \u201cAre you going?\u201d John shook his head.'
-    >>> list(sentences(s)) == ['He said, \u201cAre you going?\u201d ', 'John shook his head.']
-    True
+    >>> s = 'He said, “Are you going?” John shook his head.'
+    >>> list(sentences(s))
+    ['He said, “Are you going?” ', 'John shook his head.']
     """
     breakables = sentence_breakables(s)
     if tailor is not None:

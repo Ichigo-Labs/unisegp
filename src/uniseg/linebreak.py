@@ -139,13 +139,13 @@ def line_break(c: str, /) -> Line_Break:
 
     `c` must be a single Unicode code point string.
 
-    >>> line_break('\x0d')
+    >>> line_break('\r')
     Line_Break.CR
     >>> line_break(' ')
     Line_Break.SP
     >>> line_break('1')
     Line_Break.NU
-    >>> line_break('\u1b44')
+    >>> line_break('᭄') # (== '\u1b44')
     Line_Break.VI
     """
     return Line_Break[get_value(H_LINE_BREAK, ord(c)) or 'XX']
