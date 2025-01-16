@@ -515,18 +515,18 @@ def line_break_boundaries(s: str,
 def line_break_units(s: str,
                      legacy: bool = False,
                      tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
-    r"""Iterate every line breaking token of `s`
+    R"""Iterate every line breaking token of `s`
 
-    >>> s = 'The quick (\u201cbrown\u201d) fox can\u2019t jump 32.3 feet, right?'
-    >>> '|'.join(line_break_units(s)) == 'The |quick |(\u201cbrown\u201d) |fox |can\u2019t |jump |32.3 |feet, |right?'
-    True
+    >>> s = 'The quick (“brown”) fox can’t jump 32.3 feet, right?'
+    >>> '|'.join(line_break_units(s))
+    'The |quick |(“brown”) |fox |can’t |jump |32.3 |feet, |right?'
     >>> list(line_break_units(''))
     []
 
-    >>> list(line_break_units('\u03b1\u03b1')) == ['\u03b1\u03b1']
-    True
-    >>> list(line_break_units('\u03b1\u03b1', True)) == ['\u03b1', '\u03b1']
-    True
+    >>> list(line_break_units('αα'))
+    ['αα']
+    >>> list(line_break_units('αα', True))
+    ['α', 'α']
     """
 
     breakables = line_break_breakables(s, legacy)
