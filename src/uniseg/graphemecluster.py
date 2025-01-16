@@ -67,15 +67,15 @@ def _ep(c: Optional[str], /) -> Optional[bool]:
 
 
 def grapheme_cluster_break(c: str, /) -> Grapheme_Cluster_Break:
-    r"""Return the Grapheme_Cluster_Break property of `c`.
+    R"""Return the Grapheme_Cluster_Break property of `c`.
 
     `c` must be a single Unicode string.
 
     >>> grapheme_cluster_break('a')
     Grapheme_Cluster_Break.Other
-    >>> grapheme_cluster_break('\x0d')
+    >>> grapheme_cluster_break('\r')
     Grapheme_Cluster_Break.CR
-    >>> print(grapheme_cluster_break('\x0a'))
+    >>> print(grapheme_cluster_break('\n'))
     LF
     """
     return Grapheme_Cluster_Break[
@@ -84,7 +84,7 @@ def grapheme_cluster_break(c: str, /) -> Grapheme_Cluster_Break:
 
 
 def grapheme_cluster_breakables(s: str, /) -> Breakables:
-    """Iterate grapheme cluster breaking opportunities for every
+    R"""Iterate grapheme cluster breaking opportunities for every
     position of `s`.
 
     1 for "break" and 0 for "do not break".  The length of iteration
@@ -92,7 +92,7 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
 
     >>> list(grapheme_cluster_breakables('ABC'))
     [1, 1, 1]
-    >>> list(grapheme_cluster_breakables('\x67\u0308'))
+    >>> list(grapheme_cluster_breakables('g̈')) # (== '\u0067\u0308')
     [1, 0]
     >>> list(grapheme_cluster_breakables(''))
     []
@@ -162,15 +162,15 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     return run.literal_breakables()
 
 
-def grapheme_cluster_boundaries(
-        s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
-    """Iterate indices of the grapheme cluster boundaries of `s`.
+def grapheme_cluster_boundaries(s: str, tailor: Optional[TailorFunc] = None, /
+                                ) -> Iterator[int]:
+    R"""Iterate indices of the grapheme cluster boundaries of `s`.
 
     This function yields from 0 to the end of the string (== len(s)).
 
     >>> list(grapheme_cluster_boundaries('ABC'))
     [0, 1, 2, 3]
-    >>> list(grapheme_cluster_boundaries('\x67\u0308'))
+    >>> list(grapheme_cluster_boundaries('g̈')) # (== '\u0067\u0308')
     [0, 2]
     >>> list(grapheme_cluster_boundaries(''))
     []
@@ -181,25 +181,24 @@ def grapheme_cluster_boundaries(
     return boundaries(breakables)
 
 
-def grapheme_clusters(
-        s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
-    r"""Iterate every grapheme cluster token of `s`.
+def grapheme_clusters(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
+    R"""Iterate every grapheme cluster token of `s`.
 
     Grapheme clusters (both legacy and extended):
 
-    >>> list(grapheme_clusters('g\u0308')) == ['g\u0308']
-    True
-    >>> list(grapheme_clusters('\uac01')) == ['\uac01']
-    True
-    >>> list(grapheme_clusters('\u1100\u1161\u11a8')) == ['\u1100\u1161\u11a8']
-    True
+    >>> list(grapheme_clusters('g̈')) # (== '\u0067\u0308')
+    ['g̈']
+    >>> list(grapheme_clusters('각')) # (== '\uac01')
+    ['각']
+    >>> list(grapheme_clusters('각')) # (== '\u1100\u1161\u11a8')
+    ['각']
 
     Extended grapheme clusters:
 
-    >>> list(grapheme_clusters('\u0ba8\u0bbf')) == ['\u0ba8\u0bbf']
-    True
-    >>> list(grapheme_clusters('\u0937\u093f')) == ['\u0937\u093f']
-    True
+    >>> list(grapheme_clusters('நி')) # (== '\u0ba8\u0bbf')
+    ['நி']
+    >>> list(grapheme_clusters('षि')) # (== '\u0937\u093f')
+    ['षि']
 
     Empty string leads the result of empty sequence:
 
