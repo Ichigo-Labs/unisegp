@@ -2,7 +2,7 @@
 
 import re
 from collections.abc import Iterator, Sequence
-from typing import Literal, Optional
+from typing import Literal, Optional, Protocol
 
 from uniseg.graphemecluster import (grapheme_cluster_boundaries,
                                     grapheme_clusters)
@@ -20,7 +20,7 @@ __all__ = [
 ]
 
 
-class Formatter:
+class Formatter(Protocol):
     """Abstruct base class for formatters invoked by a :class:`Wrapper` object.
 
     This class is implemented only for convinience sake and does nothing
@@ -172,7 +172,7 @@ def wrap(formatter: Formatter, s: str, cur: int = 0, offset: int = 0, /, *,
 
 # TT
 
-class TTFormatter(Formatter):
+class TTFormatter:
     """Fixed-width text wrapping formatter."""
 
     def __init__(self, *,
