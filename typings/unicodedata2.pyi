@@ -1,9 +1,10 @@
 import sys
-from _typeshed import ReadOnlyBuffer
 from typing import Any, Literal, TypeVar, final, overload
+
+from _typeshed import ReadOnlyBuffer
 from typing_extensions import TypeAlias
 
-ucd_3_2_0: UCD
+ucd_3_2_0: 'UCD'
 unidata_version: str
 
 if sys.version_info < (3, 10):
@@ -12,6 +13,7 @@ if sys.version_info < (3, 10):
 _T = TypeVar("_T")
 
 _NormalizationForm: TypeAlias = Literal["NFC", "NFD", "NFKC", "NFKD"]
+
 
 def bidirectional(chr: str, /) -> str: ...
 def category(chr: str, /) -> str: ...
@@ -26,7 +28,9 @@ def digit(chr: str, /) -> int: ...
 @overload
 def digit(chr: str, default: _T, /) -> int | _T: ...
 
+
 _EastAsianWidth: TypeAlias = Literal["F", "H", "W", "Na", "A", "N"]
+
 
 def east_asian_width(chr: str, /) -> _EastAsianWidth: ...
 def is_normalized(form: _NormalizationForm, unistr: str, /) -> bool: ...
@@ -41,6 +45,8 @@ def normalize(form: _NormalizationForm, unistr: str, /) -> str: ...
 def numeric(chr: str, /) -> float: ...
 @overload
 def numeric(chr: str, default: _T, /) -> float | _T: ...
+
+
 @final
 class UCD:
     # The methods below are constructed from the same array in C
