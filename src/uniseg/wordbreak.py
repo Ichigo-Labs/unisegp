@@ -7,8 +7,8 @@
 from typing import Iterator, Optional
 
 from uniseg import Unicode_Property
-from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
-                             boundaries, break_units)
+from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc, boundaries,
+                             break_units)
 from uniseg.db import get_handle, get_value
 from uniseg.emoji import extended_pictographic
 
@@ -221,7 +221,7 @@ def word_breakables(s: str, /) -> Breakables:
     return run.literal_breakables()
 
 
-def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[int]:
+def word_boundaries(s: str, /, tailor: Optional[TailorFunc] = None) -> Iterator[int]:
     """Iterate indices of the word boundaries of `s`
 
     This function yields indices from the first boundary position (> 0)
@@ -233,7 +233,7 @@ def word_boundaries(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[
     return boundaries(breakables)
 
 
-def words(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
+def words(s: str, /, tailor: Optional[TailorFunc] = None) -> Iterator[str]:
     """Iterate *user-perceived* words of `s`
 
     These examples bellow is from
