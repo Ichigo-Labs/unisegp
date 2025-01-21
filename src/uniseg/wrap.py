@@ -4,8 +4,8 @@ import re
 from collections.abc import Iterator, Sequence
 from typing import Literal, Optional, Protocol
 
-from uniseg.graphemecluster import (grapheme_cluster_boundaries,
-                                    grapheme_clusters)
+from uniseg.breaking import TailorFunc
+from uniseg.graphemecluster import grapheme_cluster_boundaries, grapheme_clusters
 from uniseg.linebreak import line_break_boundaries
 from uniseg.unicodedata_ import EA, east_asian_width_
 
@@ -39,7 +39,7 @@ class Formatter(Protocol):
         Note that returning ``None`` (which is the default) means *"do not
         wrap"* while returning ``0`` means *"wrap as narrowly as possible."*
         """
-        raise NotImplementedError()
+        ...
 
     @property
     def tab_width(self) -> int:
@@ -48,29 +48,29 @@ class Formatter(Protocol):
         This property value is used by a :class:`Wrapper` object to determin
         the actual forwarding extents of tabs in each of the positions.
         """
-        raise NotImplementedError()
+        ...
 
     def reset(self) -> None:
         """Reset all states of the formatter."""
-        raise NotImplementedError()
+        ...
 
     def text_extents(self, s: str, /) -> list[int]:
         """Return a list of logical lengths from start of the string to each of
         characters in `s`.
         """
-        raise NotImplementedError()
+        ...
 
     def handle_text(self, text: str, extents: list[int], /) -> None:
         """Handler method which is invoked when `text` should be put on the
         current position with `extents`.
         """
-        raise NotImplementedError()
+        ...
 
     def handle_new_line(self) -> None:
         """Handler method which is invoked when the current line is over and a
         new line begins.
         """
-        raise NotImplementedError()
+        ...
 
 
 class Wrapper:

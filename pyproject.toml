@@ -37,3 +37,6 @@ addopts = "--doctest-modules"
 doctest_optionflags = ["IGNORE_EXCEPTION_DETAIL"]
 norecursedirs = ["docs", "samples"]
 testpaths = ["src", "tests", "tools"]
+
+[tool.isort]
+line_length = 88
