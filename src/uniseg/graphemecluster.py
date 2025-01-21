@@ -7,8 +7,8 @@
 from typing import Iterator, Optional
 
 from uniseg import Unicode_Property
-from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
-                             boundaries, break_units)
+from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc, boundaries,
+                             break_units)
 from uniseg.db import get_handle, get_value
 from uniseg.derived import InCB, indic_conjunct_break
 from uniseg.emoji import extended_pictographic
@@ -162,8 +162,9 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
     return run.literal_breakables()
 
 
-def grapheme_cluster_boundaries(s: str, tailor: Optional[TailorFunc] = None, /
-                                ) -> Iterator[int]:
+def grapheme_cluster_boundaries(
+    s: str, /, tailor: Optional[TailorFunc] = None
+) -> Iterator[int]:
     R"""Iterate indices of the grapheme cluster boundaries of `s`.
 
     This function yields from 0 to the end of the string (== len(s)).

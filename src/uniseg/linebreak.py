@@ -8,8 +8,8 @@ from collections.abc import Iterator
 from typing import Optional
 
 from uniseg import Unicode_Property
-from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc,
-                             boundaries, break_units)
+from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc, boundaries,
+                             break_units)
 from uniseg.db import get_handle, get_value
 from uniseg.emoji import extended_pictographic
 from uniseg.unicodedata_ import (EA, GC, East_Asian_Width, General_Category,
@@ -498,9 +498,9 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
     return run.literal_breakables()
 
 
-def line_break_boundaries(s: str,
-                          legacy: bool = False,
-                          tailor: Optional[TailorFunc] = None) -> Iterator[int]:
+def line_break_boundaries(
+        s: str, /, legacy: bool = False, tailor: Optional[TailorFunc] = None
+) -> Iterator[int]:
     """Iterate indices of the line breaking boundaries of `s`
 
     This function yields from 0 to the end of the string (== len(s)).

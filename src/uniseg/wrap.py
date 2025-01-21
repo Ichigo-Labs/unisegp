@@ -80,9 +80,17 @@ class Wrapper:
     :func:`wrap` instead.
     """
 
-    def wrap(self, formatter: Formatter, s: str, cur: int = 0, offset: int = 0, /, *,
-             char_wrap: bool = False,
-             ) -> int:
+    def wrap(
+        self,
+        formatter: Formatter,
+        s: str,
+        cur: int = 0,
+        offset: int = 0,
+        /,
+        *,
+        char_wrap: bool = False,
+        tailor: Optional[TailorFunc] = None,
+    ) -> int:
         """Wrap string `s` with `formatter` and invoke its handlers.
 
         The optional arguments, `cur` is the starting position of the string
@@ -114,7 +122,7 @@ class Wrapper:
                 prev_boundary = 0
                 prev_extent = 0
                 breakpoint = 0
-                for boundary in iter_boundaries(field):
+                for boundary in iter_boundaries(field, tailor=tailor):
                     extent = field_extents[boundary-1]
                     w = extent - prev_extent
                     wrap_width = formatter.wrap_width
@@ -142,9 +150,12 @@ class Wrapper:
         return iline
 
     @staticmethod
-    def _partial_extents(extents: Sequence[int],
-                         start: int,
-                         stop: Optional[int] = None, /) -> list[int]:
+    def _partial_extents(
+        extents: Sequence[int],
+        start: int,
+        stop: Optional[int] = None,
+        /,
+    ) -> list[int]:
         """(internal) return partial extents of `extents[start:end]` """
 
         if stop is None:
@@ -157,9 +168,16 @@ class Wrapper:
 _wrapper = Wrapper()
 
 
-def wrap(formatter: Formatter, s: str, cur: int = 0, offset: int = 0, /, *,
-         char_wrap: bool = False,
-         ) -> int:
+def wrap(
+    formatter: Formatter,
+    s: str,
+    cur: int = 0,
+    offset: int = 0,
+    /,
+    *,
+    char_wrap: bool = False,
+    tailor: Optional[TailorFunc] = None,
+) -> int:
     """Wrap string `s` with `formatter` using the module's static
     :class:`Wrapper` instance
 
@@ -167,7 +185,7 @@ def wrap(formatter: Formatter, s: str, cur: int = 0, offset: int = 0, /, *,
 
     - *Changed in version 0.7.1:* It returns the count of lines now.
     """
-    return _wrapper.wrap(formatter, s, cur, offset, char_wrap=char_wrap)
+    return _wrapper.wrap(formatter, s, cur, offset, char_wrap=char_wrap, tailor=tailor)
 
 
 # TT
@@ -175,12 +193,14 @@ def wrap(formatter: Formatter, s: str, cur: int = 0, offset: int = 0, /, *,
 class TTFormatter:
     """Fixed-width text wrapping formatter."""
 
-    def __init__(self, *,
-                 wrap_width: int,
-                 tab_width: int = 8,
-                 tab_char: str = ' ',
-                 ambiguous_as_wide: bool = False,
-                 ) -> None:
+    def __init__(
+        self,
+        wrap_width: int,
+        *,
+        tab_width: int = 8,
+        tab_char: str = ' ',
+        ambiguous_as_wide: bool = False,
+    ) -> None:
         self._lines = ['']
         self.wrap_width = wrap_width
         self.tab_width = tab_width
@@ -258,9 +278,9 @@ class TTFormatter:
         return iter(self._lines)
 
 
-def tt_width(s: str, /, index: int = 0, *,
-             ambiguous_as_wide: bool = False,
-             ) -> Literal[1, 2]:
+def tt_width(
+    s: str, /, index: int = 0, *, ambiguous_as_wide: bool = False
+) -> Literal[1, 2]:
     R"""Return logical width of the grapheme cluster at `s[index]` on
     fixed-width typography
 
@@ -294,9 +314,7 @@ def tt_width(s: str, /, index: int = 0, *,
     return 1
 
 
-def tt_text_extents(s: str, /, *,
-                    ambiguous_as_wide: bool = False,
-                    ) -> list[int]:
+def tt_text_extents(s: str, /, *, ambiguous_as_wide: bool = False) -> list[int]:
     R"""Return a list of logical widths from the start of `s` to each of
     characters *(not of code points)* on fixed-width typography
 
@@ -324,14 +342,19 @@ def tt_text_extents(s: str, /, *,
     return widths
 
 
-def tt_wrap(s: str, wrap_width: int, /, *,
-            tab_width: int = 8,
-            tab_char: str = ' ',
-            ambiguous_as_wide: bool = False,
-            cur: int = 0,
-            offset: int = 0,
-            char_wrap: bool = False,
-            ) -> Iterator[str]:
+def tt_wrap(
+    s: str,
+    wrap_width: int,
+    /,
+    *,
+    tab_width: int = 8,
+    tab_char: str = ' ',
+    ambiguous_as_wide: bool = False,
+    cur: int = 0,
+    offset: int = 0,
+    char_wrap: bool = False,
+    tailor: Optional[TailorFunc] = None,
+) -> Iterator[str]:
     R"""Wrap `s` with given parameters and return a list of wrapped lines.
 
     See :class:`TTFormatter` for `wrap_width`, `tab_width` and `tab_char`, and
@@ -372,7 +395,7 @@ def tt_wrap(s: str, wrap_width: int, /, *,
         tab_char=tab_char,
         ambiguous_as_wide=ambiguous_as_wide,
     )
-    _wrapper.wrap(formatter, s, cur, offset, char_wrap=char_wrap)
+    _wrapper.wrap(formatter, s, cur, offset, char_wrap=char_wrap, tailor=tailor)
     return formatter.lines()
 
 
