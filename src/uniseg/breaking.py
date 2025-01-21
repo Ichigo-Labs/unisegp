@@ -8,7 +8,7 @@ from typing import Any, Generic, Literal, Optional, TypeVar, Union
 __all__ = [
     'Breakable',
     'Breakables',
-    'TailorFunc',
+    'TailorBreakables',
     'Run',
     'boundaries',
     'break_units',
@@ -25,7 +25,7 @@ class Breakable(Enum):
 
 # type aliases for annotation
 Breakables = Iterable[Literal[0, 1]]
-TailorFunc = Callable[[str, Breakables], Breakables]
+TailorBreakables = Callable[[str, Breakables], Breakables]
 SkipTable = Sequence[Literal[0, 1]]
 
 
@@ -378,12 +378,20 @@ class Run(Generic[T]):
         return run
 
     def is_following(
-        self, attrs: Union[T, tuple[T, ...]], /, greedy: bool = False, noskip: bool = False
+        self,
+        attrs: Union[T, tuple[T, ...]],
+        /,
+        greedy: bool = False,
+        noskip: bool = False,
     ) -> 'Run[T]':
         return self.is_continuing(attrs, greedy=greedy, backward=True, noskip=noskip)
 
     def is_leading(
-        self, attrs: Union[T, tuple[T, ...]], /, greedy: bool = False, noskip: bool = False
+        self,
+        attrs: Union[T, tuple[T, ...]],
+        /,
+        greedy: bool = False,
+        noskip: bool = False,
     ) -> 'Run[T]':
         return self.is_continuing(attrs, greedy=greedy, noskip=noskip)
 
@@ -455,6 +463,10 @@ def break_units(s: str, breakables: Breakables, /) -> Iterator[str]:
             i = j
     if s:
         yield s[i:]
+
+
+def tailor_none(s: str, breakables: Breakables, /) -> Breakables:
+    return breakables
 
 
 if __name__ == '__main__':

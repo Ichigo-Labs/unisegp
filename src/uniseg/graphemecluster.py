@@ -7,7 +7,7 @@
 from typing import Iterator, Optional
 
 from uniseg import Unicode_Property
-from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc, boundaries,
+from uniseg.breaking import (Breakable, Breakables, Run, TailorBreakables, boundaries,
                              break_units)
 from uniseg.db import get_handle, get_value
 from uniseg.derived import InCB, indic_conjunct_break
@@ -163,7 +163,7 @@ def grapheme_cluster_breakables(s: str, /) -> Breakables:
 
 
 def grapheme_cluster_boundaries(
-    s: str, /, tailor: Optional[TailorFunc] = None
+    s: str, /, tailor: Optional[TailorBreakables] = None
 ) -> Iterator[int]:
     R"""Iterate indices of the grapheme cluster boundaries of `s`.
 
@@ -182,7 +182,9 @@ def grapheme_cluster_boundaries(
     return boundaries(breakables)
 
 
-def grapheme_clusters(s: str, /, tailor: Optional[TailorFunc] = None) -> Iterator[str]:
+def grapheme_clusters(
+        s: str, /, tailor: Optional[TailorBreakables] = None
+) -> Iterator[str]:
     R"""Iterate every grapheme cluster token of `s`.
 
     Grapheme clusters (both legacy and extended):

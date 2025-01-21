@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from typing import Optional
 
 from uniseg import Unicode_Property
-from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc, boundaries,
+from uniseg.breaking import (Breakable, Breakables, Run, TailorBreakables, boundaries,
                              break_units)
 from uniseg.db import get_handle, get_value
 from uniseg.emoji import extended_pictographic
@@ -499,11 +499,24 @@ def line_break_breakables(s: str, /, legacy: bool = False) -> Breakables:
 
 
 def line_break_boundaries(
-    s: str, /, legacy: bool = False, tailor: Optional[TailorFunc] = None
+    s: str, /, legacy: bool = False, tailor: Optional[TailorBreakables] = None
 ) -> Iterator[int]:
-    """Iterate indices of the line breaking boundaries of `s`
+    R"""Iterate indices of the line breaking boundaries for `s`.
 
-    This function yields from 0 to the end of the string (== len(s)).
+    This function iterates values from 0, which is the start of the string, to
+    the end boundary of the string which its value is ``len(s)``.
+
+    >>> list(line_break_boundaries('a'))
+    [1]
+    >>> list(line_break_boundaries('a b'))
+    [2, 3]
+    >>> list(line_break_boundaries('a b\n'))
+    [2, 4]
+    >>> list(line_break_boundaries('あい、うえ、お。'))
+    [1, 3, 4, 6, 8]
+
+    The length of the returned list means the count of the line break units for
+    the string.
     """
 
     breakables = line_break_breakables(s, legacy)
@@ -513,7 +526,7 @@ def line_break_boundaries(
 
 
 def line_break_units(
-    s: str, /, legacy: bool = False, tailor: Optional[TailorFunc] = None
+    s: str, /, legacy: bool = False, tailor: Optional[TailorBreakables] = None
 ) -> Iterator[str]:
     R"""Iterate every line breaking token of `s`
 

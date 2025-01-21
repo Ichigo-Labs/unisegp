@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from typing import Optional
 
 from uniseg import Unicode_Property
-from uniseg.breaking import (Breakable, Breakables, Run, TailorFunc, boundaries,
+from uniseg.breaking import (Breakable, Breakables, Run, TailorBreakables, boundaries,
                              break_units)
 from uniseg.db import get_handle, get_value
 
@@ -174,7 +174,7 @@ def sentence_breakables(s: str, /) -> Breakables:
 
 
 def sentence_boundaries(
-    s: str, /, tailor: Optional[TailorFunc] = None
+    s: str, /, tailor: Optional[TailorBreakables] = None
 ) -> Iterator[int]:
     R"""Iterate indices of the sentence boundaries of `s`.
 
@@ -194,7 +194,7 @@ def sentence_boundaries(
     return boundaries(breakables)
 
 
-def sentences(s: str, /, tailor: Optional[TailorFunc] = None) -> Iterator[str]:
+def sentences(s: str, /, tailor: Optional[TailorBreakables] = None) -> Iterator[str]:
     R"""Iterate every sentence of `s`.
 
     >>> s = 'He said, “Are you going?” John shook his head.'
