@@ -202,14 +202,13 @@ def grapheme_clusters(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterato
 
     Empty string leads the result of empty sequence:
 
-    >>> list(grapheme_clusters('')) == []
-    True
+    >>> list(grapheme_clusters(''))
+    []
 
-    You can customize the default breaking behavior by modifying
-    breakable table so as to fit the specific locale in `tailor`
-    function.  It receives `s` and its default breaking sequence
-    (iterator) as its arguments and returns the sequence of customized
-    breaking opportunities:
+    You can customize the default breaking behavior by modifying breakable
+    table so as to fit the specific locale in `tailor` function.  It receives
+    `s` and its default breaking sequence (iterator) as its arguments and
+    returns the sequence of customized breaking opportunities:
 
     >>> def tailor_grapheme_cluster_breakables(s, breakables):
     ...     for i, breakable in enumerate(breakables):
@@ -219,12 +218,10 @@ def grapheme_clusters(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterato
     ...         else:
     ...             yield breakable
     ...
-    >>> s = 'Czech'
-    >>> list(grapheme_clusters(s)) == ['C', 'z', 'e', 'c', 'h']
-    True
-    >>> list(grapheme_clusters(
-    ...     s, tailor_grapheme_cluster_breakables)) == ['C', 'z', 'e', 'ch']
-    True
+    >>> list(grapheme_clusters('Czech'))
+    ['C', 'z', 'e', 'c', 'h']
+    >>> list(grapheme_clusters('Czech', tailor_grapheme_cluster_breakables))
+    ['C', 'z', 'e', 'ch']
     """
     breakables = grapheme_cluster_breakables(s)
     if tailor is not None:
