@@ -212,7 +212,6 @@ def grapheme_clusters(s: str, tailor: Optional[TailorFunc] = None, /) -> Iterato
     breaking opportunities:
 
     >>> def tailor_grapheme_cluster_breakables(s, breakables):
-    ...
     ...     for i, breakable in enumerate(breakables):
     ...         # don't break between 'c' and 'h'
     ...         if s.endswith('c', 0, i) and s.startswith('h', i):
