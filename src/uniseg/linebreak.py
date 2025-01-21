@@ -178,7 +178,7 @@ def resolve_lb1_linebreak(c: str, /) -> Line_Break:
     return lb
 
 
-def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
+def line_break_breakables(s: str, /, legacy: bool = False) -> Breakables:
     """Iterate line breaking opportunities for every position of `s`
 
     1 means "break" and 0 means "do not break" BEFORE the postion.
@@ -499,7 +499,7 @@ def line_break_breakables(s: str, legacy: bool = False, /) -> Breakables:
 
 
 def line_break_boundaries(
-        s: str, /, legacy: bool = False, tailor: Optional[TailorFunc] = None
+    s: str, /, legacy: bool = False, tailor: Optional[TailorFunc] = None
 ) -> Iterator[int]:
     """Iterate indices of the line breaking boundaries of `s`
 
@@ -512,9 +512,9 @@ def line_break_boundaries(
     return boundaries(breakables)
 
 
-def line_break_units(s: str,
-                     legacy: bool = False,
-                     tailor: Optional[TailorFunc] = None, /) -> Iterator[str]:
+def line_break_units(
+    s: str, /, legacy: bool = False, tailor: Optional[TailorFunc] = None
+) -> Iterator[str]:
     R"""Iterate every line breaking token of `s`
 
     >>> s = 'The quick (“brown”) fox can’t jump 32.3 feet, right?'
@@ -528,7 +528,6 @@ def line_break_units(s: str,
     >>> list(line_break_units('αα', True))
     ['α', 'α']
     """
-
     breakables = line_break_breakables(s, legacy)
     if tailor is not None:
         breakables = tailor(s, breakables)
