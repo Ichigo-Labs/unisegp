@@ -1,2 +1,4 @@
-*
-!.gitignore
+test_graphemebreak.py
+test_linebreak.py
+test_sentencebreak.py
+test_wordbreak.py
