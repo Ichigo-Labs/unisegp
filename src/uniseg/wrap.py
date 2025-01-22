@@ -1,9 +1,9 @@
 """Wrap text based on Unicode line breaking algorithm."""
 
 from collections.abc import Iterator, Sequence
-from typing import Literal, Optional, Protocol
+from typing import Optional, Protocol
 
-from uniseg.breaking import Breakables, TailorBreakables, tailor_none
+from uniseg.breaking import TailorBreakables
 from uniseg.graphemecluster import grapheme_cluster_boundaries, grapheme_clusters
 from uniseg.linebreak import line_break_boundaries
 from uniseg.unicodedata_ import EA, east_asian_width_
@@ -46,10 +46,6 @@ class Formatter(Protocol):
         determin the actual forwarding extents of tabs in each of the
         positions.
         """
-        ...
-
-    def reset(self) -> None:
-        """Reset all states of the formatter."""
         ...
 
     def text_extents(self, s: str, /) -> list[int]:
@@ -102,40 +98,35 @@ class Wrapper:
         The method returns the total count of wrapped lines.
         """
         _expand_tabs = self.__class__._expand_tabs
-        _wrap_width = formatter.wrap_width
+        _width = formatter.wrap_width
         _get_text_extents = formatter.text_extents
-
         _iter_boundaries = (
-            self.__class__._grapheme_cluster_boundaries if char_wrap
+            grapheme_cluster_boundaries if char_wrap
             else line_break_boundaries
         )
         iline = 0
-        i_boundary_start = offset + cur
+        start = offset + cur
         for para in s.splitlines(True):
             while para:
                 formatter.handle_new_line()
                 iline += 1
                 text_extents = _expand_tabs(
-                    para, _get_text_extents(para), formatter.tab_width, i_boundary_start
+                    para, _get_text_extents(para), formatter.tab_width, start
                 )
-                for i_boundary_end in _iter_boundaries(para, tailor=tailor):
-                    extent = text_extents[i_boundary_end-1]
-                    if (
-                        _wrap_width is not None
-                        and extent > _wrap_width
-                        and i_boundary_start > 0
-                    ):
+                for end in _iter_boundaries(para, tailor=tailor):
+                    extent = text_extents[end-1]
+                    if _width is not None and _width < extent and 0 < start:
                         # do wrap
-                        line = para[:i_boundary_start]
-                        para = para[i_boundary_start:]
-                        formatter.handle_text(line, text_extents[:i_boundary_start])
-                        i_boundary_start = offset
+                        line = para[:start]
+                        para = para[start:]
+                        formatter.handle_text(line, text_extents[:start])
+                        start = offset
                         break
-                    i_boundary_start = i_boundary_end
+                    start = end
                 else:
                     formatter.handle_text(para, text_extents)
-                    para = ""
-                    i_boundary_start = offset
+                    start = offset
+                    break
         return iline
 
     @staticmethod
@@ -154,39 +145,6 @@ class Wrapper:
                 extent = new_extent
             _extents.append(extent)
         return _extents
-
-    @staticmethod
-    def _grapheme_cluster_boundaries(
-        s: str, /, tailor: Optional[TailorBreakables] = None
-    ) -> Iterator[int]:
-        """(internal) custom `grapheme_cluster_boundaries` function.
-
-        >>> list(grapheme_cluster_boundaries('A'))
-        [0, 1]
-        >>> list(Wrapper._grapheme_cluster_boundaries('A'))
-        [1]
-        """
-        _tailor = tailor if tailor else tailor_none
-
-        def wrapped_tailor(s: str, breakables: Breakables) -> Breakables:
-            return (
-                (0 if i == 0 else x) for i, x in enumerate(_tailor(s, breakables))
-            )
-
-        return grapheme_cluster_boundaries(s, wrapped_tailor)
-
-    @staticmethod
-    def _partial_extents(
-        extents: Sequence[int],
-        start: int,
-        stop: Optional[int] = None,
-        /,
-    ) -> list[int]:
-        """(internal) return partial extents of `extents[start:end]`."""
-        if stop is None:
-            stop = len(extents)
-        extent_offset = extents[start-1] if start > 0 else 0
-        return [extents[x] - extent_offset for x in range(start, stop)]
 
 
 # static objects
@@ -218,14 +176,14 @@ class TTFormatter:
 
     def __init__(
         self,
-        wrap_width: int,
+        width: int,
         *,
         tab_width: int = 8,
         tab_char: str = ' ',
         ambiguous_as_wide: bool = False,
     ) -> None:
         self._lines: list[str] = []
-        self.wrap_width = wrap_width
+        self.wrap_width = width
         self.tab_width = tab_width
         self.ambiguous_as_wide = ambiguous_as_wide
         self.tab_char = tab_char
@@ -270,10 +228,6 @@ class TTFormatter:
     def ambiguous_as_wide(self, value: bool) -> None:
         self._ambiguous_as_wide = value
 
-    def reset(self) -> None:
-        """Reset all states of the formatter."""
-        del self._lines[:]
-
     def text_extents(self, s: str, /) -> list[int]:
         """Return a list of logical lengths from the start of the string to the
         end of each code point for `s`.
@@ -301,9 +255,7 @@ class TTFormatter:
         return iter(self._lines)
 
 
-def tt_width(
-    s: str, /, index: int = 0, *, ambiguous_as_wide: bool = False
-) -> Literal[1, 2]:
+def tt_width(s: str, /, index: int = 0, *, ambiguous_as_wide: bool = False) -> int:
     R"""Return logical width of the grapheme cluster at `s[index]` on
     fixed-width typography
 
@@ -314,18 +266,18 @@ def tt_width(
 
     >>> tt_width('A')
     1
-    >>> tt_width('\u8240') # U+8240: CJK UNIFIED IDEOGRAPH-8240
+    >>> tt_width('\u8240')  # U+8240: CJK UNIFIED IDEOGRAPH-8240
     2
-    >>> tt_width('g\u0308') # U+0308: COMBINING DIAERESIS
+    >>> tt_width('g\u0308')     # U+0308: COMBINING DIAERESIS
     1
-    >>> tt_width('\U00029e3d') # U+29E3D: CJK UNIFIED IDEOGRAPH-29E3D
+    >>> tt_width('\U00029e3d')  # U+29E3D: CJK UNIFIED IDEOGRAPH-29E3D
     2
 
     If `ambiguous_as_wide` is specified to ``True``, some characters such as
     greek alphabets are treated as they have fullwidth as well as ideographics
     does.
 
-    >>> tt_width('α') # U+03B1: GREEK SMALL LETTER ALPHA
+    >>> tt_width('α')   # U+03B1: GREEK SMALL LETTER ALPHA
     1
     >>> tt_width('α', ambiguous_as_wide=True)
     2
@@ -345,7 +297,7 @@ def tt_text_extents(s: str, /, *, ambiguous_as_wide: bool = False) -> list[int]:
     [1, 2, 3]
     >>> tt_text_extents('あいう')
     [2, 4, 6]
-    >>> tt_text_extents('𩸽') # test a code point out of BMP
+    >>> tt_text_extents('𩸽')    # test a code point out of BMP
     [2]
 
     Calling with an empty string will return an empty list:
@@ -440,7 +392,7 @@ def tt_wrap(
     ||dog.
     """
     formatter = TTFormatter(
-        wrap_width=wrap_width,
+        width=wrap_width,
         tab_width=tab_width,
         tab_char=tab_char,
         ambiguous_as_wide=ambiguous_as_wide,
