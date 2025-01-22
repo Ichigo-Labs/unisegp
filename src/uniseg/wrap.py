@@ -413,6 +413,10 @@ def tt_wrap(
     A+++++++quick+++brown fox
     jumped++over++++the lazy dog.
 
+    (We use `s.rstrip()` for every line because trailing spaces will be
+    removed in the docstring here while every wrapped line returned may
+    keep them.)
+
     An option for treating code points of which East_Asian_Width propertiy is
     'A' (ambiguous):
 
