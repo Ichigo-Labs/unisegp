@@ -183,7 +183,7 @@ def grapheme_cluster_boundaries(
 
 
 def grapheme_clusters(
-        s: str, /, tailor: Optional[TailorBreakables] = None
+    s: str, /, tailor: Optional[TailorBreakables] = None
 ) -> Iterator[str]:
     R"""Iterate every grapheme cluster token of `s`.
 
