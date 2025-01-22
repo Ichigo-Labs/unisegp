@@ -1,10 +1,10 @@
 """Wrap text based on Unicode line breaking algorithm."""
 
-import re
 from collections.abc import Iterator, Sequence
+from sys import stderr
 from typing import Literal, Optional, Protocol
 
-from uniseg.breaking import TailorFunc
+from uniseg.breaking import Breakables, TailorBreakables, tailor_none
 from uniseg.graphemecluster import grapheme_cluster_boundaries, grapheme_clusters
 from uniseg.linebreak import line_break_boundaries
 from uniseg.unicodedata_ import EA, east_asian_width_
@@ -21,23 +21,21 @@ __all__ = [
 
 
 class Formatter(Protocol):
-    """Abstruct base class for formatters invoked by a :class:`Wrapper` object.
+    """Protocol methods and properties for formatters invoked by the
+    :class:`Wrapper` instance.
 
-    This class is implemented only for convinience sake and does nothing
-    itself.  You don't have to design your own formatter as a subclass of it,
-    while it is not deprecated either.
-
-    **Your formatters should have the methods and properties this class has.**
-    They are invoked by a :class:`Wrapper` object to determin *logical widths*
-    of texts and to give you the ways to handle them, such as to render them.
+    Your formatter should have the same methods and properties this class has.
+    They are invoked by the :class:`Wrapper` instance to determin logical
+    widths of texts and to give you the ways to handle them, such as to render
+    them.
     """
 
     @property
     def wrap_width(self) -> Optional[int]:
         """Logical width of text wrapping.
 
-        Note that returning ``None`` (which is the default) means *"do not
-        wrap"* while returning ``0`` means *"wrap as narrowly as possible."*
+        Note that returning ``None`` (which is the default) means "do not
+        wrap" while returning ``0`` means "wrap as narrowly as possible."
         """
         ...
 
@@ -45,8 +43,9 @@ class Formatter(Protocol):
     def tab_width(self) -> int:
         """Logical width of tab forwarding.
 
-        This property value is used by a :class:`Wrapper` object to determin
-        the actual forwarding extents of tabs in each of the positions.
+        This property value is used by the :class:`Wrapper` instance to
+        determin the actual forwarding extents of tabs in each of the
+        positions.
         """
         ...
 
@@ -56,20 +55,18 @@ class Formatter(Protocol):
 
     def text_extents(self, s: str, /) -> list[int]:
         """Return a list of logical lengths from start of the string to each of
-        characters in `s`.
+        code point in `s`.
         """
         ...
 
     def handle_text(self, text: str, extents: list[int], /) -> None:
-        """Handler method which is invoked when `text` should be put on the
-        current position with `extents`.
+        """Handler method which is invoked when the `text` should be put on the
+        current position and `extents`.
         """
         ...
 
     def handle_new_line(self) -> None:
-        """Handler method which is invoked when the current line is over and a
-        new line begins.
-        """
+        """Handler method which is invoked when a new line begins."""
         ...
 
 
@@ -84,12 +81,12 @@ class Wrapper:
         self,
         formatter: Formatter,
         s: str,
-        cur: int = 0,
-        offset: int = 0,
         /,
+        cur: int = 0,
+        _offset: int = 0,
         *,
         char_wrap: bool = False,
-        tailor: Optional[TailorFunc] = None,
+        tailor: Optional[TailorBreakables] = None,
     ) -> int:
         """Wrap string `s` with `formatter` and invoke its handlers.
 
@@ -103,51 +100,77 @@ class Wrapper:
         This may be helpful when you don't want the word wrapping feature in
         your application.
 
-        This function returns the total count of wrapped lines.
+        The method returns the total count of wrapped lines.
         """
-        partial_extents = self._partial_extents
-        if char_wrap:
-            iter_boundaries = grapheme_cluster_boundaries
-        else:
-            iter_boundaries = line_break_boundaries
+        _expand_tabs = self.__class__._expand_tabs
+        _wrap_width = formatter.wrap_width
+        _get_text_extents = formatter.text_extents
 
+        _iter_boundaries = (
+            self.__class__._grapheme_cluster_boundaries if char_wrap
+            else line_break_boundaries
+        )
         iline = 0
         for para in s.splitlines(True):
-            for field in re.split('(\\t)', para):
-                if field == '\t':
-                    tw = formatter.tab_width
-                    field_extents = [tw - (offset + cur) % tw]
+            while para:
+                formatter.handle_new_line()
+                iline += 1
+                text_extents = _expand_tabs(
+                    para, _get_text_extents(para), formatter.tab_width,
+                )
+                i_boundary_start = 0
+                for i_boundary_end in _iter_boundaries(para, tailor=tailor):
+                    extent = text_extents[i_boundary_end-1]
+                    if (
+                        _wrap_width is not None
+                        and extent > _wrap_width
+                        and i_boundary_start > 0
+                    ):
+                        # do wrap
+                        line = para[:i_boundary_start]
+                        para = para[i_boundary_start:]
+                        formatter.handle_text(line, text_extents[:i_boundary_start])
+                        break
+                    i_boundary_start = i_boundary_end
                 else:
-                    field_extents = formatter.text_extents(field)
-                prev_boundary = 0
-                prev_extent = 0
-                breakpoint = 0
-                for boundary in iter_boundaries(field, tailor=tailor):
-                    extent = field_extents[boundary-1]
-                    w = extent - prev_extent
-                    wrap_width = formatter.wrap_width
-                    if wrap_width is not None and cur + w > wrap_width:
-                        line = field[breakpoint:prev_boundary]
-                        line_extents = partial_extents(
-                            field_extents,
-                            breakpoint,
-                            prev_boundary
-                        )
-                        formatter.handle_text(line, line_extents)
-                        formatter.handle_new_line()
-                        iline += 1
-                        cur = 0
-                        breakpoint = prev_boundary
-                    cur += w
-                    prev_boundary = boundary
-                    prev_extent = extent
-                line = field[breakpoint:]
-                line_extents = partial_extents(field_extents, breakpoint)
-                formatter.handle_text(line, line_extents)
-            formatter.handle_new_line()
-            iline += 1
-            cur = 0
+                    formatter.handle_text(para, text_extents)
+                    para = ""
         return iline
+
+    @staticmethod
+    def _expand_tabs(s: str, s_extents: list[int], tab_width: int, /) -> list[int]:
+        # expand tabs
+        _extents = []
+        _offset = 0
+        for c, extent in zip(s, s_extents):
+            extent += _offset
+            if c == '\t':
+                new_extent = ((extent + tab_width) // tab_width) * tab_width
+                print(f"{extent=}, {new_extent=}", file=stderr)
+                _offset += new_extent - extent
+                extent = new_extent
+            _extents.append(extent)
+        return _extents
+
+    @staticmethod
+    def _grapheme_cluster_boundaries(
+        s: str, /, tailor: Optional[TailorBreakables] = None
+    ) -> Iterator[int]:
+        """(internal) custom `grapheme_cluster_boundaries` function.
+
+        >>> list(grapheme_cluster_boundaries('A'))
+        [0, 1]
+        >>> list(Wrapper._grapheme_cluster_boundaries('A'))
+        [1]
+        """
+        _tailor = tailor if tailor else tailor_none
+
+        def wrapped_tailor(s: str, breakables: Breakables) -> Breakables:
+            return (
+                (0 if i == 0 else x) for i, x in enumerate(_tailor(s, breakables))
+            )
+
+        return grapheme_cluster_boundaries(s, wrapped_tailor)
 
     @staticmethod
     def _partial_extents(
@@ -156,8 +179,7 @@ class Wrapper:
         stop: Optional[int] = None,
         /,
     ) -> list[int]:
-        """(internal) return partial extents of `extents[start:end]` """
-
+        """(internal) return partial extents of `extents[start:end]`."""
         if stop is None:
             stop = len(extents)
         extent_offset = extents[start-1] if start > 0 else 0
@@ -171,19 +193,17 @@ _wrapper = Wrapper()
 def wrap(
     formatter: Formatter,
     s: str,
+    /,
     cur: int = 0,
     offset: int = 0,
-    /,
     *,
     char_wrap: bool = False,
-    tailor: Optional[TailorFunc] = None,
+    tailor: Optional[TailorBreakables] = None,
 ) -> int:
     """Wrap string `s` with `formatter` using the module's static
     :class:`Wrapper` instance
 
     See :meth:`Wrapper.wrap` for further details of the parameters.
-
-    - *Changed in version 0.7.1:* It returns the count of lines now.
     """
     return _wrapper.wrap(formatter, s, cur, offset, char_wrap=char_wrap, tailor=tailor)
 
@@ -201,7 +221,7 @@ class TTFormatter:
         tab_char: str = ' ',
         ambiguous_as_wide: bool = False,
     ) -> None:
-        self._lines = ['']
+        self._lines: list[str] = []
         self.wrap_width = wrap_width
         self.tab_width = tab_width
         self.ambiguous_as_wide = ambiguous_as_wide
@@ -252,8 +272,8 @@ class TTFormatter:
         del self._lines[:]
 
     def text_extents(self, s: str, /) -> list[int]:
-        """Return a list of logical lengths from start of the string to
-        each of characters in `s`.
+        """Return a list of logical lengths from the start of the string to the
+        end of each code point for `s`.
         """
         return tt_text_extents(s, ambiguous_as_wide=self.ambiguous_as_wide)
 
@@ -261,14 +281,16 @@ class TTFormatter:
         """Handler which is invoked when a text should be put on the current
         position.
         """
-        if text == '\t':
-            text = self.tab_char * extents[0]
-        self._lines[-1] += text
+        L = []
+        ex0 = 0
+        for c, ex in zip(text, extents):
+            if c == '\t':
+                c = self.tab_char * (ex - ex0)
+            L.append(c)
+            ex0 = ex
+        self._lines[-1] += ''.join(L)
 
     def handle_new_line(self) -> None:
-        """Handler which is invoked when the current line is over and a new
-        line begins.
-        """
         self._lines.append('')
 
     def lines(self) -> Iterator[str]:
@@ -315,11 +337,9 @@ def tt_width(
 
 
 def tt_text_extents(s: str, /, *, ambiguous_as_wide: bool = False) -> list[int]:
-    R"""Return a list of logical widths from the start of `s` to each of
-    characters *(not of code points)* on fixed-width typography
+    R"""Return a list of logical lengths from the start of the string to the
+    end of each code point for `s`.
 
-    >>> tt_text_extents('')
-    []
     >>> tt_text_extents('abc')
     [1, 2, 3]
     >>> tt_text_extents('あいう')
@@ -327,8 +347,13 @@ def tt_text_extents(s: str, /, *, ambiguous_as_wide: bool = False) -> list[int]:
     >>> tt_text_extents('𩸽') # test a code point out of BMP
     [2]
 
-    The meaning of `ambiguous_as_wide` is the same as that of
-    :func:`tt_width`:
+    Calling with an empty string will return an empty list:
+
+    >>> tt_text_extents('')
+    []
+
+    The meaning of `ambiguous_as_wide` is the same as that of :func:`tt_width`:
+
     >>> tt_text_extents('αβ')
     [1, 2]
     >>> tt_text_extents('αβ', ambiguous_as_wide=True)
@@ -344,8 +369,8 @@ def tt_text_extents(s: str, /, *, ambiguous_as_wide: bool = False) -> list[int]:
 
 def tt_wrap(
     s: str,
-    wrap_width: int,
     /,
+    wrap_width: int,
     *,
     tab_width: int = 8,
     tab_char: str = ' ',
@@ -353,12 +378,10 @@ def tt_wrap(
     cur: int = 0,
     offset: int = 0,
     char_wrap: bool = False,
-    tailor: Optional[TailorFunc] = None,
+    tailor: Optional[TailorBreakables] = None,
 ) -> Iterator[str]:
-    R"""Wrap `s` with given parameters and return a list of wrapped lines.
-
-    See :class:`TTFormatter` for `wrap_width`, `tab_width` and `tab_char`, and
-    :func:`tt_wrap` for `cur`, `offset` and `char_wrap`.
+    R"""Wrap string `s` based on fixed-width typography algorithm and return
+    a list of wrapped lines.
 
     >>> s1 = 'A quick brown fox jumped over the lazy dog.'
     >>> list(tt_wrap(s1, 24))
@@ -366,6 +389,12 @@ def tt_wrap(
     >>> s2 = '和歌は、人の心を種として、万の言の葉とぞなれりける。'
     >>> list(tt_wrap(s2, 24))
     ['和歌は、人の心を種とし', 'て、万の言の葉とぞなれり', 'ける。']
+
+    If `wrap_width` is less than the length of the word of the line, at least
+    one word will be remain as the part of the line:
+
+    >>> list(tt_wrap('supercalifragilisticexpialidocious', 24))
+    ['supercalifragilisticexpialidocious']
 
     Tab options:
 
