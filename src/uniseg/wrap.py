@@ -98,53 +98,52 @@ class Wrapper:
         The method returns the total count of wrapped lines.
         """
         _expand_tabs = self.__class__._expand_tabs
-        _width = formatter.wrap_width
+        _wrap_width = formatter.wrap_width
+        _tab_width = formatter.tab_width
         _get_text_extents = formatter.text_extents
         _iter_boundaries = (
-            grapheme_cluster_boundaries if char_wrap
-            else line_break_boundaries
+            grapheme_cluster_boundaries if char_wrap else line_break_boundaries
         )
         iline = 0
         start = offset + cur
         for para in s.splitlines(True):
-            while para:
+            while True:
                 formatter.handle_new_line()
                 iline += 1
-                text_extents = _expand_tabs(
-                    para, _get_text_extents(para), formatter.tab_width, start
-                )
+                extents = _get_text_extents(para)
+                extents = _expand_tabs(para, extents, _tab_width, start)
                 for end in _iter_boundaries(para, tailor=tailor):
-                    extent = text_extents[end-1]
-                    if _width is not None and _width < extent and 0 < start:
+                    extent = extents[end-1]
+                    if _wrap_width is not None and _wrap_width < extent and 0 < start:
                         # do wrap
                         line = para[:start]
                         para = para[start:]
-                        formatter.handle_text(line, text_extents[:start])
+                        formatter.handle_text(line, extents[:start])
                         start = offset
                         break
                     start = end
                 else:
-                    formatter.handle_text(para, text_extents)
+                    formatter.handle_text(para, extents)
                     start = offset
                     break
         return iline
 
     @staticmethod
     def _expand_tabs(
-        s: str, s_extents: list[int], tab_width: int, cur: int = 0, /
+        s: str, extents: list[int], /, tab_width: int, offset: int = 0
     ) -> list[int]:
         # expand tabs
-        _extents = []
-        _offset = 0
-        for c, extent in zip(s, s_extents):
-            extent += _offset
+        expanded_extens = []
+        gap = 0
+        for c, extent in zip(s, extents):
+            extent += gap
             if c == '\t':
-                tab_extent = ((cur + extent + tab_width) // tab_width) * tab_width
-                new_extent = tab_extent - cur
-                _offset += new_extent - extent
+                tab_extent = ((offset + extent + tab_width) // tab_width) * tab_width
+                new_extent = tab_extent - offset
+                gap += new_extent - extent
                 extent = new_extent
-            _extents.append(extent)
-        return _extents
+            expanded_extens.append(extent)
+        return expanded_extens
 
 
 # static objects
@@ -238,14 +237,15 @@ class TTFormatter:
         """Handler which is invoked when a text should be put on the current
         position.
         """
-        L = []
-        ex0 = 0
-        for c, ex in zip(text, extents):
+        chars: list[str] = []
+        prev_extent = 0
+        for c, extent in zip(text, extents):
             if c == '\t':
-                c = self.tab_char * (ex - ex0)
-            L.append(c)
-            ex0 = ex
-        self._lines[-1] += ''.join(L)
+                chars.append(self.tab_char * (extent - prev_extent))
+            else:
+                chars.append(c)
+            prev_extent = extent
+        self._lines[-1] += ''.join(chars)
 
     def handle_new_line(self) -> None:
         self._lines.append('')
