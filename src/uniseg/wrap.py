@@ -1,7 +1,6 @@
 """Wrap text based on Unicode line breaking algorithm."""
 
 from collections.abc import Iterator, Sequence
-from sys import stderr
 from typing import Literal, Optional, Protocol
 
 from uniseg.breaking import Breakables, TailorBreakables, tailor_none
@@ -83,7 +82,7 @@ class Wrapper:
         s: str,
         /,
         cur: int = 0,
-        _offset: int = 0,
+        offset: int = 0,
         *,
         char_wrap: bool = False,
         tailor: Optional[TailorBreakables] = None,
@@ -111,14 +110,14 @@ class Wrapper:
             else line_break_boundaries
         )
         iline = 0
+        i_boundary_start = offset + cur
         for para in s.splitlines(True):
             while para:
                 formatter.handle_new_line()
                 iline += 1
                 text_extents = _expand_tabs(
-                    para, _get_text_extents(para), formatter.tab_width,
+                    para, _get_text_extents(para), formatter.tab_width, i_boundary_start
                 )
-                i_boundary_start = 0
                 for i_boundary_end in _iter_boundaries(para, tailor=tailor):
                     extent = text_extents[i_boundary_end-1]
                     if (
@@ -130,23 +129,27 @@ class Wrapper:
                         line = para[:i_boundary_start]
                         para = para[i_boundary_start:]
                         formatter.handle_text(line, text_extents[:i_boundary_start])
+                        i_boundary_start = offset
                         break
                     i_boundary_start = i_boundary_end
                 else:
                     formatter.handle_text(para, text_extents)
                     para = ""
+                    i_boundary_start = offset
         return iline
 
     @staticmethod
-    def _expand_tabs(s: str, s_extents: list[int], tab_width: int, /) -> list[int]:
+    def _expand_tabs(
+        s: str, s_extents: list[int], tab_width: int, cur: int = 0, /
+    ) -> list[int]:
         # expand tabs
         _extents = []
         _offset = 0
         for c, extent in zip(s, s_extents):
             extent += _offset
             if c == '\t':
-                new_extent = ((extent + tab_width) // tab_width) * tab_width
-                print(f"{extent=}, {new_extent=}", file=stderr)
+                tab_extent = ((cur + extent + tab_width) // tab_width) * tab_width
+                new_extent = tab_extent - cur
                 _offset += new_extent - extent
                 extent = new_extent
             _extents.append(extent)
@@ -295,8 +298,6 @@ class TTFormatter:
 
     def lines(self) -> Iterator[str]:
         """Iterate every wrapped line strings."""
-        if not self._lines[-1]:
-            self._lines.pop()
         return iter(self._lines)
 
 
@@ -395,17 +396,20 @@ def tt_wrap(
 
     >>> list(tt_wrap('supercalifragilisticexpialidocious', 24))
     ['supercalifragilisticexpialidocious']
+    >>> list(tt_wrap('wrap supercalifragilisticexpialidocious long words', 24))
+    ['wrap ', 'supercalifragilisticexpialidocious ', 'long words']
 
     Tab options:
 
-    >>> s3 = 'A\tquick\tbrown fox\njumped\tover\tthe lazy dog.'
-    >>> print(''.join(tt_wrap(s3, 24)))
+    >>> s3 = 'A\tquick\tbrown fox jumped\tover\tthe lazy dog.'
+    >>> print('\n'.join(s.rstrip() for s in tt_wrap(s3, 32)))
     A       quick   brown fox
     jumped  over    the lazy dog.
-    >>> print(''.join(tt_wrap(s3, 24, tab_width=10)))
+    >>> print('\n'.join(s.rstrip() for s in tt_wrap(s3, 32, tab_width=10)))
     A         quick     brown fox
-    jumped    over      the lazy dog.
-    >>> print(''.join(tt_wrap(s3, 24, tab_char='+')))
+    jumped    over      the lazy
+    dog.
+    >>> print('\n'.join(s.rstrip() for s in tt_wrap(s3, 32, tab_char='+')))
     A+++++++quick+++brown fox
     jumped++over++++the lazy dog.
 
@@ -417,6 +421,19 @@ def tt_wrap(
     ['μῆνιν ἄειδε ', 'θεὰ Πηληϊάδεω ', 'Ἀχιλῆος']
     >>> list(tt_wrap(s4, 24, ambiguous_as_wide=False))
     ['μῆνιν ἄειδε θεὰ ', 'Πηληϊάδεω Ἀχιλῆος']
+
+    The `cur` option controls the indentation of the first line of the result:
+
+    >>> print('*** ' + '\n'.join(s.rstrip() for s in tt_wrap(s3, 32, cur=4)))
+    *** A   quick   brown fox
+    jumped  over    the lazy dog.
+
+    The `offset` affects indent level for every line:
+
+    >>> print('\n'.join(('||' + s.rstrip()) for s in tt_wrap(s3, 32, offset=2)))
+    ||A     quick   brown fox
+    ||jumped        over    the lazy
+    ||dog.
     """
     formatter = TTFormatter(
         wrap_width=wrap_width,
