@@ -1,3 +1,5 @@
+from uniseg.breaking import Breakables
+from uniseg.linebreak import LB, line_break
 from uniseg.wrap import tt_wrap
 
 
@@ -127,6 +129,34 @@ def test_tt_wrap_010() -> None:
     #   ||A     quick   brown fox
     #   ||jumped        over    the
     #   ||lazy dog.
+    assert expect == actual
+
+
+def test_tt_wrap_011() -> None:
+    actual = list(
+        tt_wrap('なんかシュッ、としたやつ', 12)
+    )
+    expect = [
+        'なんか',
+        'シュッ、とし',
+        'たやつ'
+    ]
+    assert expect == actual
+
+    def tailor(s: str, breakables: Breakables) -> Breakables:
+        return [
+            1 if line_break(c) == LB.CJ else b for c, b in zip(s, breakables)
+        ]
+
+    actual = list(
+        tt_wrap('なんかシュッ、としたやつ', 12, tailor=tailor)
+    )
+    expect = [
+        # ---------+--
+        'なんかシュ',
+        'ッ、としたや',
+        'つ'
+    ]
     assert expect == actual
 
 
