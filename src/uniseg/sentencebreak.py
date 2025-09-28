@@ -4,6 +4,8 @@
 <https://www.unicode.org/reports/tr29/tr29-45.html>`_
 """
 
+from __future__ import annotations
+
 from collections.abc import Iterator
 from typing import Optional
 
