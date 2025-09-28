@@ -1,9 +1,9 @@
 ======
-uniseg
+unisegp
 ======
 
 A Python package to determine Unicode text segmentations.
-
+Fork of uniseg.
 
 - `unisegp · PyPI <https://pypi.org/project/unisegp/>`_
 - `Ichigo-Labs / unisegp — GitHub <https://github.com/Ichigo-Labs/unisegp>`_
@@ -85,7 +85,7 @@ Supporting segmentations are:
 Requirements
 ============
 
-Python 3.9 or later.
+Python 3.8 or later.
 
 
 Install
@@ -93,7 +93,7 @@ Install
 
 .. code:: console
 
-  $ pip install uniseg
+  $ pip install unisegp
 
 
 Changes
