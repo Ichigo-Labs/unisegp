@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 dynamic = ["version"]
-name = "uniseg"
+name = "unisegp"
 dependencies = []
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 authors = [
     {name = "Masaaki Shibata", email = "mshibata@emptypage.jp"},
 ]
@@ -28,7 +28,7 @@ classifiers = [
 
 [project.urls]
 Documentation = "https://uniseg-py.readthedocs.io/"
-Repository = "https://bitbucket.org/emptypage/uniseg-py/"
+Repository = "https://github.com/Ichigo-Labs/unisegp"
 
 [tool.setuptools_scm]
 

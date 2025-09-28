@@ -1,5 +1,7 @@
 """Breakable table and string tokenization."""
 
+from __future__ import annotations
+
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from copy import copy
 from enum import Enum
@@ -52,7 +54,8 @@ class Run(Generic[T]):
         self._chars = list(text)
         self._attributes = [func(c) for c in text]
         self._skip_table = [1 for __ in text]
-        self._breakables = list[Optional[Breakable]](None for __ in text)
+        # Avoid parameterized built-in at runtime for Python 3.8
+        self._breakables = [None for __ in text]
         self._position = 0
         self._condition = bool(text)
 

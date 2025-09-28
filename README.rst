@@ -5,8 +5,8 @@ uniseg
 A Python package to determine Unicode text segmentations.
 
 
-- `uniseg · PyPI <https://pypi.org/project/uniseg/>`_
-- `emptypage / uniseg-py — Bitbucket <https://bitbucket.org/emptypage/uniseg-py/>`_
+- `unisegp · PyPI <https://pypi.org/project/unisegp/>`_
+- `Ichigo-Labs / unisegp — GitHub <https://github.com/Ichigo-Labs/unisegp>`_
 - `uniseg documentation — Read the Docs <https://uniseg-py.readthedocs.io/>`_
 
 
