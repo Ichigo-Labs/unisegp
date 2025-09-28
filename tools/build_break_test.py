@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Generate uniseg break test code."""
 
+from __future__ import annotations
+
 import re
 from argparse import ArgumentParser, FileType
 from textwrap import wrap

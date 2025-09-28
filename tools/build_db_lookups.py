@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import array
 import sys
 from argparse import ArgumentParser, FileType
@@ -92,8 +94,8 @@ def main() -> None:
     output: TextIO = args.output
     prop_args: list[PropArg] = args.files
 
-    names = list[str]()
-    db = [list[Optional[str]]() for cp in range(sys.maxunicode + 1)]
+    names = []
+    db = [[] for _ in range(sys.maxunicode + 1)]
     for prop_arg in prop_args:
         name = prop_arg.name
         stream = prop_arg.stream

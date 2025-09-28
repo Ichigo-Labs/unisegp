@@ -3,6 +3,8 @@
 The UCD files are published under <https://www.unicode.org/Public/>.
 """
 
+from __future__ import annotations
+
 import re
 from dataclasses import dataclass
 from typing import (Iterable, Iterator, NamedTuple, Optional, TextIO, Union,
