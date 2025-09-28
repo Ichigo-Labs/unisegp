@@ -2,10 +2,20 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Iterator
 from copy import copy
 from enum import Enum
-from typing import Any, Generic, Literal, Optional, TypeVar, Union
+from typing import (
+    Any,
+    Callable as TCallable,
+    Generic,
+    Iterable as TIterable,
+    Literal,
+    Optional,
+    Sequence as TSequence,
+    TypeVar,
+    Union,
+)
 
 __all__ = [
     'Breakable',
@@ -25,10 +35,10 @@ class Breakable(Enum):
         return bool(self.value)
 
 
-# type aliases for annotation
-Breakables = Iterable[Literal[0, 1]]
-TailorBreakables = Callable[[str, Breakables], Breakables]
-SkipTable = Sequence[Literal[0, 1]]
+# type aliases for annotation (must use typing generics for 3.8)
+Breakables = TIterable[Literal[0, 1]]
+TailorBreakables = TCallable[[str, Breakables], Breakables]
+SkipTable = TSequence[Literal[0, 1]]
 
 
 T = TypeVar('T')
